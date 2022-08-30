@@ -71,6 +71,12 @@ export const object = {
           default: "false",
           section: "X"
       },
+      x_rotation: {
+          type: "boolean",
+          label: "X Tick Rotation",
+          default: "false",
+          section: "X"
+      },
       show_yaxis_name: {
           type: "boolean",
           label: "Show Y-Axis Name",
@@ -109,7 +115,53 @@ export const object = {
           label: "Unpin Y-Axis from 0",
           default: "true",
           section: "Y"
-      }
+      },
+      margin_bottom: {
+        section: 'Margins',
+        order:1,
+        type: 'string',
+        display:'text',
+        label: 'Margin - bottom',
+        default: ''
+      },
+      margin_left: {
+        section: 'Margins',
+        order:4,
+        type: 'string',
+        display:'text',
+        label: 'Margin - left',
+        default: ''
+      },
+    //   label_bottom: {
+    //     section: 'Margins',
+    //     order:2,
+    //     type: 'string',
+    //     display:'text',
+    //     label: 'Label offset - bottom',
+    //     default: ''
+    //   },
+    //   label_left: {
+    //     section: 'Margins',
+    //     order:5,
+    //     type: 'string',
+    //     display:'text',
+    //     label: 'Label offset - left',
+    //     default: ''
+    //   },
+      wrap_bottom: {
+        section: 'Margins',
+        order:3,
+        type: 'boolean',
+        label: 'Truncate x-axis labels',
+        default: "false"
+      },
+      wrap_left: {
+        section: 'Margins',
+        order:6,
+        type: 'boolean',
+        label: 'Truncate y-axis labels',
+        default: "false"
+      },
     },
     // Set up the initial state of the visualization
     create: function(element, config) {
@@ -218,6 +270,19 @@ export const object = {
   
           return sorted[middle];
       }
+
+      function wrap() {
+        const this_width = 100
+        const this_padding = 5
+        var self = d3.select(this),
+            textLength = self.node().getComputedTextLength(),
+            text = self.text();
+        while (textLength > (this_width - 2 * this_padding) && text.length > 0) {
+            text = text.slice(0, -1);
+            self.text(text + '...');
+            textLength = self.node().getComputedTextLength();
+        }
+      } 
   
       try {
   
@@ -236,14 +301,24 @@ export const object = {
               bottom_margin = 30
           }
   
-          const margin = {
+          let margin = {
               top: 10, 
               right: 10, 
               bottom: bottom_margin, 
               left: left_margin
           };
+
+          if (config.margin_bottom.length > 0) {
+              margin.bottom = +config.margin_bottom
+          }
+
+          if (config.margin_left.length > 0) {
+              margin.left = +config.margin_left
+          }
   
           console.log("margin", margin)
+
+          console.log("element", element)
   
           const width = element.clientWidth - margin.left - margin.right;
           const height = element.clientHeight - margin.top - margin.bottom; 
@@ -456,10 +531,22 @@ export const object = {
                   .style("transform", `translateY(${height}px)`)
                   .attr("class", "x-axis")
 
+          if (config.x_rotation == "true") {
+            xAxis.selectAll("text")
+                .attr("transform", "rotate(-35)")
+                .style("text-anchor", "end")
+                .attr("dx", "-.8em")
+                .attr("dy", ".15em")
+          }
+
+          if (config.wrap_bottom == "true") {
+              xAxis.selectAll("text").each(wrap)
+          }
+
           if (config.xticklabels_show == "false") {
             d3.selectAll(".x-axis text")
                 .attr("class", "hide")
-        }
+        } 
 
           if (config.x_gridlines == "false") {
             d3.selectAll(".x-axis line")
@@ -493,6 +580,10 @@ export const object = {
           const yAxis = group.append("g")
               .call(yAxisGenerator)
               .attr("class", "y-axis")
+
+          if (config.wrap_left == "true") {
+              yAxis.selectAll("text").each(wrap)
+          }
 
           if (config.yticklabels_show == "false") {
             d3.selectAll(".y-axis text")
@@ -534,6 +625,8 @@ export const object = {
                     }
                 })
           }
+
+          
   
           // -------------------------------------------------------
           // DRAW DATA

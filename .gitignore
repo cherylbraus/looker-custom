@@ -4,3 +4,6 @@ node_modules
 .DS_Store
 .vscode
 yarn-error.log
+dist/template.js
+webpack.config.js
+
