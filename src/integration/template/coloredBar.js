@@ -678,7 +678,7 @@ export const object = {
                         .attr("fill-opacity", "0.3")
 
                     d3.selectAll(".front-bars-labels")
-                        .attr("fill-opacity", "0.1")
+                        .attr("fill-opacity", "1.0")
 
                     d3.selectAll(".back-bars-labels")
                         .attr("fill-opacity", "1.0")

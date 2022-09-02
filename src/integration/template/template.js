@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
-import { object } from './splitViolin'
+import { object } from './map'
 import * as $ from 'jquery'
 
 // Query the element
@@ -26,9 +26,9 @@ $("body").append(menuOptions)
 
 const keys = Object.keys(object.options)
 
-console.log("object.options", object.options)
-console.log("Object", Object.keys(object.options))
-console.log("keys", keys)
+// console.log("object.options", object.options)
+// console.log("Object", Object.keys(object.options))
+// console.log("keys", keys)
 
 keys.forEach(function(entry, i) {
 
@@ -71,10 +71,10 @@ keys.forEach(function(entry, i) {
 			let str;
 
 			if (ent == object.options[entry]["default"]) {
-				console.log("adding default")
+				// console.log("adding default")
 				str = "<input type='radio' internal_cat='" + keys[i] + "' internal_value='" + ent + "' id='" + keys[i] + "' name='" + array_name + "' value='" + ent + "' checked></input><label class='form-label' for ='" + ent + "'>" + ent + "</label>"
 			} else {
-				console.log("not default")
+				// console.log("not default")
 				str = "<input type='radio' internal_cat='" + keys[i] + "' internal_value='" + ent + "' id='" + keys[i] + "' name='" + array_name + "' value='" + ent + "'></input><label class='form-label' for ='" + ent + "'>" + ent + "</label>"
 			}
 			form.append(str)
@@ -82,12 +82,12 @@ keys.forEach(function(entry, i) {
 	} else if (object.options[entry].type == "array") {
 		const array_values = object.options[entry].default;
 
-		console.log("array_values", array_values)
+		// console.log("array_values", array_values)
 
 		array_values.forEach(function(ent) {
 			let str;
 
-			console.log("ent", ent)
+			// console.log("ent", ent)
 
 			if (ent == array_values[0]) {
 				str = "<input type='radio' internal_cat='" + keys[i] + "' internal_value='" + ent + "' id='" + ent + "' name='" + array_name + "' value='" + ent + "' checked></input><label class='form-label' for='" + ent + "'>" + ent + "</label>"
@@ -100,7 +100,7 @@ keys.forEach(function(entry, i) {
 })
 
 
-d3.json("http://localhost:3001/dataSplitViolinRegion").then(function(data) {
+d3.json("http://localhost:3001/dataGeo").then(function(data) {
 	let todays_options = {}
 
 	$('input:radio:checked').each(function() {
