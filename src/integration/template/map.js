@@ -1,4 +1,4 @@
-import { isWhiteSpaceLike } from "typescript";
+import { createIntersectionTypeNode, isWhiteSpaceLike } from "typescript";
 
 export const object = {
     id: "mapTest",
@@ -110,10 +110,10 @@ export const object = {
     try {
 
         let margin = {
-            top: 0,
-            right: 0,
-            bottom: 0,
-            left: 0,
+            top: 10,
+            right: 10,
+            bottom: 10,
+            left: 10,
         }
 
         const width = element.clientWidth - margin.left - margin.right;
@@ -155,7 +155,14 @@ export const object = {
             data_ready.push(entry)
         })
 
-        console.log("data_ready", data_ready)
+        const coordAccessor = d => d.coords;
+        const measureAccessor = d => +d.measure;
+        const lonAccessor = d => +d.lon;
+        const latAccessor = d => +d.lat;
+        const marketAccessor = d => d.market;
+        const regionAccessor = d => d.region;
+
+        // console.log("data_ready", data_ready)
 
         // try sometime...
         // d3.scaleSequentialQuantile()
@@ -164,97 +171,189 @@ export const object = {
 
         d3.json('./dataState.json').then(function(mdata) { 
             console.log("map", mdata)
-            console.log("data", data)
+            console.log("data_ready", data_ready)
 
             // grab info from original, looker dataset
-            let coords = []
+            // let coords = []
 
-            // console.log("dimensions", dimensions[2])
-            data_ready.forEach((d, index) => {
-                coords.push(d['coords'])
-            })
+            // // console.log("dimensions", dimensions[2])
+            // data_ready.forEach((d, index) => {
+            //     coords.push(d['coords'])
+            // })
 
-            console.log("coords", coords)
+            // console.log("coords", coords)
 
 
             // set-up the map and import the state geometries data
-            let scale = Math.min(width/Math.PI*5, height/Math.PI*5)
-            console.log("scale", scale)
             
+            // NEED THIS SECTION FOR EXAMPLES 1-3 (EVERYTHING EXCEPT HEXGRID) ---------------
+
+            // let scale = Math.min(width/Math.PI*5, height/Math.PI*5)
+            
+            // const projection = d3.geoAlbersUsa()
+            //     // .scale(1000)
+            //     .scale(scale)
+            //     .translate([width/2, height/2])
+
+            // const path = d3.geoPath()
+            //     .projection(projection)
+
+
+            // const state = group
+            //     .append('g')
+            //     .attr("stroke", "#fff")
+            //     .attr("stroke-width", 2)
+            //     .attr("fill", "#ededed")
+            //     .selectAll("path")
+            //     .data(topojson.feature(mdata, mdata.objects.states).features)
+            //     .enter()
+            //     .append("path")
+            //     .attr("d", path) 
+
+            // NEED ABOVE SECTION FOR EXAMPLES 1-3 (EVERYTHING EXCEPT HEXGRID) ---------------
+            
+            // ---------------------------------------------------------------------
+            // 1. Data Points
+            // add circles for the individual points
+
+            // const points = group
+            //     .append('g')
+            //     .selectAll("circle")
+            //         .data(data_ready)
+            //         .enter()
+            //         .append("circle")
+            //         .attr("cx", d => projection([d['lon'], d['lat']])[0])
+            //         .attr("cy", d => projection([d['lon'], d['lat']])[1])
+            //         .attr("r", () => {
+            //             if (scale < 500) {
+            //                 return 2
+            //             } else if (scale < 750) {
+            //                 return 3
+            //             } else if (scale < 1250) {
+            //                 return 4
+            //             } else {
+            //                 return 5
+            //             }
+            //         })
+            //         .attr("fill", "steelblue")
+
+        
+            // ---------------------------------------------------------------------
+            // 2. Spikes            
+
+            // const maxLength = 200;
+            // const length = d3.scaleLinear(d3.extent(data_ready, d => d['measure']), [0, maxLength])
+            // const spike = (length, width = 7) => `M${-width / 2},0L0,${-length}L${width / 2},0`
+            // const spikeColor = "steelblue"
+
+            // const spikes = group    
+            //     .append('g')
+            //         .attr("fill", spikeColor)
+            //         .attr("fill-opacity", 0.3)
+            //         .attr("stroke", spikeColor)
+            //         .attr("stroke-width", 2)
+            //         .attr("stroke-opacity", 0.8)
+            //     .selectAll("path")
+            //     .data(data_ready)
+            //     .join("path")
+            //         .attr("transform", d => `translate(${projection(d['coords'].reverse())})`)
+            //         .attr("d", d => spike(length(measureAccessor(d))))
+
+
+            // console.log("ticks", length.ticks(4).slice(1))
+
+            // const legend = svg.append("g")
+            //         .attr("class", "legend")
+            //         .attr("fill", "#777")
+            //         .attr("text-anchor", "middle")
+            //         .attr("font-size", 10)
+            //     .selectAll("g")
+            //         .data(length.ticks(4).reverse())
+            //     .enter()
+            //     .append("g")
+            //         .attr("transform", (d, i) => `translate(${width - 20 - i * 24}, ${height - 20})`)
+
+            // legend.append("path")
+            //     .attr("fill", spikeColor)
+            //     .attr("fill-opacity", 0.3)
+            //     .attr("stroke", spikeColor)
+            //     .attr("d", d => spike(length(d)))
+
+            // legend.append("text")
+            //     .attr("dy", "1.3em")
+            //     .text(length.tickFormat(4, "s"))
+
+
+            // ---------------------------------------------------------------------
+            // 3. HexBin Map
+            
+            // const hexbin = d3.hexbin(0).extent([[0,0], [width, height]]).radius(10) // creates a hexbin generator
+            
+            // // create other scales
+            // const radiusScale = d3.scaleSqrt([0, d3.max(data_ready, d => measureAccessor(d))], [0, hexbin.radius() * Math.SQRT2])
+            // // const colorScale = d3.scaleSequential(d3.extent(data_ready, d => regionAccessor(d)), d3.interpolateSpectral)
+            // const colorScale = d3.scaleOrdinal()
+            //     .domain(d => regionAccessor(d))
+            //     .range(d3.schemeDark2)
+
+            // console.log("color domain", colorScale.domain(), colorScale.domain)
+            // console.log("color range", colorScale.range(), colorScale.range)
+
+            // const hbins = group
+            //     .append('g')
+            //     .selectAll("path")
+            //     .data(data_ready)
+            //     .join("path")
+            //         .attr("transform", d => `translate(${projection(d['coords'].reverse())})`)
+            //         .attr("d", d => hexbin.hexagon(radiusScale(measureAccessor(d))))
+            //         .attr("fill", d => colorScale(regionAccessor(d)))
+            //         .attr("stroke", d => d3.lab(colorScale(regionAccessor(d))).darker())
+
+            // const legend = svg.append('g')
+
+
+            // ---------------------------------------------------------------------
+            // 4. HexGrid Map
+
             const projection = d3.geoAlbersUsa()
-                // .scale(1000)
-                .scale(scale)
-                .translate([width/2, height/2])
+                .fitSize([width, height], topojson.feature(mdata, mdata.objects.nation))
 
             const path = d3.geoPath()
                 .projection(projection)
 
-            // const usa = group
-            //     .append('g')
-            //     .append("path")
-            //     .datum(topojson.feature(mdata, mdata.objects.nation))
-            //     .attr("d", path) 
+            data_ready.forEach(d => {
+                const coords = projection([+d.lon, +d.lat])
+                d.x = coords[0]
+                d.y = coords[1]
+            })
 
-            const state = group
-                .append('g')
-                .attr("stroke", "#fff")
-                .attr("stroke-width", 2)
-                .attr("fill", "#ededed")
-                .selectAll("path")
-                .data(topojson.feature(mdata, mdata.objects.states).features)
+            const hexgrid = d3.hexgrid()
+                .extent([width, height])
+                .geography(topojson.feature(mdata, mdata.objects.nation))
+                .projection(projection)
+                .pathGenerator(path)
+                .hexRadius(5)
+
+            console.log("data_ready", data_ready)
+
+            const hex = hexgrid(data_ready)
+
+            console.log("grid", hex.grid)
+            console.log("pointdensity points", [...hex.grid.extentPointDensity].reverse())
+
+            const colorScale = d3.scaleSequential(d3.interpolateViridis)
+                .domain([...hex.grid.extentPointDensity].reverse())         
+
+            const grid = group.append('g')
+                .selectAll('.hex')
+                .data(hex.grid.layout)
                 .enter()
-                .append("path")
-                .attr("d", path) 
-            
-            // add circles for the individual points
-            const points = group
-                .append('g')
-                .selectAll("circle")
-                    .data(data_ready)
-                    .enter()
-                    .append("circle")
-                    .attr("cx", d => projection([d['lon'], d['lat']])[0])
-                    .attr("cy", d => projection([d['lon'], d['lat']])[1])
-                    .attr("r", () => {
-                        if (scale < 500) {
-                            return 2
-                        } else if (scale < 750) {
-                            return 3
-                        } else if (scale < 1250) {
-                            return 4
-                        } else {
-                            return 5
-                        }
-                    })
-                    .attr("fill", "steelblue")
-
-            legend
-            const maxLength = 200;
-            const length = d3.scaleLinear(d3.extent(data_ready, d => d['measure']), [0, maxLength])
-            const spike = (length, width = 7) => `M${-width / 2},0L0,${-length}L${width / 2},0`
-
-            console.log("ticks", length.ticks(4).slice(1))
-
-            const legend = svg.append("g")
-                    .attr("class", "legend")
-                    .attr("fill", "#777")
-                    .attr("text-anchor", "middle")
-                    .attr("font-size", 10)
-                .selectAll("g")
-                    .data(length.ticks(4).reverse())
-                .enter()
-                .append("g")
-                    .attr("transform", (d, i) => `translate(${width - 20 - i * 24}, ${height - 20})`)
-
-            legend.append("path")
-                .attr("fill", "red")
-                .attr("fill-opacity", 0.3)
-                .attr("stroke", "red")
-                .attr("d", d => spike(length(d)))
-
-            legend.append("text")
-                .attr("dy", "1.3em")
-                .text(length.tickFormat(4, "s"))
+                .append('path')
+                    .attr('class', 'hex')
+                    .attr('d', hex.hexagon())
+                    .attr('transform', d => `translate(${d.x}, ${d.y})`)
+                    .style('fill', d => !d.pointDensity ? '#fff' : colorScale(d.pointDensity))
+                    .style("stroke", "lightgrey")
 
         })
 
