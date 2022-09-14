@@ -329,10 +329,10 @@ export const object = {
                     dateAccessor(d) <= extent[1];
             }
 
-            result.forEach((d,i) => {
-                const bool = isInBrushExtent(d)
-                console.log("bool", bool, dateAccessor(d))
-            })
+            // result.forEach((d,i) => {
+            //     const bool = isInBrushExtent(d)
+            //     console.log("bool", bool, dateAccessor(d))
+            // })
 
             let extent = null;
             const dots = groupLine
