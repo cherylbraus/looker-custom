@@ -288,12 +288,25 @@ export const object = {
         function find_median(numbers) {
             const sorted = Array.from(numbers).sort((a, b) => a - b);
             const middle = Math.floor(sorted.length / 2);
+            const lowerQ = Math.floor(sorted.length / 4);
+            const upperQ = Math.floor(sorted.length * (3/4));
+  
+            let medianVal;
     
             if (sorted.length % 2 === 0) {
-                return (sorted[middle - 1] + sorted[middle]) / 2;
+                medianVal = (sorted[middle - 1] + sorted[middle]) / 2;
+              //   return (sorted[middle - 1] + sorted[middle]) / 2;
+            } else {
+                medianVal = sorted[middle]
+            }
+  
+            const quartiles = {
+                lower: sorted[lowerQ],
+                median: medianVal,
+                upper: sorted[upperQ]
             }
     
-            return sorted[middle];
+            return quartiles;
         }
 
         function wrap() {
@@ -605,12 +618,15 @@ export const object = {
                     if (longest > maxDepth) {maxDepth = longest}
 
                     const flat = v.value.flat()
+                    const quartileVals = find_median(flat)
 
                     v["mean"] = flat.reduce((acc, c) => {
                         return acc + c;
                     }, 0) / flat.length;
 
-                    v["median"] = find_median(flat)
+                    v["median"] = quartileVals["median"]
+                    v["lower"] = quartileVals["lower"]
+                    v["upper"] = quartileVals["upper"]
                     v["none"] = 0
                 })
             })
@@ -834,7 +850,7 @@ export const object = {
                             return yScale(d.values[0][config.statistics])
                         })
                         .attr("width", xScale.bandwidth()/3)
-                        .attr("height", 1.75)
+                        .attr("height", 2)
                         .attr("stroke", d => {
                             if (config.statistics == "none") {
                                 return "none"
@@ -866,7 +882,7 @@ export const object = {
                             return yScale(d.values[1][config.statistics])
                         })
                         .attr("width", xScale.bandwidth()/3)
-                        .attr("height", 1.75)
+                        .attr("height", 2)
                         .attr("stroke", d => {
                             if (config.statistics == "none") {
                                 return "none"
@@ -883,6 +899,92 @@ export const object = {
                             }
                         })
                         .attr("clip-path", "url(#plot-area)")
+            
+            if (config.statistics === "median") {
+                const leftLowerQuartileMarker = group.selectAll(".left-lower-quartile")
+                    .data(groupBins)
+                    .enter()
+                    .append('g')
+                        .attr("transform", function(d) {
+                            return (`translate(${xScale(d.key)}, 0)`)
+                        })
+                        .attr("class", "left-lower-quartile")
+                        .append("line")
+                            .attr("x1", xScale.bandwidth()/6)
+                            .attr("x2", xScale.bandwidth()/2)
+                            .attr("y1", d => {
+                                return yScale(d.values[0]["lower"])
+                            })
+                            .attr("y2", d => {
+                                return yScale(d.values[0]["lower"])
+                            })
+                            .attr("stroke-dasharray", ("5,3"))
+                            .attr("stroke-width", 1.)
+                            .attr("stroke", "#8c8c8c")
+
+                const rightLowerQuartileMarker = group.selectAll(".right-lower-quartile")
+                    .data(groupBins)
+                    .enter()
+                    .append('g')
+                        .attr("transform", function(d) {
+                            return (`translate(${xScale(d.key)}, 0)`)
+                        })
+                        .attr("class", "right-lower-quartile")
+                        .append("line")
+                            .attr("x1", xScale.bandwidth()/2)
+                            .attr("x2", xScale.bandwidth()*(5/6))
+                            .attr("y1", d => {
+                                return yScale(d.values[1]["lower"])
+                            })
+                            .attr("y2", d => {
+                                return yScale(d.values[1]["lower"])
+                            })
+                            .attr("stroke-dasharray", ("5,3"))
+                            .attr("stroke-width", 1.)
+                            .attr("stroke", "#8c8c8c")
+
+                const leftUpperQuartileMarker = group.selectAll(".left-upper-quartile")
+                    .data(groupBins)
+                    .enter()
+                    .append('g')
+                        .attr("transform", function(d) {
+                            return (`translate(${xScale(d.key)}, 0)`)
+                        })
+                        .attr("class", "left-upper-quartile")
+                        .append("line")
+                            .attr("x1", xScale.bandwidth()/6)
+                            .attr("x2", xScale.bandwidth()/2)
+                            .attr("y1", d => {
+                                return yScale(d.values[0]["upper"])
+                            })
+                            .attr("y2", d => {
+                                return yScale(d.values[0]["upper"])
+                            })
+                            .attr("stroke-dasharray", ("5,3"))
+                            .attr("stroke-width", 1.)
+                            .attr("stroke", "#8c8c8c")
+        
+                const rightUpperQuartileMarker = group.selectAll(".right-upper-quartile")
+                    .data(groupBins)
+                    .enter()
+                    .append('g')
+                        .attr("transform", function(d) {
+                            return (`translate(${xScale(d.key)}, 0)`)
+                        })
+                        .attr("class", "right-upper-quartile")
+                        .append("line")
+                            .attr("x1", xScale.bandwidth()/2)
+                            .attr("x2", xScale.bandwidth()*(5/6))
+                            .attr("y1", d => {
+                                return yScale(d.values[1]["upper"])
+                            })
+                            .attr("y2", d => {
+                                return yScale(d.values[1]["upper"])
+                            })
+                            .attr("stroke-dasharray", ("5,3"))
+                            .attr("stroke-width", 1.)
+                            .attr("stroke", "#8c8c8c")
+            }
                     
 
             

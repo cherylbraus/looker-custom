@@ -263,12 +263,25 @@ export const object = {
       function find_median(numbers) {
           const sorted = Array.from(numbers).sort((a, b) => a - b);
           const middle = Math.floor(sorted.length / 2);
+          const lowerQ = Math.floor(sorted.length / 4);
+          const upperQ = Math.floor(sorted.length * (3/4));
+
+          let medianVal;
   
           if (sorted.length % 2 === 0) {
-              return (sorted[middle - 1] + sorted[middle]) / 2;
+              medianVal = (sorted[middle - 1] + sorted[middle]) / 2;
+            //   return (sorted[middle - 1] + sorted[middle]) / 2;
+          } else {
+              medianVal = sorted[middle]
+          }
+
+          const quartiles = {
+              lower: sorted[lowerQ],
+              median: medianVal,
+              upper: sorted[upperQ]
           }
   
-          return sorted[middle];
+          return quartiles;
       }
 
       function wrap() {
@@ -487,18 +500,23 @@ export const object = {
   
               const findLengthFrom = value.value
               const flat = value.value.flat()
+              const quartileVals = find_median(flat)
   
               value["mean"] = flat.reduce((acc, c) => {
                 return acc + c;
                 }, 0) / flat.length;
   
-              value["median"] = find_median(flat)
+              value["median"] = quartileVals["median"]
+              value["lower"] = quartileVals["lower"]
+              value["upper"] = quartileVals["upper"]
               value["none"] = 0
   
               const lengths = findLengthFrom.map(function(a) {return a.length})
               const longest = d3.max(lengths)
               if (longest > maxNum) {maxNum = longest}
           })
+
+          console.log("look at data", groupBins)
   
           // -------------------------------------------------------
           // SCALES AGAIN
@@ -715,6 +733,51 @@ export const object = {
                           }
                       })
                       .attr("clip-path", "url(#plot-area)")
+
+        if (config.statistics === "median") {
+            const lowerQuartileMarkers = group.selectAll(".lower-quartile")
+                .data(groupBins)
+                .enter()
+                .append("g")
+                    .attr("transform", function(d) {
+                        return (`translate(${xScale(d.key)}, 0)`)
+                    })
+                    .attr("class", "lower-quartile")
+                    .append("line")
+                        .attr("x1", xScale.bandwidth()/4)
+                        .attr("x2", xScale.bandwidth()*(3/4))
+                        .attr("y1", d => {
+                            return yScale(d["lower"])
+                        })
+                        .attr("y2", d => {
+                            return yScale(d["lower"])
+                        })
+                        .attr("stroke-dasharray", ("5,3"))
+                        .attr("stroke-width", 1.5)
+                        .attr("stroke", "#8c8c8c")
+
+            const upperQuartileMarkers = group.selectAll(".upper-quartile")
+                .data(groupBins)
+                .enter()
+                .append("g")
+                    .attr("transform", function(d) {
+                        return (`translate(${xScale(d.key)}, 0)`)
+                    })
+                    .attr("class", "upper-quartile")
+                    .append("line")
+                        .attr("x1", xScale.bandwidth()/4)
+                        .attr("x2", xScale.bandwidth()*(3/4))
+                        .attr("y1", d => {
+                            return yScale(d["upper"])
+                        })
+                        .attr("y2", d => {
+                            return yScale(d["upper"])
+                        })
+                        .attr("stroke-dasharray", ("5,3"))
+                        .attr("stroke-width", 1.5)
+                        .attr("stroke", "#8c8c8c")
+
+        }
                       
   
       } catch(error) {

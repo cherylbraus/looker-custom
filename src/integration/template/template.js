@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
-import { object } from './divergingBar'
+import { object } from './splitViolin'
 import * as $ from 'jquery'
 
 // Query the element
@@ -100,7 +100,7 @@ keys.forEach(function(entry, i) {
 })
 
 
-d3.json("http://localhost:3001/dataDivergingBar").then(function(data) {
+d3.json("http://localhost:3001/dataSplitViolin").then(function(data) {
 	let todays_options = {}
 
 	$('input:radio:checked').each(function() {

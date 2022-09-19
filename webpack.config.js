@@ -8,7 +8,7 @@ var webpackConfig = {
     // cleveland: './src/integration/cleveland/cleveland.js',
     // groupedStackedAB: './src/integration/groupedStackedAB/groupedStackedAB.js',
     // groupedStacked: './src/integration/groupedStacked/groupedStacked.js',
-    violin: './src/integration/violin/violin.js',
+    // violin: './src/integration/violin/violin.js',
     // test: './src/integration/test/test.js',
     // splitViolin: './src/integration/splitViolin/splitViolin.js',
     // coloredBars: './src/integration/coloredBars/coloredBars.js',
@@ -30,7 +30,7 @@ var webpackConfig = {
     // sparklines: './src/integration/sparklines/sparklines.js',
     // fever: './src/integration/fever/fever.js',
     // coloredBar: './src/integration/coloredBar/coloredBar.js',
-    // template: './src/integration/template/template.js',
+    template: './src/integration/template/template.js',
   },
   output: {
     filename: "[name].js",
