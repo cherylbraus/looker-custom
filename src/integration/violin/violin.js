@@ -317,7 +317,7 @@ looker.plugins.visualizations.add({
       }
 
       this.trigger('registerOptions', options)
-  
+      
       try {
   
           let left_margin;
