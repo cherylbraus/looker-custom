@@ -23,6 +23,7 @@ looker.plugins.visualizations.add({
         ],
         default: "15",
         section: "Custom Options",
+        order: 1,
       },
       statistics: {
         type: 'string',
@@ -35,90 +36,105 @@ looker.plugins.visualizations.add({
         ],
         default: "mean",
         section: "Custom Options",
+        order: 2,
       },
       colors: {
           type: "array",
           label: "Violin Color",
           default: ["#27566b"],
+        //   default: ["#27566b", "#8cbb61", "#007b82", "#f1cc56", "#339f7b", "#d3d3d3"],
           display: "color",
-          section: "Custom Options"
+          section: "Custom Options",
+          order: 3,
       },
       show_xaxis_name: {
           type: "boolean",
           label: "Show X-Axis Name",
           default: true,
-          section: "X"
+          section: "X",
+          order: 3,
       },
       xaxis_label: {
           type: "string",
           label: "X-Axis Label",
           display: "text",
           default: "",
-          section: "X"
+          section: "X",
+          order: 6,
       },
       xticklabels_show: {
           type: "boolean",
           label: "Show X Tick Labels",
           default: true,
-          section: "X"
+          section: "X",
+          order: 2,
       },
       xticklabel_format: {
           type: "string",
           label: "X Tick Time Label Format",
           display: "text",
           default: "%b",
-          section: "X"
+          section: "X",
+          order: 5,
       },
       x_gridlines: {
           type: "boolean",
           label: "Show X Gridlines",
           default: false,
-          section: "X"
+          section: "X",
+          order: 1,
       },
       x_rotation: {
-          type: "boolean",
-          label: "X Tick Rotation",
-          default: false,
-          section: "X"
+        type: "boolean",
+        label: "X Tick Rotation",
+        default: false,
+        section: "X",
+        order: 4,
       },
       show_yaxis_name: {
           type: "boolean",
           label: "Show Y-Axis Name",
           default: true,
-          section: "Y"
+          section: "Y",
+          order: 3,
       },
       yaxis_label: {
           type: "string",
           label: "Y-Axis Label",
           display: "text",
           default: "",
-          section: "Y"
+          section: "Y",
+          order: 6,
       },
       yticklabels_show: {
           type: "boolean",
           label: "Show Y Tick Labels",
           default: true,
-          section: "Y"
+          section: "Y",
+          order: 2,
       },
       yticklabel_format: {
           type: "string",
           label: "Y Tick Value Format",
           display: "text",
-          default: ",.0f",
+          default: ",",
           placeholder: "#,###",
-          section: "Y"
+          section: "Y",
+          order: 5,
       },
       y_gridlines: {
           type: "boolean",
           label: "Show Y Gridlines",
           default: false,
-          section: "Y"
+          section: "Y",
+          order: 1,
       },
       unpin_y: {
           type: "boolean",
           label: "Unpin Y-Axis from 0",
           default: true,
-          section: "Y"
+          section: "Y",
+          order: 4,
       },
       margin_bottom: {
         section: 'Margins',
@@ -128,43 +144,27 @@ looker.plugins.visualizations.add({
         label: 'Margin - bottom',
         default: ''
       },
-    //   margin_left: {
-    //     section: 'Margins',
-    //     order:4,
-    //     type: 'string',
-    //     display:'text',
-    //     label: 'Margin - left',
-    //     default: ''
-    //   },
-    //   label_bottom: {
-    //     section: 'Margins',
-    //     order:2,
-    //     type: 'string',
-    //     display:'text',
-    //     label: 'Label offset - bottom',
-    //     default: ''
-    //   },
-    //   label_left: {
-    //     section: 'Margins',
-    //     order:5,
-    //     type: 'string',
-    //     display:'text',
-    //     label: 'Label offset - left',
-    //     default: ''
-    //   },
-      wrap_bottom: {
+      margin_left: {
         section: 'Margins',
         order:3,
+        type: 'string',
+        display:'text',
+        label: 'Margin - left',
+        default: ''
+      },
+      wrap_bottom: {
+        section: 'Margins',
+        order:2,
         type: 'boolean',
         label: 'Truncate x-axis labels',
-        default: false
+        default: false,
       },
       wrap_left: {
         section: 'Margins',
-        order:6,
+        order:4,
         type: 'boolean',
         label: 'Truncate y-axis labels',
-        default: false
+        default: false,
       },
     },
     // Set up the initial state of the visualization
@@ -172,8 +172,24 @@ looker.plugins.visualizations.add({
       // Insert a <style> tag with some styles we'll use later.
       element.innerHTML = `
         <style>
+            @font-face {
+                font-family: Roboto;
+                font-weight: 300;
+                font-style: normal;
+                src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');
+            }
+            @font-face { font-family: Roboto; font-weight: 400; font-style: normal;
+                src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');
+            }
+                @font-face { font-family: Roboto; font-weight: 500; font-style: normal;
+                src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');
+            }
+            @font-face { font-family: Roboto; font-weight: 700; font-style: normal;
+                src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');
+            }
+
           body {
-            font-family: Arial;
+            font-family: 'Roboto';
             font-size: 12px;
           }
 
@@ -209,12 +225,12 @@ looker.plugins.visualizations.add({
         .axis-label {
           fill: #3a4245;
           font-size: 12px;
-          font-family: 'sans-serif';
+          font-family: 'Roboto';
           text-anchor: middle;
         }
 
         .y-axis, .x-axis {
-          font-family: "sans-serif";
+          font-family: "Roboto";
         }
 
         .x-axis .domain {
@@ -286,7 +302,7 @@ looker.plugins.visualizations.add({
             self.text(text + '...');
             textLength = self.node().getComputedTextLength();
         }
-      } 
+      }
 
       const options = { ...this.options}
 
@@ -325,6 +341,8 @@ looker.plugins.visualizations.add({
   
           if (config.show_yaxis_name == true) {
               left_margin = 80
+          } else if (config.yticklabels_show == false) {
+              left_margin = 30
           } else {
               left_margin = 60
           }
@@ -342,17 +360,31 @@ looker.plugins.visualizations.add({
               left: left_margin
           };
 
-          if (config.margin_bottom.length > 0) {
-              margin.bottom = +config.margin_bottom
-          }
+        if (config.margin_bottom.length > 0) {
+            margin.bottom = +config.margin_bottom
+        }
 
-        //   if (config.margin_left.length > 0) {
-        //       margin.left = +config.margin_left
-        //   }
+        if (config.margin_left.length > 0) {
+            margin.left = +config.margin_left
+        }
   
           console.log("margin", margin)
-
-          console.log("element", element)
+  
+          const width = element.clientWidth - margin.left - margin.right;
+          const height = element.clientHeight - margin.top - margin.bottom; 
+      
+          const svg = (
+              d3.select(element).select('svg')
+                  .html('')
+                  .attr('width', '100%')
+                  .attr('height', '100%')
+              )
+  
+          const group = svg.append('g')
+              .attr('transform', `translate(${margin.left}, ${margin.top})`)
+              .attr('width', "100%")
+              .attr('height', (height + "px"))
+              .classed("group", true)
   
           // Get the shape of the data, this chart can take two dimensions or a pivot on the shorter dimension
           const dimensions = queryResponse.fields.dimension_like
@@ -366,7 +398,7 @@ looker.plugins.visualizations.add({
               day: "%Y-%m-%d",
               null: null
           }
-
+  
           let pivotSort;
           if (pivots[0].sorted.desc) {
               pivotSort = true
@@ -415,47 +447,23 @@ looker.plugins.visualizations.add({
                   
               });
 
-            if (pivotSort) {
-                data_ready.sort((a,b) => a.group - b.group)
-            } else if (pivotSort == false) {
-                data_ready.sort((a,b) => b.group - a.group)
+            // sorting the data based on how user sorted
+            if (pivots[0].time_interval) {
+                if (pivotSort) {
+                    data_ready.sort((a,b) => b.group - a.group)
+                } else if (pivotSort == false) {
+                    data_ready.sort((a,b) => a.group - b.group)
+                }
+            } else {
+                if (pivotSort) {
+                    data_ready.sort((a,b) => (b.group > a.group) ? 1 : ((a.group > b.group) ? -1: 0))
+                } else {
+                    data_ready.sort((a,b) => (a.group > b.group) ? 1 : ((b.group > a.group) ? -1: 0))
+                }
             }
+            
       
           console.log("data ready sorted", data_ready)
-
-          // ------------------------------------------------------------------
-
-          let yvalFormatted = 0;
-          data_ready.forEach((d,i) => {
-              const strLength = d3.format(config.yticklabel_format)(d["value"]).length;
-              if (strLength > yvalFormatted) {
-                  yvalFormatted = strLength
-              }
-          })
-          
-          if (config.show_yaxis_name == true) {
-              margin.left = 6 * yvalFormatted + 45
-          } else {
-              margin.left = 6 * yvalFormatted + 25
-          }
-          console.log("margin.left new", margin.left)
-
-
-          const width = element.clientWidth - margin.left - margin.right;
-          const height = element.clientHeight - margin.top - margin.bottom; 
-      
-          const svg = (
-              d3.select(element).select('svg')
-                  .html('')
-                  .attr('width', '100%')
-                  .attr('height', '100%')
-              )
-  
-          const group = svg.append('g')
-              .attr('transform', `translate(${margin.left}, ${margin.top})`)
-              .attr('width', "100%")
-              .attr('height', (height + "px"))
-              .classed("group", true)
   
   
           // Clear any errors from previous updates
@@ -523,8 +531,8 @@ looker.plugins.visualizations.add({
               const flat = value.value.flat()
   
               value["mean"] = flat.reduce((acc, c) => {
-                return acc + c;
-                }, 0) / flat.length;
+              return acc + c;
+              }, 0) / flat.length;
   
               value["median"] = find_median(flat)
               value["none"] = 0
@@ -557,12 +565,16 @@ looker.plugins.visualizations.add({
   
           // x ticklabels
           if (config.xticklabels_show == true) {
-              if (pivotDate) {
+            if (pivotDate) {
+                console.log("xticklabels & pivotDate is true", config.xticklabel_format)
                 xAxisGenerator
-                    .tickFormat(d3.timeFormat(config.xticklabel_format))
-              }
+                  .tickFormat(d3.timeFormat(config.xticklabel_format))
+            } else {
+                console.log("show xticklabels, but not dates")
+            }
           } else {
-              xAxisGenerator
+              console.log("don't show xticklabels")
+                xAxisGenerator
                   .tickFormat("")
           }
   
@@ -582,23 +594,24 @@ looker.plugins.visualizations.add({
               .call(xAxisGenerator)
                   .style("transform", `translateY(${height}px)`)
                   .attr("class", "x-axis")
+                  .style("font-family", "Roboto")
 
-          if (config.x_rotation == true) {
+        if (config.x_rotation == true) {
             xAxis.selectAll("text")
                 .attr("transform", "rotate(-35)")
                 .style("text-anchor", "end")
                 .attr("dx", "-.8em")
                 .attr("dy", ".15em")
-          }
+        }
 
-          if (config.wrap_bottom == true) {
-              xAxis.selectAll("text").each(wrap)
-          }
+        if (config.wrap_bottom == true) {
+            xAxis.selectAll("text").each(wrap)
+        }
 
           if (config.xticklabels_show == false) {
             d3.selectAll(".x-axis text")
                 .attr("class", "hide")
-        } 
+        }
 
           if (config.x_gridlines == false) {
             d3.selectAll(".x-axis line")
@@ -632,10 +645,11 @@ looker.plugins.visualizations.add({
           const yAxis = group.append("g")
               .call(yAxisGenerator)
               .attr("class", "y-axis")
+              .style("font-family", "Roboto")
 
-          if (config.wrap_left == true) {
-              yAxis.selectAll("text").each(wrap)
-          }
+        if (config.wrap_left == true) {
+            yAxis.selectAll("text").each(wrap)
+        }
 
           if (config.yticklabels_show == false) {
             d3.selectAll(".y-axis text")
@@ -646,12 +660,6 @@ looker.plugins.visualizations.add({
             d3.selectAll(".y-axis line")
                 .attr("class", "hide")
         }
-
-        const yLabels = yAxis.selectAll("text")
-        const maxTextWidth = d3.max(yLabels.nodes(), n => n.getComputedTextLength())
-        console.log("yLabels, length", yLabels, maxTextWidth)
-
-        // group.attr("transform", `translateX(${maxTextWidth})`)
   
               
           // AXIS LABELS
@@ -659,7 +667,7 @@ looker.plugins.visualizations.add({
               const xAxisLabel = xAxis.append("text")
                 .attr("class", "axis-label")
                 .attr("x", width/2)
-                .attr("y", (margin.bottom - 5))
+                .attr("y", (margin.bottom - 8))
                 .text(function() {
                     if (config.xaxis_label) {
                         return config.xaxis_label
@@ -683,8 +691,6 @@ looker.plugins.visualizations.add({
                     }
                 })
           }
-
-          
   
           // -------------------------------------------------------
           // DRAW DATA
@@ -734,18 +740,18 @@ looker.plugins.visualizations.add({
                       .attr("width", xScale.bandwidth()/2)
                       .attr("height", 1.75)
                       .attr("stroke", d => {
-                        if (config.statistics == "none") {
-                            return "none"
-                        } else {
-                            return "#c6cccf"
-                        }
+                          if (config.statistics == "none") {
+                              return "none"
+                          } else {
+                              return "#c6cccf"
+                          }
                       })
                       .attr("stroke-width", .75)
                       .attr("fill", d => {
                           if (config.statistics == "none") {
                               return "none"
                           } else {
-                              return "#8c8c8c"
+                              return "gray"
                           }
                       })
                       .attr("clip-path", "url(#plot-area)")

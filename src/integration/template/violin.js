@@ -100,7 +100,7 @@ export const object = {
           type: "string",
           label: "Y Tick Value Format",
           display: "text",
-          default: ",",
+          default: ",.0f",
           placeholder: "#,###",
           section: "Y"
       },
@@ -124,14 +124,14 @@ export const object = {
         label: 'Margin - bottom',
         default: ''
       },
-      margin_left: {
-        section: 'Margins',
-        order:4,
-        type: 'string',
-        display:'text',
-        label: 'Margin - left',
-        default: ''
-      },
+    //   margin_left: {
+    //     section: 'Margins',
+    //     order:4,
+    //     type: 'string',
+    //     display:'text',
+    //     label: 'Margin - left',
+    //     default: ''
+    //   },
     //   label_bottom: {
     //     section: 'Margins',
     //     order:2,
@@ -312,29 +312,13 @@ export const object = {
               margin.bottom = +config.margin_bottom
           }
 
-          if (config.margin_left.length > 0) {
-              margin.left = +config.margin_left
-          }
+        //   if (config.margin_left.length > 0) {
+        //       margin.left = +config.margin_left
+        //   }
   
           console.log("margin", margin)
 
           console.log("element", element)
-  
-          const width = element.clientWidth - margin.left - margin.right;
-          const height = element.clientHeight - margin.top - margin.bottom; 
-      
-          const svg = (
-              d3.select(element).select('svg')
-                  .html('')
-                  .attr('width', '100%')
-                  .attr('height', '100%')
-              )
-  
-          const group = svg.append('g')
-              .attr('transform', `translate(${margin.left}, ${margin.top})`)
-              .attr('width', "100%")
-              .attr('height', (height + "px"))
-              .classed("group", true)
   
           // Get the shape of the data, this chart can take two dimensions or a pivot on the shorter dimension
           const dimensions = queryResponse.fields.dimension_like
@@ -404,6 +388,40 @@ export const object = {
             }
       
           console.log("data ready sorted", data_ready)
+
+          // ------------------------------------------------------------------
+
+          let yvalFormatted = 0;
+          data_ready.forEach((d,i) => {
+              const strLength = d3.format(config.yticklabel_format)(d["value"]).length;
+              if (strLength > yvalFormatted) {
+                  yvalFormatted = strLength
+              }
+          })
+          
+          if (config.show_yaxis_name == "true") {
+              margin.left = 6 * yvalFormatted + 45
+          } else {
+              margin.left = 6 * yvalFormatted + 25
+          }
+          console.log("margin.left new", margin.left)
+
+
+          const width = element.clientWidth - margin.left - margin.right;
+          const height = element.clientHeight - margin.top - margin.bottom; 
+      
+          const svg = (
+              d3.select(element).select('svg')
+                  .html('')
+                  .attr('width', '100%')
+                  .attr('height', '100%')
+              )
+  
+          const group = svg.append('g')
+              .attr('transform', `translate(${margin.left}, ${margin.top})`)
+              .attr('width', "100%")
+              .attr('height', (height + "px"))
+              .classed("group", true)
   
   
           // Clear any errors from previous updates
@@ -594,6 +612,12 @@ export const object = {
             d3.selectAll(".y-axis line")
                 .attr("class", "hide")
         }
+
+        const yLabels = yAxis.selectAll("text")
+        const maxTextWidth = d3.max(yLabels.nodes(), n => n.getComputedTextLength())
+        console.log("yLabels, length", yLabels, maxTextWidth)
+
+        // group.attr("transform", `translateX(${maxTextWidth})`)
   
               
           // AXIS LABELS
@@ -601,7 +625,7 @@ export const object = {
               const xAxisLabel = xAxis.append("text")
                 .attr("class", "axis-label")
                 .attr("x", width/2)
-                .attr("y", (margin.bottom - 8))
+                .attr("y", (margin.bottom - 5))
                 .text(function() {
                     if (config.xaxis_label) {
                         return config.xaxis_label

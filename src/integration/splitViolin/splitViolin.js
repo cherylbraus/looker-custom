@@ -152,14 +152,14 @@ looker.plugins.visualizations.add({
             label: 'Margin - bottom',
             default: ''
         },
-        margin_left: {
-            section: 'Margins',
-            order:3,
-            type: 'string',
-            display:'text',
-            label: 'Margin - left',
-            default: ''
-        },
+        // margin_left: {
+        //     section: 'Margins',
+        //     order:3,
+        //     type: 'string',
+        //     display:'text',
+        //     label: 'Margin - left',
+        //     default: ''
+        // },
         wrap_bottom: {
             section: 'Margins',
             order:2,
@@ -371,28 +371,13 @@ looker.plugins.visualizations.add({
             margin.bottom = +config.margin_bottom
         }
 
-        if (config.margin_left.length > 0) {
-            margin.left = +config.margin_left
-        }
+        // if (config.margin_left.length > 0) {
+        //     margin.left = +config.margin_left
+        // }
   
         //   console.log("margin", margin)
   
-          const width = element.clientWidth - margin.left - margin.right;
-          const height = element.clientHeight - margin.top - margin.bottom; 
-      
-          const svg = (
-              d3.select(element).select('svg')
-                  .html('')
-                  .attr('width', '100%')
-                  .attr('height', '100%')
-              )
-  
-          const group = svg.append('g')
-              .attr('transform', `translate(${margin.left}, ${margin.top})`)
-              .attr('width', "100%")
-              .attr('height', (height + "px"))
-              .classed("group", true)
-
+         
             // require 2 pivots, 1 dimension, 1 measure
             const dimension = queryResponse.fields.dimension_like[0]
             const measure = queryResponse.fields.measure_like[0]
@@ -507,6 +492,39 @@ looker.plugins.visualizations.add({
             }
 
             console.log("data_ready", data_ready)
+
+            // ------------------------------------------------------------------
+            let yvalFormatted = 0;
+            data_ready.forEach((d,i) => {
+                const strLength = d3.format(config.yticklabel_format)(d["value"]).length;
+                if (strLength > yvalFormatted) {
+                    yvalFormatted = strLength
+                }
+            })
+
+            if (config.show_yaxis_name == true) {
+                margin.left = 6 * yvalFormatted + 65
+            } else {
+                margin.left = 6 * yvalFormatted + 45
+            }
+            console.log("margin.left new", margin.left)
+
+            const width = element.clientWidth - margin.left - margin.right;
+            const height = element.clientHeight - margin.top - margin.bottom; 
+        
+            const svg = (
+                d3.select(element).select('svg')
+                    .html('')
+                    .attr('width', '100%')
+                    .attr('height', '100%')
+                )
+    
+            const group = svg.append('g')
+                .attr('transform', `translate(${margin.left}, ${margin.top})`)
+                .attr('width', "100%")
+                .attr('height', (height + "px"))
+                .classed("group", true)
+  
 
 
             // DATA ANALYSIS

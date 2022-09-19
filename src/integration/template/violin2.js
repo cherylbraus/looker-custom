@@ -1,8 +1,4 @@
-import * as d3 from 'd3'
-import * as d3Collection from 'd3-collection'
-import { formatType, handleErrors } from '../common/utils'
-
-looker.plugins.visualizations.add({
+export const object = {
     // Id and Label are legacy properties that no longer have any function besides documenting
     // what the visualization used to have. The properties are now set via the manifest
     // form within the admin/visualizations page of Looker
@@ -46,7 +42,7 @@ looker.plugins.visualizations.add({
       show_xaxis_name: {
           type: "boolean",
           label: "Show X-Axis Name",
-          default: true,
+          default: "true",
           section: "X"
       },
       xaxis_label: {
@@ -59,7 +55,7 @@ looker.plugins.visualizations.add({
       xticklabels_show: {
           type: "boolean",
           label: "Show X Tick Labels",
-          default: true,
+          default: "true",
           section: "X"
       },
       xticklabel_format: {
@@ -72,19 +68,19 @@ looker.plugins.visualizations.add({
       x_gridlines: {
           type: "boolean",
           label: "Show X Gridlines",
-          default: false,
+          default: "false",
           section: "X"
       },
       x_rotation: {
           type: "boolean",
           label: "X Tick Rotation",
-          default: false,
+          default: "false",
           section: "X"
       },
       show_yaxis_name: {
           type: "boolean",
           label: "Show Y-Axis Name",
-          default: true,
+          default: "true",
           section: "Y"
       },
       yaxis_label: {
@@ -97,27 +93,27 @@ looker.plugins.visualizations.add({
       yticklabels_show: {
           type: "boolean",
           label: "Show Y Tick Labels",
-          default: true,
+          default: "true",
           section: "Y"
       },
       yticklabel_format: {
           type: "string",
           label: "Y Tick Value Format",
           display: "text",
-          default: ",.0f",
+          default: ",",
           placeholder: "#,###",
           section: "Y"
       },
       y_gridlines: {
           type: "boolean",
           label: "Show Y Gridlines",
-          default: false,
+          default: "false",
           section: "Y"
       },
       unpin_y: {
           type: "boolean",
           label: "Unpin Y-Axis from 0",
-          default: true,
+          default: "true",
           section: "Y"
       },
       margin_bottom: {
@@ -128,14 +124,14 @@ looker.plugins.visualizations.add({
         label: 'Margin - bottom',
         default: ''
       },
-    //   margin_left: {
-    //     section: 'Margins',
-    //     order:4,
-    //     type: 'string',
-    //     display:'text',
-    //     label: 'Margin - left',
-    //     default: ''
-    //   },
+      margin_left: {
+        section: 'Margins',
+        order:4,
+        type: 'string',
+        display:'text',
+        label: 'Margin - left',
+        default: ''
+      },
     //   label_bottom: {
     //     section: 'Margins',
     //     order:2,
@@ -157,14 +153,14 @@ looker.plugins.visualizations.add({
         order:3,
         type: 'boolean',
         label: 'Truncate x-axis labels',
-        default: false
+        default: "false"
       },
       wrap_left: {
         section: 'Margins',
         order:6,
         type: 'boolean',
         label: 'Truncate y-axis labels',
-        default: false
+        default: "false"
       },
     },
     // Set up the initial state of the visualization
@@ -287,49 +283,19 @@ looker.plugins.visualizations.add({
             textLength = self.node().getComputedTextLength();
         }
       } 
-
-      const options = { ...this.options}
-
-      if (config.show_xaxis_name) {
-          options.xaxis_label.hidden = false
-      } else {
-          options.xaxis_label.hidden = true
-      }
-
-      if (config.xticklabels_show) {
-          options.x_rotation.hidden = false
-          options.xticklabel_format.hidden = false
-      } else {
-          options.x_rotation.hidden = true
-          options.xticklabel_format.hidden = true
-      }
-
-      if (config.show_yaxis_name) {
-          options.yaxis_label.hidden = false
-      } else {
-          options.yaxis_label.hidden = true
-      }
-
-      if (config.yticklabels_show) {
-          options.yticklabel_format.hidden = false
-      } else {
-          options.yticklabel_format.hidden = true
-      }
-
-      this.trigger('registerOptions', options)
   
       try {
   
           let left_margin;
           let bottom_margin;
   
-          if (config.show_yaxis_name == true) {
+          if (config.show_yaxis_name == "true") {
               left_margin = 80
           } else {
               left_margin = 60
           }
   
-          if (config.show_xaxis_name == true) {
+          if (config.show_xaxis_name == "true") {
               bottom_margin = 50
           } else {
               bottom_margin = 30
@@ -346,13 +312,29 @@ looker.plugins.visualizations.add({
               margin.bottom = +config.margin_bottom
           }
 
-        //   if (config.margin_left.length > 0) {
-        //       margin.left = +config.margin_left
-        //   }
+          if (config.margin_left.length > 0) {
+              margin.left = +config.margin_left
+          }
   
           console.log("margin", margin)
 
           console.log("element", element)
+  
+          const width = element.clientWidth - margin.left - margin.right;
+          const height = element.clientHeight - margin.top - margin.bottom; 
+      
+          const svg = (
+              d3.select(element).select('svg')
+                  .html('')
+                  .attr('width', '100%')
+                  .attr('height', '100%')
+              )
+  
+          const group = svg.append('g')
+              .attr('transform', `translate(${margin.left}, ${margin.top})`)
+              .attr('width', "100%")
+              .attr('height', (height + "px"))
+              .classed("group", true)
   
           // Get the shape of the data, this chart can take two dimensions or a pivot on the shorter dimension
           const dimensions = queryResponse.fields.dimension_like
@@ -422,40 +404,6 @@ looker.plugins.visualizations.add({
             }
       
           console.log("data ready sorted", data_ready)
-
-          // ------------------------------------------------------------------
-
-          let yvalFormatted = 0;
-          data_ready.forEach((d,i) => {
-              const strLength = d3.format(config.yticklabel_format)(d["value"]).length;
-              if (strLength > yvalFormatted) {
-                  yvalFormatted = strLength
-              }
-          })
-          
-          if (config.show_yaxis_name == true) {
-              margin.left = 6 * yvalFormatted + 45
-          } else {
-              margin.left = 6 * yvalFormatted + 25
-          }
-          console.log("margin.left new", margin.left)
-
-
-          const width = element.clientWidth - margin.left - margin.right;
-          const height = element.clientHeight - margin.top - margin.bottom; 
-      
-          const svg = (
-              d3.select(element).select('svg')
-                  .html('')
-                  .attr('width', '100%')
-                  .attr('height', '100%')
-              )
-  
-          const group = svg.append('g')
-              .attr('transform', `translate(${margin.left}, ${margin.top})`)
-              .attr('width', "100%")
-              .attr('height', (height + "px"))
-              .classed("group", true)
   
   
           // Clear any errors from previous updates
@@ -536,7 +484,7 @@ looker.plugins.visualizations.add({
   
           // -------------------------------------------------------
           // SCALES AGAIN
-          if (config.unpin_y == true) {
+          if (config.unpin_y == "true") {
               yScale.domain([d3.min(data_ready, (d)=>{
                   return d.value
                   }),yMax])
@@ -556,7 +504,7 @@ looker.plugins.visualizations.add({
               .tickPadding(10)
   
           // x ticklabels
-          if (config.xticklabels_show == true) {
+          if (config.xticklabels_show == "true") {
               if (pivotDate) {
                 xAxisGenerator
                     .tickFormat(d3.timeFormat(config.xticklabel_format))
@@ -567,7 +515,7 @@ looker.plugins.visualizations.add({
           }
   
           // x gridlines
-          if (config.x_gridlines == true) {
+          if (config.x_gridlines == "true") {
               xAxisGenerator
                   .tickSizeInner(-height)
           } else {
@@ -583,7 +531,7 @@ looker.plugins.visualizations.add({
                   .style("transform", `translateY(${height}px)`)
                   .attr("class", "x-axis")
 
-          if (config.x_rotation == true) {
+          if (config.x_rotation == "true") {
             xAxis.selectAll("text")
                 .attr("transform", "rotate(-35)")
                 .style("text-anchor", "end")
@@ -591,16 +539,16 @@ looker.plugins.visualizations.add({
                 .attr("dy", ".15em")
           }
 
-          if (config.wrap_bottom == true) {
+          if (config.wrap_bottom == "true") {
               xAxis.selectAll("text").each(wrap)
           }
 
-          if (config.xticklabels_show == false) {
+          if (config.xticklabels_show == "false") {
             d3.selectAll(".x-axis text")
                 .attr("class", "hide")
         } 
 
-          if (config.x_gridlines == false) {
+          if (config.x_gridlines == "false") {
             d3.selectAll(".x-axis line")
                 .attr("class", "hide")
         }
@@ -612,7 +560,7 @@ looker.plugins.visualizations.add({
               .tickPadding(10)
   
           // y ticklabels
-          if (config.yticklabels_show == true) {
+          if (config.yticklabels_show == "true") {
               yAxisGenerator
                   .tickFormat(d3.format(config.yticklabel_format))
           } else {
@@ -621,7 +569,7 @@ looker.plugins.visualizations.add({
           }
   
           // y gridlines
-          if (config.y_gridlines == true) {
+          if (config.y_gridlines == "true") {
               yAxisGenerator  
                   .tickSize(-width)
           } else {
@@ -633,16 +581,16 @@ looker.plugins.visualizations.add({
               .call(yAxisGenerator)
               .attr("class", "y-axis")
 
-          if (config.wrap_left == true) {
+          if (config.wrap_left == "true") {
               yAxis.selectAll("text").each(wrap)
           }
 
-          if (config.yticklabels_show == false) {
+          if (config.yticklabels_show == "false") {
             d3.selectAll(".y-axis text")
                .attr("class", "hide")
        }
 
-          if (config.y_gridlines == false) {
+          if (config.y_gridlines == "false") {
             d3.selectAll(".y-axis line")
                 .attr("class", "hide")
         }
@@ -655,7 +603,7 @@ looker.plugins.visualizations.add({
   
               
           // AXIS LABELS
-          if (config.show_xaxis_name == true) {
+          if (config.show_xaxis_name == "true") {
               const xAxisLabel = xAxis.append("text")
                 .attr("class", "axis-label")
                 .attr("x", width/2)
@@ -669,7 +617,7 @@ looker.plugins.visualizations.add({
                  })
           }
   
-          if (config.show_yaxis_name == true) {
+          if (config.show_yaxis_name == "true") {
               const yAxisLabel = yAxis.append("text")
                 .attr("class", "axis-label")
                 .attr("x", (-height/2))
@@ -764,4 +712,4 @@ looker.plugins.visualizations.add({
       // Callback at the end of the rendering to let Looker know it's finished
       done()
     }
-  });
+  };
