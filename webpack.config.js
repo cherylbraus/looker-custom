@@ -41,12 +41,12 @@ var webpackConfig = {
   resolve: {
     extensions: [".ts", ".js"]
   },
-  // optimization: {
-  //   minimize: false
-  // },
-  plugins: [
-    new UglifyJSPlugin()
-  ],
+  optimization: {
+    minimize: false
+  },
+  // plugins: [
+  //   new UglifyJSPlugin()
+  // ],
   module: {
     rules: [
       { test: /\.js$/, loader: "babel-loader" },

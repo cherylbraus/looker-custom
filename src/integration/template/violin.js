@@ -195,9 +195,22 @@ export const object = {
           color: black;
         }
 
+        svg {
+            position: relative;
+        }
+
         .line {
           fill: none;
           stroke-width: 2px;
+          pointer-events: none;
+        }
+
+        .path {
+            pointer-events: none;
+        }
+
+        .listeners {
+            fill: transparent;
         }
 
         /* ---AXIS OPTIONS: START--- */
@@ -244,9 +257,32 @@ export const object = {
 
         /* ---AXIS OPTIONS: END--- */
 
+        .tooltip {
+            box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        .tooltip #tt-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: #c3c3c3;
+            text-transform: uppercase;
+        }
+
+        hr { 
+            margin-top: 1px; 
+            margin-bottom: 1px 
+        }
+
+        #tt-body {
+          margin-top: 5px;
+        }
+
         </style>
         <svg>
-        </svg>`;
+        </svg>
+        <div class="tooltip"></div>`;
       element.style.fontFamily = `"Open Sans", "Helvetica", sans-serif`
   
     },
@@ -324,6 +360,114 @@ export const object = {
           if (config.margin_bottom.length > 0) {
               margin.bottom = +config.margin_bottom
           }
+
+        // TOOLTIPS ---------------------------------------------------------------
+        // create tooltip
+        const tooltip = d3.select(".tooltip")
+            .style("position", "absolute")
+            .style("padding", "5px")
+            .style("background-color", "white")
+            .style("opacity", 0)
+            .style("border-radius", "4px")
+            .style("display", "block")
+            .style("border", "solid")
+            .style("border-color", "lightgrey")
+            .style("border-width", ".5px")
+
+        tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>')
+
+        const tooltipHeader = tooltip.select("#tt-header")
+        const tooltipBody = tooltip.select("#tt-body")
+
+        const mouseover = function(d) {
+            tooltip 
+                .transition()
+                .duration(0)
+                .style("opacity", 0.9)
+            d3.select(this)
+                .style("opacity", 1)
+
+            console.log("mouseover", d3.mouse(this))
+        }
+
+        const mousemove = function(d) {
+            // attempt 1
+            // let x;
+            // let y;
+
+            // if (d3.event.pageX < width * 0.5) {
+            //     x = `${d3.event.pageX}px`
+            // } else {
+            //     x = `calc(-100% + ${d3.event.pageX}px)`
+            // }
+
+            // if (d3.event.pageY < height * 0.7) {
+            //     y = `${d3.event.pageY}px`
+            // } else {
+            //     y = `calc(-50% + ${d3.event.pageY}px)`
+            // }
+
+            // tooltip.style("transform", `translate(`+ x + y + `)`)
+
+            // attempt 2
+            // const xPosition = d3.mouse(this)[0] - 15
+            // const yPosition = d3.mouse(this)[1] - 25
+            // tooltip.attr("transform", "translate(" + xPosition + "," + yPosition + ")")
+
+            // tooltip
+            //     .style("top", d3.event.pageY - 150 + "px")
+            //     .style("left", (d3.mouse(this)[0]) + "px")
+            //     .style("top", (d3.mouse(this)[1]) - 150 + "px")
+
+            if (d3.event.pageY < height*.7) {
+                console.log("here less")
+                tooltip
+                    .style("top", (d3.mouse(this)[1] - 10 + "px"))
+            } else {
+                tooltip
+                    .style("top", (d3.mouse(this)[1] - 100 + "px"))
+            }
+
+            if (d3.event.pageX < width*.5) {
+                tooltip
+                    .style("left", d3.event.pageX + 30 + "px") 
+            } else {
+                tooltip
+                    .style("left", d3.event.pageX - 150 + "px")
+            }
+
+            console.log("D", d, d3.mouse(this)[0], d3.mouse(this)[1], d3.event.pageX, d3.event.pageY)
+
+            // text in tooltip
+            let title;
+            if (pivotDate) {
+                title = d3.timeFormat(config.xticklabel_format)(new Date(d.key))
+            } else {
+                title = d.key
+            }
+
+            tooltipHeader.html(title + "<hr>")
+
+            tooltipBody.html('<span style="float:right;">Mean: ' + d3.format(config.yticklabel_format)(d.mean) + '</span>' + '<br>' + 
+            '<span style="float:right;">Median: ' + d3.format(config.yticklabel_format)(d.median) + '</span>' + '<br>' + 
+            '<span style="float:right;">Lower Q: ' + d3.format(config.yticklabel_format)(d.lower) + '</span>' + '<br>' + 
+            '<span style="float:right;">Upper Q: ' + d3.format(config.yticklabel_format)(d.upper) + '</span>')
+
+            console.log("mousemove", d3.mouse(this))
+        }
+
+        const mouseleave = function(d) {
+            tooltip    
+                .transition()
+                .duration(0)
+                .style("opacity", 0)
+            d3.select(this)
+                .style("opacity", 1)
+
+            console.log("mouseleave", d3.mouse(this))
+        }
+
+        // --------------------------------------------------------------------------
 
         //   if (config.margin_left.length > 0) {
         //       margin.left = +config.margin_left
@@ -478,7 +622,7 @@ export const object = {
               .value((d) => {
                   return d})
               .thresholds(+config.thresholds)
-          
+
           const groupBins = d3.nest()
               .key(function(d){
                   return d.group
@@ -691,6 +835,9 @@ export const object = {
                   })
                   .attr("class", "violin")
                       .style("fill", config.colors)
+                        .on("mouseover", mouseover)
+                        .on("mousemove", mousemove)
+                        .on("mouseleave", mouseleave)
               .append("path")
                   .datum(function(d) {
                           return (d.value)})
@@ -701,6 +848,7 @@ export const object = {
                       .y(function(d) {return yScale(d.x0)})
                       .curve(d3.curveCatmullRom))
                   .attr("clip-path", "url(#plot-area)")
+                    
               
           const stats_marker = group.selectAll(".rect")
               .data(groupBins)
@@ -778,6 +926,14 @@ export const object = {
                         .attr("stroke", "#8c8c8c")
 
         }
+
+        // interaction bars
+        const barRectListeners = group.selectAll(".listeners")
+            .data(groupBins)
+            .enter()
+            .append("rect")
+                .attr("class", "listeners")
+                .attr("x", d => xScale(d.x0))
                       
   
       } catch(error) {
