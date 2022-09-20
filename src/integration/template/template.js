@@ -100,7 +100,7 @@ keys.forEach(function(entry, i) {
 })
 
 
-d3.json("http://localhost:3001/dataSplitViolinRegion").then(function(data) {
+d3.json("http://localhost:3001/dataSplitViolin").then(function(data) {
 	let todays_options = {}
 
 	$('input:radio:checked').each(function() {

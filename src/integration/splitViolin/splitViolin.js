@@ -273,9 +273,32 @@ looker.plugins.visualizations.add({
 
             /* ---AXIS OPTIONS: END--- */
 
+            .tooltip {
+                box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;
+                font-size: 12px;
+                pointer-events: none;
+            }
+    
+            .tooltip #tt-header {
+                font-size: 12px;
+                font-weight: 600;
+                color: #c3c3c3;
+                text-transform: uppercase;
+            }
+    
+            hr { 
+                margin-top: 1px; 
+                margin-bottom: 1px 
+            }
+    
+            #tt-body {
+              margin-top: 5px;
+            }
+
             </style>
             <svg>
-            </svg>`;
+            </svg>
+            <div class="tooltip"></div>`;
         element.style.fontFamily = `"Open Sans", "Helvetica", "sans-serif"`
     },
 
@@ -292,12 +315,25 @@ looker.plugins.visualizations.add({
         function find_median(numbers) {
             const sorted = Array.from(numbers).sort((a, b) => a - b);
             const middle = Math.floor(sorted.length / 2);
+            const lowerQ = Math.floor(sorted.length / 4);
+            const upperQ = Math.floor(sorted.length * (3/4));
+  
+            let medianVal;
     
             if (sorted.length % 2 === 0) {
-                return (sorted[middle - 1] + sorted[middle]) / 2;
+                medianVal = (sorted[middle - 1] + sorted[middle]) / 2;
+              //   return (sorted[middle - 1] + sorted[middle]) / 2;
+            } else {
+                medianVal = sorted[middle]
+            }
+  
+            const quartiles = {
+                lower: sorted[lowerQ],
+                median: medianVal,
+                upper: sorted[upperQ]
             }
     
-            return sorted[middle];
+            return quartiles;
         }
 
         function wrap() {
@@ -374,8 +410,101 @@ looker.plugins.visualizations.add({
         // if (config.margin_left.length > 0) {
         //     margin.left = +config.margin_left
         // }
-  
-        //   console.log("margin", margin)
+
+
+
+        // TOOLTIPS ---------------------------------------------------------------
+        // create a tooltip
+        const tooltip = d3.select(".tooltip")
+            .style("position", "absolute")
+            .style("padding", "5px")
+            .style("background-color", "white")
+            .style("opacity", 0)
+            .style("border-radius", "4px")
+            .style("display", "block")
+            .style("border", "solid")
+            .style("border-color", "lightgrey")
+            .style("border-width", ".5px")
+
+        tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>')
+
+        const tooltipHeader = tooltip.select("#tt-header")
+        const tooltipBody = tooltip.select("#tt-body")
+
+        const mouseover = function(d) {
+            tooltip 
+                .transition()
+                .duration(0)
+                .style("opacity", 0.9)
+            d3.select(this)
+                .style("opacity", 1)
+
+            console.log("mouseover", d3.mouse(this))
+        }
+
+        const mousemove = function(d) {
+            if (d3.event.pageY < height*.7) {
+                console.log("here less")
+                tooltip
+                    .style("top", (d3.mouse(this)[1] - 10 + "px"))
+            } else {
+                tooltip
+                    .style("top", (d3.mouse(this)[1] - 100 + "px"))
+            }
+
+            if (d3.event.pageX < width*.5) {
+                tooltip
+                    .style("left", d3.event.pageX + 30 + "px") 
+            } else {
+                tooltip
+                    .style("left", d3.event.pageX - 150 + "px")
+            }
+
+            console.log("D", d)
+            console.log("this", d3.mouse(this)[0], d3.mouse(this)[1])
+            console.log("xNum", xNum(0))
+
+            let tt_data;
+            if (d3.mouse(this)[0] < xNum(0)) {
+                tt_data = d.values[0]
+            } else {
+                tt_data = d.values[1]
+            }
+
+            // text in tooltip
+            let title = '';
+            if (pivotDate[0]) {
+                title += `${d3.timeFormat(config.xticklabel_format)(new Date(d.key))}`
+            } else {
+                title += d.key
+            }
+
+            if (pivotDate[1]) {
+                title += ` - ${d3.timeFormat(config.xticklabel_format)(new Date(tt_data.key))}`
+            } else {
+                title += ` - ${tt_data.key}`
+            }
+
+            tooltipHeader.html(title + "<hr>")
+
+            tooltipBody.html('<span style="float:right;">Mean: ' + d3.format(config.yticklabel_format)(tt_data.mean) + '</span>' + '<br>' + 
+            '<span style="float:right;">Median: ' + d3.format(config.yticklabel_format)(tt_data.median) + '</span>' + '<br>' + 
+            '<span style="float:right;">Lower Q: ' + d3.format(config.yticklabel_format)(tt_data.lower) + '</span>' + '<br>' + 
+            '<span style="float:right;">Upper Q: ' + d3.format(config.yticklabel_format)(tt_data.upper) + '</span>')
+
+            console.log("mousemove", d3.mouse(this))
+        }
+
+        const mouseleave = function(d) {
+            tooltip    
+                .transition()
+                .duration(0)
+                .style("opacity", 0)
+            d3.select(this)
+                .style("opacity", 1)
+
+            console.log("mouseleave", d3.mouse(this))
+        }  
   
          
             // require 2 pivots, 1 dimension, 1 measure
@@ -630,12 +759,15 @@ looker.plugins.visualizations.add({
                     if (longest > maxDepth) {maxDepth = longest}
 
                     const flat = v.value.flat()
+                    const quartileVals = find_median(flat)
 
                     v["mean"] = flat.reduce((acc, c) => {
                         return acc + c;
                     }, 0) / flat.length;
 
-                    v["median"] = find_median(flat)
+                    v["median"] = quartileVals["median"]
+                    v["lower"] = quartileVals["lower"]
+                    v["upper"] = quartileVals["upper"]
                     v["none"] = 0
                 })
             })
@@ -812,6 +944,9 @@ looker.plugins.visualizations.add({
                     })
                     .attr("class", "violin")
                     .attr("clip-path", "url(#plot-area)")
+                    .on("mouseover", mouseover)
+                    .on("mousemove", mousemove)
+                    .on("mouseleave", mouseleave)
 
             const leftViolins = violins
                 .append("path")
@@ -904,6 +1039,92 @@ looker.plugins.visualizations.add({
                             }
                         })
                         .attr("clip-path", "url(#plot-area)")
+
+            if (config.statistics === "median") {
+                const leftLowerQuartileMarker = group.selectAll(".left-lower-quartile")
+                    .data(groupBins)
+                    .enter()
+                    .append('g')
+                        .attr("transform", function(d) {
+                            return (`translate(${xScale(d.key)}, 0)`)
+                        })
+                        .attr("class", "left-lower-quartile")
+                        .append("line")
+                            .attr("x1", xScale.bandwidth()/6)
+                            .attr("x2", xScale.bandwidth()/2)
+                            .attr("y1", d => {
+                                return yScale(d.values[0]["lower"])
+                            })
+                            .attr("y2", d => {
+                                return yScale(d.values[0]["lower"])
+                            })
+                            .attr("stroke-dasharray", ("5,3"))
+                            .attr("stroke-width", 1.)
+                            .attr("stroke", "#8c8c8c")
+
+                const rightLowerQuartileMarker = group.selectAll(".right-lower-quartile")
+                    .data(groupBins)
+                    .enter()
+                    .append('g')
+                        .attr("transform", function(d) {
+                            return (`translate(${xScale(d.key)}, 0)`)
+                        })
+                        .attr("class", "right-lower-quartile")
+                        .append("line")
+                            .attr("x1", xScale.bandwidth()/2)
+                            .attr("x2", xScale.bandwidth()*(5/6))
+                            .attr("y1", d => {
+                                return yScale(d.values[1]["lower"])
+                            })
+                            .attr("y2", d => {
+                                return yScale(d.values[1]["lower"])
+                            })
+                            .attr("stroke-dasharray", ("5,3"))
+                            .attr("stroke-width", 1.)
+                            .attr("stroke", "#8c8c8c")
+
+                const leftUpperQuartileMarker = group.selectAll(".left-upper-quartile")
+                    .data(groupBins)
+                    .enter()
+                    .append('g')
+                        .attr("transform", function(d) {
+                            return (`translate(${xScale(d.key)}, 0)`)
+                        })
+                        .attr("class", "left-upper-quartile")
+                        .append("line")
+                            .attr("x1", xScale.bandwidth()/6)
+                            .attr("x2", xScale.bandwidth()/2)
+                            .attr("y1", d => {
+                                return yScale(d.values[0]["upper"])
+                            })
+                            .attr("y2", d => {
+                                return yScale(d.values[0]["upper"])
+                            })
+                            .attr("stroke-dasharray", ("5,3"))
+                            .attr("stroke-width", 1.)
+                            .attr("stroke", "#8c8c8c")
+        
+                const rightUpperQuartileMarker = group.selectAll(".right-upper-quartile")
+                    .data(groupBins)
+                    .enter()
+                    .append('g')
+                        .attr("transform", function(d) {
+                            return (`translate(${xScale(d.key)}, 0)`)
+                        })
+                        .attr("class", "right-upper-quartile")
+                        .append("line")
+                            .attr("x1", xScale.bandwidth()/2)
+                            .attr("x2", xScale.bandwidth()*(5/6))
+                            .attr("y1", d => {
+                                return yScale(d.values[1]["upper"])
+                            })
+                            .attr("y2", d => {
+                                return yScale(d.values[1]["upper"])
+                            })
+                            .attr("stroke-dasharray", ("5,3"))
+                            .attr("stroke-width", 1.)
+                            .attr("stroke", "#8c8c8c")
+            }
                     
 
             

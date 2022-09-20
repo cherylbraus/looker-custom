@@ -379,7 +379,33 @@ export const object = {
         const tooltipHeader = tooltip.select("#tt-header")
         const tooltipBody = tooltip.select("#tt-body")
 
-        const mouseover = function(d) {
+        const let tt_data;
+        if (d3.mouse(this)[0] < xNum(0)) {
+            tt_data = d.values[0]
+        } else {
+            tt_data = d.values[1]
+        }
+
+        // text in tooltip
+        let title = '';
+        if (pivotDate[0]) {
+            title += `${d3.timeFormat(config.xticklabel_format)(new Date(d.key))}`
+        } else {
+            title += d.key
+        }
+
+        if (pivotDate[1]) {
+            title += ` - ${d3.timeFormat(config.xticklabel_format)(new Date(tt_data.key))}`
+        } else {
+            title += ` - ${tt_data.key}`
+        }
+
+        tooltipHeader.html(title + "<hr>")
+
+        tooltipBody.html('<span style="float:right;">Mean: ' + d3.format(config.yticklabel_format)(tt_data.mean) + '</span>' + '<br>' + 
+        '<span style="float:right;">Median: ' + d3.format(config.yticklabel_format)(tt_data.median) + '</span>' + '<br>' + 
+        '<span style="float:right;">Lower Q: ' + d3.format(config.yticklabel_format)(tt_data.lower) + '</span>' + '<br>' + 
+        '<span style="float:right;">Upper Q: ' + d3.format(config.yticklabel_format)(tt_data.upper) + '</span>')over = function(d) {
             tooltip 
                 .transition()
                 .duration(0)
@@ -925,16 +951,7 @@ export const object = {
                         .attr("stroke-width", 1.5)
                         .attr("stroke", "#8c8c8c")
 
-        }
-
-        // interaction bars
-        const barRectListeners = group.selectAll(".listeners")
-            .data(groupBins)
-            .enter()
-            .append("rect")
-                .attr("class", "listeners")
-                .attr("x", d => xScale(d.x0))
-                      
+        }                      
   
       } catch(error) {
           if (environment == "prod") {

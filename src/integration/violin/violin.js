@@ -248,9 +248,32 @@ looker.plugins.visualizations.add({
 
         /* ---AXIS OPTIONS: END--- */
 
+        .tooltip {
+            box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;
+            font-size: 12px;
+            pointer-events: none;
+        }
+
+        .tooltip #tt-header {
+            font-size: 12px;
+            font-weight: 600;
+            color: #c3c3c3;
+            text-transform: uppercase;
+        }
+
+        hr { 
+            margin-top: 1px; 
+            margin-bottom: 1px 
+        }
+
+        #tt-body {
+          margin-top: 5px;
+        }
+
         </style>
         <svg>
-        </svg>`;
+        </svg>
+        <div class="tooltip"></div>`;
       element.style.fontFamily = `"Open Sans", "Helvetica", sans-serif`
   
     },
@@ -265,15 +288,28 @@ looker.plugins.visualizations.add({
       }
   
       function find_median(numbers) {
-          const sorted = Array.from(numbers).sort((a, b) => a - b);
-          const middle = Math.floor(sorted.length / 2);
-  
-          if (sorted.length % 2 === 0) {
-              return (sorted[middle - 1] + sorted[middle]) / 2;
-          }
-  
-          return sorted[middle];
-      }
+        const sorted = Array.from(numbers).sort((a, b) => a - b);
+        const middle = Math.floor(sorted.length / 2);
+        const lowerQ = Math.floor(sorted.length / 4);
+        const upperQ = Math.floor(sorted.length * (3/4));
+
+        let medianVal;
+
+        if (sorted.length % 2 === 0) {
+            medianVal = (sorted[middle - 1] + sorted[middle]) / 2;
+          //   return (sorted[middle - 1] + sorted[middle]) / 2;
+        } else {
+            medianVal = sorted[middle]
+        }
+
+        const quartiles = {
+            lower: sorted[lowerQ],
+            median: medianVal,
+            upper: sorted[upperQ]
+        }
+
+        return quartiles;
+    }
 
       function wrap() {
         const this_width = 100
@@ -353,6 +389,87 @@ looker.plugins.visualizations.add({
           console.log("margin", margin)
 
           console.log("element", element)
+
+        // TOOLTIPS ---------------------------------------------------------------
+        // create tooltip
+        const tooltip = d3.select(".tooltip")
+        .style("position", "absolute")
+        .style("padding", "5px")
+        .style("background-color", "white")
+        .style("opacity", 0)
+        .style("border-radius", "4px")
+        .style("display", "block")
+        .style("border", "solid")
+        .style("border-color", "lightgrey")
+        .style("border-width", ".5px")
+
+        tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>')
+
+        const tooltipHeader = tooltip.select("#tt-header")
+        const tooltipBody = tooltip.select("#tt-body")
+
+        const mouseover = function(d) {
+            tooltip 
+                .transition()
+                .duration(0)
+                .style("opacity", 0.9)
+            d3.select(this)
+                .style("opacity", 1)
+
+            console.log("mouseover", d3.mouse(this))
+        }
+
+        const mousemove = function(d) {
+            if (d3.event.pageY < height*.7) {
+                console.log("here less")
+                tooltip
+                    .style("top", (d3.mouse(this)[1] - 10 + "px"))
+            } else {
+                tooltip
+                    .style("top", (d3.mouse(this)[1] - 100 + "px"))
+            }
+
+            if (d3.event.pageX < width*.5) {
+                tooltip
+                    .style("left", d3.event.pageX + 30 + "px") 
+            } else {
+                tooltip
+                    .style("left", d3.event.pageX - 150 + "px")
+            }
+
+            console.log("D", d, d3.mouse(this)[0], d3.mouse(this)[1], d3.event.pageX, d3.event.pageY)
+
+            // text in tooltip
+            let title;
+            if (pivotDate) {
+                title = d3.timeFormat(config.xticklabel_format)(new Date(d.key))
+            } else {
+                title = d.key
+            }
+
+            tooltipHeader.html(title + "<hr>")
+
+            tooltipBody.html('<span style="float:right;">Mean: ' + d3.format(config.yticklabel_format)(d.mean) + '</span>' + '<br>' + 
+            '<span style="float:right;">Median: ' + d3.format(config.yticklabel_format)(d.median) + '</span>' + '<br>' + 
+            '<span style="float:right;">Lower Q: ' + d3.format(config.yticklabel_format)(d.lower) + '</span>' + '<br>' + 
+            '<span style="float:right;">Upper Q: ' + d3.format(config.yticklabel_format)(d.upper) + '</span>')
+
+            console.log("mousemove", d3.mouse(this))
+        }
+
+        const mouseleave = function(d) {
+            tooltip    
+                .transition()
+                .duration(0)
+                .style("opacity", 0)
+            d3.select(this)
+                .style("opacity", 1)
+
+            console.log("mouseleave", d3.mouse(this))
+        }
+
+        // --------------------------------------------------------------------------
+
   
           // Get the shape of the data, this chart can take two dimensions or a pivot on the shorter dimension
           const dimensions = queryResponse.fields.dimension_like
@@ -521,13 +638,16 @@ looker.plugins.visualizations.add({
   
               const findLengthFrom = value.value
               const flat = value.value.flat()
+              const quartileVals = find_median(flat)
   
               value["mean"] = flat.reduce((acc, c) => {
                 return acc + c;
                 }, 0) / flat.length;
   
-              value["median"] = find_median(flat)
-              value["none"] = 0
+                value["median"] = quartileVals["median"]
+                value["lower"] = quartileVals["lower"]
+                value["upper"] = quartileVals["upper"]
+                value["none"] = 0
   
               const lengths = findLengthFrom.map(function(a) {return a.length})
               const longest = d3.max(lengths)
@@ -707,6 +827,9 @@ looker.plugins.visualizations.add({
                   })
                   .attr("class", "violin")
                       .style("fill", config.colors)
+                        .on("mouseover", mouseover)
+                        .on("mousemove", mousemove)
+                        .on("mouseleave", mouseleave)
               .append("path")
                   .datum(function(d) {
                           return (d.value)})
@@ -749,6 +872,51 @@ looker.plugins.visualizations.add({
                           }
                       })
                       .attr("clip-path", "url(#plot-area)")
+
+            if (config.statistics === "median") {
+                const lowerQuartileMarkers = group.selectAll(".lower-quartile")
+                    .data(groupBins)
+                    .enter()
+                    .append("g")
+                        .attr("transform", function(d) {
+                            return (`translate(${xScale(d.key)}, 0)`)
+                        })
+                        .attr("class", "lower-quartile")
+                        .append("line")
+                            .attr("x1", xScale.bandwidth()/4)
+                            .attr("x2", xScale.bandwidth()*(3/4))
+                            .attr("y1", d => {
+                                return yScale(d["lower"])
+                            })
+                            .attr("y2", d => {
+                                return yScale(d["lower"])
+                            })
+                            .attr("stroke-dasharray", ("5,3"))
+                            .attr("stroke-width", 1.5)
+                            .attr("stroke", "#8c8c8c")
+
+                const upperQuartileMarkers = group.selectAll(".upper-quartile")
+                    .data(groupBins)
+                    .enter()
+                    .append("g")
+                        .attr("transform", function(d) {
+                            return (`translate(${xScale(d.key)}, 0)`)
+                        })
+                        .attr("class", "upper-quartile")
+                        .append("line")
+                            .attr("x1", xScale.bandwidth()/4)
+                            .attr("x2", xScale.bandwidth()*(3/4))
+                            .attr("y1", d => {
+                                return yScale(d["upper"])
+                            })
+                            .attr("y2", d => {
+                                return yScale(d["upper"])
+                            })
+                            .attr("stroke-dasharray", ("5,3"))
+                            .attr("stroke-width", 1.5)
+                            .attr("stroke", "#8c8c8c")
+
+            }  
                       
   
       } catch(error) {

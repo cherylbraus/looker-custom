@@ -21294,7 +21294,48 @@ var splitViolin_object = {
       // create a clip-path for when they unpin/pin the y axis
 
 
-      group.append("defs").append("clipPath").attr("id", "plot-area").append("rect").attr("x", 0).attr("y", 0).attr("width", width).attr("height", height);
+      group.append("defs").append("clipPath").attr("id", "plot-area").append("rect").attr("x", 0).attr("y", 0).attr("width", width).attr("height", height); //     const violins = group.selectAll(".violin")
+      //       .data(groupBins)
+      //       .enter()
+      //       .append("g")
+      //           .attr("transform", function(d) {
+      //               return ("translate(" + xScale(d.key) + ",0)")
+      //           })
+      //           .attr("class", "violin")
+      //           .attr("clip-path", "url(#plot-area)")
+      //   const leftViolins = violins
+      //       .append("path")
+      //           .datum(function(d) {
+      //               return (d.values[0])
+      //           })
+      //           .attr("class", "left-violin")
+      //           .style("stroke", "none")
+      //           .style("fill", config.left_color)
+      //           .attr("d", d => d3.area()
+      //               .x0(d => xNum(-d["value"].length))
+      //               .x1(d => xNum(0))
+      //               .y(d => yScale(d["value"].x0))
+      //               .curve(d3.curveMonotoneY))
+      //             .on("mouseover", mouseover)
+      //             .on("mousemove", mousemove)
+      //             .on("mouseleave", mouseleave)
+      //   const rightViolins = violins
+      //       .append("path")
+      //           .datum(function(d) {
+      //               return (d.values[1])
+      //           })
+      //           .attr("class", "right-violin")
+      //           .style("stroke", "none")
+      //           .style("fill", config.right_color)
+      //           .attr("d", d => d3.area()
+      //                 .x0(d => xNum(0))
+      //                 .x1(d => xNum(d["value"].length))
+      //                 .y(d => yScale(d["value"].x0))
+      //               .curve(d3.curveMonotoneY))
+      //             .on("mouseover", mouseover)
+      //             .on("mousemove", mousemove)
+      //             .on("mouseleave", mouseleave)
+
       var violins = group.selectAll(".violin").data(groupBins).enter().append("g").attr("transform", function (d) {
         return "translate(" + xScale(d.key) + ",0)";
       }).attr("class", "violin").attr("clip-path", "url(#plot-area)").on("mouseover", mouseover).on("mousemove", mousemove).on("mouseleave", mouseleave);
@@ -21514,7 +21555,7 @@ template_keys.forEach(function (entry, i) {
     });
   }
 });
-json("http://localhost:3001/dataSplitViolinRegion").then(function (data) {
+json("http://localhost:3001/dataSplitViolin").then(function (data) {
   var todays_options = {};
   jquery('input:radio:checked').each(function () {
     todays_options[this.attributes.internal_cat.value] = this.attributes.internal_value.value;
