@@ -170,8 +170,27 @@ export const object = {
       // Insert a <style> tag with some styles we'll use later.
       element.innerHTML = `
         <style>
+        @font-face { 
+          font-family: Roboto; 
+          font-weight: 300; 
+          font-style: normal;
+          src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');
+        }
+
+        @font-face { font-family: Roboto; font-weight: 400; font-style: normal;
+          src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');
+        }
+
+        @font-face { font-family: Roboto; font-weight: 500; font-style: normal;
+          src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');
+        }
+
+        @font-face { font-family: Roboto; font-weight: 700; font-style: normal;
+          src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');
+        }
+
           body {
-            font-family: Arial;
+            font-family: Roboto;
             font-size: 12px;
           }
 
@@ -207,12 +226,12 @@ export const object = {
         .axis-label {
           fill: #3a4245;
           font-size: 12px;
-          font-family: 'sans-serif';
+          font-family: Roboto;
           text-anchor: middle;
         }
 
         .y-axis, .x-axis {
-          font-family: "sans-serif";
+          font-family: Roboto;
         }
 
         .x-axis .domain {
@@ -256,19 +275,10 @@ export const object = {
     updateAsync: function(data, element, config, queryResponse, details, done, environment = "prod") {
         if (environment == "prod") {
             if (!handleErrors(this, queryResponse, {
-            min_pivots: 1, max_pivots: 1,
-            min_dimensions: 1, max_dimensions: 1,
-            min_measures: 1, max_measures: 1
+            min_pivots: 0, max_pivots: 1,
+            min_dimensions: 0, max_dimensions: undefined,
+            min_measures: 0, max_measures: 3
             })) return
-        }
-
-        const grades = {
-            "A": {sign: 1},
-            "B": {sign: 1},
-            "C": {sign: -1},
-            "D": {sign: -1},
-            "E": {sign: -1},
-            "F": {sign: -1}
         }
 
         try {
@@ -276,9 +286,9 @@ export const object = {
             let bottom_margin;
     
             if (config.show_yaxis_name == "true") {
-                left_margin = 80
+                left_margin = 30
             } else {
-                left_margin = 60
+                left_margin = 30
             }
     
             if (config.show_xaxis_name == "true") {
@@ -289,7 +299,7 @@ export const object = {
     
             let margin = {
                 top: 10, 
-                right: 40, 
+                right: 30, 
                 bottom: bottom_margin, 
                 left: left_margin
             };
@@ -315,12 +325,22 @@ export const object = {
                     .attr('width', '100%')
                     .attr('height', '100%')
                 )
-    
-            const group = svg.append('g')
-                .attr('transform', `translate(${margin.left}, ${margin.top})`)
-                .attr('width', "100%")
-                .attr('height', (height + "px"))
-                .classed("group", true)
+
+            
+            // data setup ----------------------------------------
+            const headersNegative = ["C", "F"]
+            const headersPositive = ["A", "B"]
+
+            let dataPositive = []
+            let dataNegative = []
+
+            let negPos = "carrier_scorecard_agg.carrier_grade"
+
+            let positivesVolume = []
+            let negativesVolume = []
+            let positiveUnique = []
+            let negativeUnique = []
+
     
             // Get the shape of the data, this chart can take two dimensions or a pivot on the shorter dimension
             const dimensions = queryResponse.fields.dimension_like
@@ -330,174 +350,167 @@ export const object = {
             console.log("measures", measures)
 
             let data_ready = []
+            let data_keys = [] // unique values in the column that will be each y group
 
             data.forEach((d) => {
-                if (d[measures[0].name].value != null && d[dimensions[0].name].value != null) {
-                    let entry = {}
-                    entry['entity'] = d[dimensions[0].name].value
-                    entry['group'] = d[dimensions[1].name].value
-                    entry['measure'] = d[dimensions[2].name].value
-                    data_ready.push(entry)
+              if (data_keys.includes(d[dimensions[1].name].value)) {
+                return
+              } else if (d[dimensions[1].name].value != null) {
+                data_keys.push(d[dimensions[1].name].value)
+              }
+            })
+
+            data_keys.forEach((entry, i) => {
+              let pod = {}
+              pod['group'] = entry
+              pod['A'] = 0
+              pod['B'] = 0
+              pod['total'] = 0
+
+              data.forEach((ent) => {
+                if (ent[dimensions[1].name]['value'] == entry) {
+                  if (ent[dimensions[2].name]['value'] == 'A') {
+                    pod['A'] += ent[measures[0].name]['value']
+                    pod['total'] += ent[measures[0].name]['value']
+                  } else if (ent[dimensions[2].name]['value'] == 'B') {
+                    pod['B'] += ent[measures[0].name]['value']
+                    pod['total'] += ent[measures[0].name]['value']
+                  }
                 }
+              })
+              positivesVolume.push(pod)
+            })
+
+            data_keys.forEach((entry,i)=>{
+              let pod = {}
+              pod["group"] = entry
+              pod["C"] = 0
+              pod["D"] = 0
+              pod["E"] = 0
+              pod["F"] = 0
+              pod["total"] = 0
+              data.forEach((ent)=>{
+                if (ent[dimensions[1].name]["value"] == entry) {
+                  if (ent[dimensions[2].name]["value"] == "C") {
+                    pod["C"] += ent[measures[0].name]["value"]
+                    pod["total"] += ent[measures[0].name]["value"]
+                  } else if(ent[dimensions[2].name]["value"] == "D") {
+                    pod["D"] += ent[measures[0].name]["value"]
+                    pod["total"] += ent[measures[0].name]["value"]
+                  } else if (ent[dimensions[2].name]["value"] == "E") {
+                    pod["E"] += ent[measures[0].name]["value"]
+                    pod["total"] += ent[measures[0].name]["value"]
+                  } else if(ent[dimensions[2].name]["value"] == "F") {
+                    pod["F"] += ent[measures[0].name]["value"]
+                    pod["total"] += ent[measures[0].name]["value"]
+                  }
+                }
+              })
+              negativesVolume.push(pod)
             })
 
             console.log("data", data)
             console.log("data_ready", data_ready)
+            console.log("data_keys", data_keys)
+            console.log("positivesVolume", positivesVolume)
+            console.log("negativesVolume", negativesVolume)
+            console.log("positivesUnique", positiveUnique)
+            console.log("negativesUnique", negativeUnique)
     
-            // const grouped = d3.nest()
-            //     .key((d) => {return d.group})
-            //     .key((d) => {return d.measure})
-            //     .rollup((d) => {return d.length})
-            //     .entries(data_ready)
+            
+            const stackedPositives = d3.stack()
+              .keys(headersPositive)
+              (positivesVolume)
 
-            // console.log("grouped", grouped)
+            const stackedNegatives = d3.stack()
+              .keys(headersNegative)
+              (negativesVolume)
 
-            let positives = []
-            let negatives = []
-            data_ready.forEach((d,i) => {
-                const sign = grades[d.measure].sign
-
-                if (sign === 1) {
-                  const exists = positives.find(e => e.group === d.group && e.measure === d.measure)
-                  if (exists !== undefined) {
-                    exists.total += 1
-                  } else {
-                    let ent = {}
-                    ent['group'] = d.group
-                    ent['measure'] = d.measure
-                    ent['total'] = 1 * grades[d.measure].sign
-                    positives.push(ent)
-                  }
-                } else {
-                  const exists = negatives.find(e => e.group === d.group && e.measure === d.measure)
-                  if (exists !== undefined) {
-                    exists.total += 1
-                  } else {
-                    let ent = {}
-                    ent['group'] = d.group
-                    ent['measure'] = d.measure
-                    ent['total'] = 1 * grades[d.measure].sign
-                    negatives.push(ent)
-                  }
-                }
-              });
-
-            console.log("positives", positives)
-            console.log("negatives", negatives)
-
-            // accessor functions
-            const groupAccessor = d => d.group // (y)
-            const measureAccessor = d => d.measure // (z)
-            const totalAccessor = d => d.total // (x)
-
-            console.log("map example", d3.map(positives, d => measureAccessor(d)))
-
-            // REALIZED THIS IS WRONG - need to figure out the max total when all stacks are placed consecutively
-            // not just what the max single stack section is
-            const maxX = Math.max(d3.max(positives.map(d => d.total)), 
-              d3.max(negatives.map(d => d.total)))
-
-            d3.rollup(positives, D => {
-              console.log("D", D)
-              return d3.sum(D, d => -d['total'])
-            }, d => d['group'])
-            // console.log(d3.max(d3.sum(positives, d => -d.total)))
-
-
+            console.log("stackedPositives", stackedPositives)
+            console.log("stackedNegatives", stackedNegatives)
+            console.log("data_key mapping", data_keys.map((d) => {return d}))
 
             // SCALES ------------------------------------------------------------
-            // const xScalePos = d3.scaleLinear()
-            //   .domain([0, maxX])
-            //   .range([width/2, width])
+            const yScale = d3.scaleBand()
+              .domain(data_keys.map((d) => {return d}))
+              .range([height, 0])
+              .padding(0.05)
 
-            // const xAxisPos = d3.axisTop()
-            //   .scale(xScalePos)
+            const universalMax = d3.max(
+              [d3.max(positivesVolume, d => {return d.total}),
+              d3.max(negativesVolume, d => {return d.total})])
 
-            // const xScaleNeg = d3.scaleLinear()
-            //   .domain([0, maxX])
-            //   .range([width/2, 0])
+            console.log("universalMax", universalMax)
 
-            // const xAxisNeg = d3.axisTop()
-            //   .scale(xScaleNeg)
+            const xScale = d3.scaleLinear()
+                .domain([0, universalMax])
+                .range([0, width/2])
 
-            // const yScale = d3.scaleBand()
-            //   .domain([... new Set(data_ready.map(d => d.group))].sort())
-            //   .range([height, 0])
-            //   .padding(0.2)
-
-            // const yAxis = d3.axisLeft()
-            //   .scale(yScale)
-            //   .tickSize(0)
-
-            // console.log("reverse", [... new Set(data_ready.map(d => d.measure))].sort().reverse())
-
-            // const colorScalePos = d3.scaleOrdinal()
-            //   .domain([... new Set(positives.map(d => d.measure))].sort().reverse())
-            //   .range(d3.schemeTableau10)
-
-            // const colorScaleNeg = d3.scaleOrdinal()
-            //   .domain([... new Set(negatives.map(d => d.measure))].sort())
-            //   .range(d3.schemeSet3)
-
-            // console.log(colorScalePos("A"))
-            // console.log(colorScalePos("B"))
-            // console.log(colorScaleNeg("C"))
-            // console.log(colorScaleNeg("F"))
-
-
-            // const stackPos = d3.stack()
-            //   .keys([... new Set(positives.map(d => d.measure))].sort())
-            //   .value((obj, key) => obj.total)
-            //   (positives)
-
-            // const stackNeg = d3.stack()
-            //   .keys([... new Set(negatives.map(d => d.measure))].sort())
-            //   .value((obj, key) => obj.total)
-            //   (negatives)
-
-            // console.log("stackedData", stackPos, stackNeg)
-
-            // // colors are not filling in (maybe I can't use a sequential color scheme for categorical)
-            // // also, placement of negatives is not correct... maybe setup xScaleNeg wrong?
-            // const barsPos = group
-            //   .selectAll("g")
-            //   .data(stackPos)
-            //   .enter()
-            //   .append('g')
-            //   .selectAll('rect')
-            //   .data(d => d)
-            //   .enter()
-            //   .append('rect')
-            //     .attr('fill', d => colorScalePos(d.data.measure))
-            //     .attr('x', d => Math.min(xScalePos(d[0]), xScalePos(d[1])))
-            //     .attr('y', d => yScale(d.data.group))
-            //     .attr('width', d => Math.abs(xScalePos(d[0]) - xScalePos(d[1])))
-            //     .attr('height', yScale.bandwidth())
-            //     .classed("rect-pos", true)
-
-            // const barsNeg = group
-            //   .selectAll("g")
-            //   .data(stackNeg)
-            //   .enter()
-            //   .append('g')
-            //   .selectAll('rect')
-            //   .data(d => d)
-            //   .enter()
-            //   .append('rect')
-            //     .attr('fill', d => {
-            //       console.log(d.data.measure, colorScaleNeg(d.data.measure))
-            //       colorScaleNeg(d.data.measure)
-            //     })
-            //     .attr('x', d => Math.max(xScaleNeg(d[0]), xScaleNeg(d[1])))
-            //     .attr('y', d => yScale(d.data.group))
-            //     .attr('width', d => Math.abs(xScaleNeg(d[0]) - xScaleNeg(d[1])))
-            //     .attr('height', yScale.bandwidth())
-            //     .classed("rect-neg", true)
+            const zScale = d3.scaleOrdinal()
+                .domain(["A","B","C","F"])
+                .range(["#27566b","#339f7b","#007b82","#f1cc56"])
 
             
+            // DRAW DATA ------------------------------------------------------------
+            const groupPos = svg.append('g')
+                .attr("transform", `translate(${(width/2) + margin.left}, ${margin.top})`)
+                .attr("width", (width/2 + "px"))
+                .attr("height", (height + "px"))
+                .attr("class", "group-pos")
+
+            const groupNeg = svg.append('g')
+                .attr("transform", `translate(${margin.left}, ${margin.top})`)
+                .attr("width", (width/2 + "px"))
+                .attr("height", (height + "px"))
+                .attr("class", "group-neg")
+
+            const posGroups = groupPos
+                .selectAll(".bar-groups")
+                // Enter in the stack data = loop key per key = group per group
+                .data(stackedPositives)
+                .enter()
+                .append("g")
+                  .attr("class", "bar-groups")
+                  .attr("fill", (d, i) => {
+                    return zScale(d.key)
+                  })
+
+            const negGroups = groupNeg
+                .selectAll(".bar-groups-neg")
+                .data(stackedNegatives)
+                .enter()
+                .append('g')
+                  .attr("class", "bar-groups-neg")
+                  .attr("fill", (d, i) => {
+                    return zScale(d.key)
+                  })
             
+            posGroups
+                .selectAll("rect")
+                // enter a second time = loop subgroup per subgroup to add all rects
+                .data(d => d)
+                .enter()
+                .append('rect')
+                  .attr('x', d => xScale(d[0])) // already translated to width/2 so can use xScale as-is
+                  .attr('y', d => yScale(d.data.group))
+                  .attr('height', d => yScale.bandwidth())
+                  .attr('width', d => xScale(d[1]) - xScale(d[0]))
 
+            console.log("x neg check")
+            console.log("xScale(3145)", xScale(3145))
+            console.log("width/2", width/2)
+            console.log("diff", (width/2) - xScale(3145))
 
+            negGroups
+                .selectAll("rect")
+                .data(d => d)
+                .enter()
+                .append('rect')
+                  .attr('x', d => (width/2) - xScale(d[1]))
+                  .attr('y', d => yScale(d.data.group))
+                  .attr('height', d => yScale.bandwidth())
+                  .attr('width', d => xScale(d[1]) - xScale(d[0]))
+            
 
         } catch(error) {
             if (environment == "prod") {

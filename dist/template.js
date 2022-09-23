@@ -20598,25 +20598,14 @@ var utils_handleErrors = function (vis, res, options) {
         && check('mes-req', 'Measure', measures.length, options.min_measures, options.max_measures));
 };
 
-// CONCATENATED MODULE: ./src/integration/template/splitViolin.js
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+// CONCATENATED MODULE: ./src/integration/template/divergingBar.js
 
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-var splitViolin_object = {
+var divergingBar_object = {
   // Id and Label are legacy properties that no longer have any function besides documenting
   // what the visualization used to have. The properties are now set via the manifest
-  // form within the admin/visualizations page of Looker.
-  id: "split-violin",
-  label: "ZDev Split Violin",
+  // form within the admin/visualizations page of Looker
+  id: "violin",
+  label: "ZDev Violin",
   options: {
     thresholds: {
       type: 'string',
@@ -20652,18 +20641,10 @@ var splitViolin_object = {
       "default": "mean",
       section: "Custom Options"
     },
-    left_color: {
+    colors: {
       type: "array",
-      label: "Left Color",
+      label: "Violin Color",
       "default": ["#27566b"],
-      display: "color",
-      section: "Custom Options"
-    },
-    right_color: {
-      type: "array",
-      label: "Right Color",
-      "default": ["#f1cc56"],
-      //"#339f7b"],
       display: "color",
       section: "Custom Options"
     },
@@ -20728,7 +20709,7 @@ var splitViolin_object = {
       type: "string",
       label: "Y Tick Value Format",
       display: "text",
-      "default": ",.0f",
+      "default": ",",
       placeholder: "#,###",
       section: "Y"
     },
@@ -20752,14 +20733,14 @@ var splitViolin_object = {
       label: 'Margin - bottom',
       "default": ''
     },
-    // margin_left: {
-    //   section: 'Margins',
-    //   order:4,
-    //   type: 'string',
-    //   display:'text',
-    //   label: 'Margin - left',
-    //   default: ''
-    // },
+    margin_left: {
+      section: 'Margins',
+      order: 4,
+      type: 'string',
+      display: 'text',
+      label: 'Margin - left',
+      "default": ''
+    },
     //   label_bottom: {
     //     section: 'Margins',
     //     order:2,
@@ -20793,9 +20774,9 @@ var splitViolin_object = {
   },
   // Set up the initial state of the visualization
   create: function create(element, config) {
-    // Insert a <style> tag with some styles we'll use later
-    element.innerHTML = "\n        <style>\n                @font-face {\n                    font-family: Roboto;\n                    font-weight: 300;\n                    font-style: normal;\n                    src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');\n                }\n                @font-face { font-family: Roboto; font-weight: 400; font-style: normal;\n                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');\n                }\n                    @font-face { font-family: Roboto; font-weight: 500; font-style: normal;\n                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');\n                }\n                @font-face { font-family: Roboto; font-weight: 700; font-style: normal;\n                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');\n                }\n\n            body {\n                font-family: 'Roboto';\n                font-size: 12px;\n            }\n\n            #viz-container {\n            z-index: 9;\n            position: relative;\n            background-color: none;\n            border: 1px solid #d3d3d3;\n            text-align: center;\n            width: 600px;\n            height: 360px;\n            }\n\n            #viz {\n            font-family: 'Open Sans', 'Helvetica', 'sans-serif;';\n            cursor: move;\n            z-index: 10;\n            background-color: none;\n            color: #fff;\n            height: 100%;\n            width: 100%;\n            fill: black;\n            color: black;\n            }\n\n            .line {\n            fill: none;\n            stroke-width: 2px;\n            }\n\n            /* ---AXIS OPTIONS: START--- */\n\n            .axis-label {\n            fill: #3a4245;\n            font-size: 12px;\n            font-family: 'Roboto';\n            text-anchor: middle;\n            }\n\n            .y-axis, .x-axis {\n            font-family: \"Roboto\";\n            }\n\n            .x-axis .domain {\n            stroke: #ccd6eb;\n            stroke-width: 1;\n            }\n\n            .y-axis .domain {\n            stroke: none;\n            }\n\n            .x-axis text, .y-axis text {\n            font-size: 12px;\n            color: #3a4245;\n            visibility: visible;\n            }\n\n            .x-axis text .hide, .y-axis text .hide {\n            visibility: hidden;\n            }\n\n            .x-axis line, .y-axis line {\n            stroke: #e6e6e6;\n            stroke-width: 1;\n            opacity: 1;\n            }\n\n            .x-axis line .hide, .y-axis line .hide {\n            opacity: 0;\n            }\n\n            /* ---AXIS OPTIONS: END--- */\n\n            .tooltip {\n                box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;\n                font-size: 12px;\n                pointer-events: none;\n            }\n    \n            .tooltip #tt-header {\n                font-size: 12px;\n                font-weight: 600;\n                color: #c3c3c3;\n                text-transform: uppercase;\n            }\n    \n            hr { \n                margin-top: 1px; \n                margin-bottom: 1px \n            }\n    \n            #tt-body {\n              margin-top: 5px;\n            }\n\n            </style>\n            <svg>\n            </svg>\n            <div class=\"tooltip\"></div>";
-    element.style.fontFamily = "\"Open Sans\", \"Helvetica\", \"sans-serif\"";
+    // Insert a <style> tag with some styles we'll use later.
+    element.innerHTML = "\n        <style>\n        @font-face { \n          font-family: Roboto; \n          font-weight: 300; \n          font-style: normal;\n          src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');\n        }\n\n        @font-face { font-family: Roboto; font-weight: 400; font-style: normal;\n          src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');\n        }\n\n        @font-face { font-family: Roboto; font-weight: 500; font-style: normal;\n          src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');\n        }\n\n        @font-face { font-family: Roboto; font-weight: 700; font-style: normal;\n          src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');\n        }\n\n          body {\n            font-family: Roboto;\n            font-size: 12px;\n          }\n\n        #viz-container {\n          z-index: 9;\n          position: relative;\n          background-color: none;\n          border: 1px solid #d3d3d3;\n          text-align: center;\n          width: 600px;\n          height: 360px;\n        }\n\n        #viz {\n          font-family: 'Open Sans', 'Helvetica', 'sans-serif;';\n          cursor: move;\n          z-index: 10;\n          background-color: none;\n          color: #fff;\n          height: 100%;\n          width: 100%;\n          fill: black;\n          color: black;\n        }\n\n        .line {\n          fill: none;\n          stroke-width: 2px;\n        }\n\n        /* ---AXIS OPTIONS: START--- */\n\n        .axis-label {\n          fill: #3a4245;\n          font-size: 12px;\n          font-family: Roboto;\n          text-anchor: middle;\n        }\n\n        .y-axis, .x-axis {\n          font-family: Roboto;\n        }\n\n        .x-axis .domain {\n          stroke: #ccd6eb;\n          stroke-width: 1;\n        }\n\n        .y-axis .domain {\n          stroke: none;\n        }\n\n        .x-axis text, .y-axis text {\n          font-size: 12px;\n          color: #3a4245;\n          visibility: visible;\n        }\n\n        .x-axis text .hide, .y-axis text .hide {\n          visibility: hidden;\n        }\n\n        .x-axis line, .y-axis line {\n          stroke: #e6e6e6;\n          stroke-width: 1;\n          opacity: 1;\n        }\n\n        .x-axis line .hide, .y-axis line .hide {\n          opacity: 0;\n        }\n\n        /* ---AXIS OPTIONS: END--- */\n\n        </style>\n        <svg>\n        </svg>";
+    element.style.fontFamily = "\"Open Sans\", \"Helvetica\", sans-serif";
   },
   // Render in response to the data or settings changing
   updateAsync: function updateAsync(data, element, config, queryResponse, details, done) {
@@ -20803,50 +20784,13 @@ var splitViolin_object = {
 
     if (environment == "prod") {
       if (!handleErrors(this, queryResponse, {
-        min_pivots: 2,
-        max_pivots: 2,
-        min_dimensions: 1,
-        max_dimensions: 1,
-        min_measures: 1,
-        max_measures: 1
+        min_pivots: 0,
+        max_pivots: 1,
+        min_dimensions: 0,
+        max_dimensions: undefined,
+        min_measures: 0,
+        max_measures: 3
       })) return;
-    }
-
-    function find_median(numbers) {
-      var sorted = Array.from(numbers).sort(function (a, b) {
-        return a - b;
-      });
-      var middle = Math.floor(sorted.length / 2);
-      var lowerQ = Math.floor(sorted.length / 4);
-      var upperQ = Math.floor(sorted.length * (3 / 4));
-      var medianVal;
-
-      if (sorted.length % 2 === 0) {
-        medianVal = (sorted[middle - 1] + sorted[middle]) / 2; //   return (sorted[middle - 1] + sorted[middle]) / 2;
-      } else {
-        medianVal = sorted[middle];
-      }
-
-      var quartiles = {
-        lower: sorted[lowerQ],
-        median: medianVal,
-        upper: sorted[upperQ]
-      };
-      return quartiles;
-    }
-
-    function wrap() {
-      var this_width = 100;
-      var this_padding = 5;
-      var self = d3.select(this),
-          textLength = self.node().getComputedTextLength(),
-          text = self.text();
-
-      while (textLength > this_width - 2 * this_padding && text.length > 0) {
-        text = text.slice(0, -1);
-        self.text(text + '...');
-        textLength = self.node().getComputedTextLength();
-      }
     }
 
     try {
@@ -20854,9 +20798,9 @@ var splitViolin_object = {
       var bottom_margin;
 
       if (config.show_yaxis_name == "true") {
-        left_margin = 80;
+        left_margin = 30;
       } else {
-        left_margin = 60;
+        left_margin = 30;
       }
 
       if (config.show_xaxis_name == "true") {
@@ -20866,597 +20810,248 @@ var splitViolin_object = {
       }
 
       var margin = {
-        top: 25,
-        right: 10,
+        top: 10,
+        right: 30,
         bottom: bottom_margin,
         left: left_margin
       };
 
       if (config.margin_bottom.length > 0) {
         margin.bottom = +config.margin_bottom;
-      } // TOOLTIPS ---------------------------------------------------------------
-      // create a tooltip
-
-
-      var tooltip = d3.select(".tooltip").style("position", "absolute").style("padding", "5px").style("background-color", "white").style("opacity", 0).style("border-radius", "4px").style("display", "block").style("border", "solid").style("border-color", "lightgrey").style("border-width", ".5px");
-      tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>');
-      var tooltipHeader = tooltip.select("#tt-header");
-      var tooltipBody = tooltip.select("#tt-body");
-
-      var mouseover = function mouseover(d) {
-        tooltip.transition().duration(0).style("opacity", 0.9);
-        d3.select(this).style("opacity", 1);
-        console.log("mouseover", d3.mouse(this));
-      };
-
-      var mousemove = function mousemove(d) {
-        if (d3.event.pageY < height * .7) {
-          console.log("here less");
-          tooltip.style("top", d3.mouse(this)[1] - 10 + "px");
-        } else {
-          tooltip.style("top", d3.mouse(this)[1] - 100 + "px");
-        }
-
-        if (d3.event.pageX < width * .5) {
-          tooltip.style("left", d3.event.pageX + 30 + "px");
-        } else {
-          tooltip.style("left", d3.event.pageX - 150 + "px");
-        }
-
-        console.log("D", d);
-        console.log("this", d3.mouse(this)[0], d3.mouse(this)[1]);
-        console.log("xNum", xNum(0));
-        var tt_data;
-
-        if (d3.mouse(this)[0] < xNum(0)) {
-          tt_data = d.values[0];
-        } else {
-          tt_data = d.values[1];
-        } // text in tooltip
-
-
-        var title = '';
-
-        if (pivotDate[0]) {
-          title += "".concat(d3.timeFormat(config.xticklabel_format)(new Date(d.key)));
-        } else {
-          title += d.key;
-        }
-
-        if (pivotDate[1]) {
-          title += " - ".concat(d3.timeFormat(config.xticklabel_format)(new Date(tt_data.key)));
-        } else {
-          title += " - ".concat(tt_data.key);
-        }
-
-        tooltipHeader.html(title + "<hr>");
-        tooltipBody.html('<span style="float:right;">Mean: ' + d3.format(config.yticklabel_format)(tt_data.mean) + '</span>' + '<br>' + '<span style="float:right;">Median: ' + d3.format(config.yticklabel_format)(tt_data.median) + '</span>' + '<br>' + '<span style="float:right;">Lower Q: ' + d3.format(config.yticklabel_format)(tt_data.lower) + '</span>' + '<br>' + '<span style="float:right;">Upper Q: ' + d3.format(config.yticklabel_format)(tt_data.upper) + '</span>');
-        console.log("mousemove", d3.mouse(this));
-      };
-
-      var mouseleave = function mouseleave(d) {
-        tooltip.transition().duration(0).style("opacity", 0);
-        d3.select(this).style("opacity", 1);
-        console.log("mouseleave", d3.mouse(this));
-      }; // require 2 pivots, 1 dimension, 1 measure
-
-
-      var dimension = queryResponse.fields.dimension_like[0];
-      var measure = queryResponse.fields.measure_like[0];
-      var pivots = queryResponse.fields.pivots;
-      console.log("dimension", dimension);
-      console.log("measure", measure);
-      console.log("pivots", pivots); // let dimensionFormat;
-      // if (dimension.value_format.includes("$")) {
-      //     dimensionFormat = "USD"
-      // } else if (dimension.value_format.includes("%")) {
-      //     dimensionFormat = "Percentage"
-      // } else {
-      //     dimensionFormat = null
-      // }
-      // determine how to format the time pivot (if there is one)
-
-      var dateDict = {
-        month: "%Y-%m",
-        year: "%Y",
-        week: "%Y-%m-%d",
-        day: "%Y-%m-%d",
-        "null": null
-      };
-      var pivotDate = [];
-      pivots.forEach(function (element, index) {
-        if (pivots[index].time_interval) {
-          if (["day", "week", "month", "year"].includes(pivots[index].time_interval.name)) {
-            pivotDate.push(pivots[index].time_interval.name);
-          } else {
-            pivotDate.push(null);
-          }
-        } else {
-          pivotDate.push(null);
-        }
-      });
-      var parseTime = [];
-      pivotDate.forEach(function (element) {
-        parseTime.push(d3.timeParse(dateDict[element]));
-      });
-      console.log("pivotDate", pivotDate);
-      console.log("parseTime", parseTime); // determine whether the user sorted the pivot in asc or desc order
-
-      var pivotSort = [];
-      pivots.forEach(function (element, index) {
-        console.log("sorted" in pivots[index]);
-
-        if ("sorted" in pivots[index]) {
-          if (pivots[index].sorted.desc) {
-            pivotSort.push(true);
-          } else {
-            pivotSort.push(false);
-          }
-        } else {
-          pivotSort.push(null);
-        }
-      });
-      console.log("pivotSort", pivotSort);
-      var legend_label = pivots[1].field_group_variant; // reformat the data
-
-      var data_ready = []; // console.log("data", data)
-
-      data.forEach(function (d) {
-        var keys = Object.keys(d[measure.name]);
-
-        for (var _i = 0, _Object$entries = Object.entries(d[measure.name]); _i < _Object$entries.length; _i++) {
-          var _Object$entries$_i = _slicedToArray(_Object$entries[_i], 2),
-              key = _Object$entries$_i[0],
-              value = _Object$entries$_i[1];
-
-          var entry = {};
-
-          if (pivotDate[0]) {
-            entry["group"] = parseTime[0](key.split("|FIELD|")[0]);
-          } else {
-            entry["group"] = key.split("|FIELD|")[0];
-          }
-
-          if (pivotDate[1]) {
-            entry["side"] = parseTime[1](key.split("|FIELD|")[1]);
-          } else {
-            entry["side"] = key.split("|FIELD|")[1];
-          }
-
-          entry["to_measure"] = d[dimension.name].value;
-          entry["value"] = value.value;
-          data_ready.push(entry);
-        }
-      });
-      data_ready = data_ready.filter(function (entry) {
-        return entry.right != "TXX Undefined";
-      }); // sort 2nd pivot first and then 1st pivot
-
-      if (pivotSort[1] !== null) {
-        if (pivotSort[1]) {
-          data_ready.sort(function (a, b) {
-            return b.side - a.side;
-          });
-        } else {
-          data_ready.sort(function (a, b) {
-            return a.side - b.side;
-          });
-        }
       }
 
-      if (pivotSort[0] !== null) {
-        if (pivotSort[0]) {
-          data_ready.sort(function (a, b) {
-            return b.group - a.group;
-          });
-        } else {
-          data_ready.sort(function (a, b) {
-            return a.group - b.group;
-          });
-        }
+      if (config.margin_left.length > 0) {
+        margin.left = +config.margin_left;
       }
 
-      console.log("data_ready", data_ready); // ------------------------------------------------------------------
-
-      var yvalFormatted = 0;
-      data_ready.forEach(function (d, i) {
-        var strLength = d3.format(config.yticklabel_format)(d["value"]).length;
-
-        if (strLength > yvalFormatted) {
-          yvalFormatted = strLength;
-        }
-      });
-
-      if (config.show_yaxis_name == true) {
-        margin.left = 6 * yvalFormatted + 65;
-      } else {
-        margin.left = 6 * yvalFormatted + 45;
-      }
-
-      console.log("margin.left new", margin.left);
+      console.log("margin", margin);
+      console.log("element", element);
       var width = element.clientWidth - margin.left - margin.right;
       var height = element.clientHeight - margin.top - margin.bottom;
-      var svg = d3.select(element).select('svg').html('').attr('width', '100%').attr('height', '100%');
-      var group = svg.append('g').attr('transform', "translate(".concat(margin.left, ", ").concat(margin.top, ")")).attr('width', "100%").attr('height', height + "px").classed("group", true); // DATA ANALYSIS
+      var svg = d3.select(element).select('svg').html('').attr('width', '100%').attr('height', '100%'); // const group = svg.append('g')
+      //     .attr('transform', `translate(${margin.left}, ${margin.top})`)
+      //     .attr('width', "100%")
+      //     .attr('height', (height + "px"))
+      //     .classed("group", true)
+      // data setup ----------------------------------------
 
-      var groupAccessor = function groupAccessor(d) {
-        return d.group;
-      };
+      var headersNegative = ["C", "F"];
+      var headersPositive = ["A", "B"];
+      var dataPositive = [];
+      var dataNegative = [];
+      var negPos = "carrier_scorecard_agg.carrier_grade";
+      var positivesVolume = [];
+      var negativesVolume = [];
+      var positiveUnique = [];
+      var negativeUnique = []; // Get the shape of the data, this chart can take two dimensions or a pivot on the shorter dimension
 
-      var sideAccessor = function sideAccessor(d) {
-        return d.side;
-      };
+      var dimensions = queryResponse.fields.dimension_like;
+      var measures = queryResponse.fields.measure_like;
+      console.log("dimensions", dimensions);
+      console.log("measures", measures);
+      var data_ready = [];
+      var data_keys = []; // unique values in the column that will be each y group
 
-      var measureAccessor = function measureAccessor(d) {
-        return d.to_measure;
-      };
-
-      var valueAccessor = function valueAccessor(d) {
-        return d.value;
-      }; // // set dimensions and svg element
-      // this.clearErrors();
-
-
-      console.log("errors NOT cleared"); // define range of values for each group/pivot level
-      // if just need the highest pivot level to be used on x-axis
-
-      var buckets = {};
-      buckets['label'] = pivots[0].label;
-      var bucket_data = [];
-      data_ready.forEach(function (d) {
-        if (bucket_data.includes(d.group)) {
+      data.forEach(function (d) {
+        if (data_keys.includes(d[dimensions[1].name].value)) {
           return;
-        } else {
-          bucket_data.push(d.group);
+        } else if (d[dimensions[1].name].value != null) {
+          data_keys.push(d[dimensions[1].name].value);
         }
       });
-      buckets['range'] = bucket_data;
-      bucket_data = [];
-      data_ready.forEach(function (d) {
-        if (d.side.includes("Undefined") || bucket_data.includes(d.side)) {
-          return;
-        } else {
-          bucket_data.push(d.side);
-        }
+      data_keys.forEach(function (entry, i) {
+        var pod = {};
+        pod['group'] = entry;
+        pod['A'] = 0;
+        pod['B'] = 0;
+        pod['total'] = 0;
+        data.forEach(function (ent) {
+          if (ent[dimensions[1].name]['value'] == entry) {
+            if (ent[dimensions[2].name]['value'] == 'A') {
+              pod['A'] += ent[measures[0].name]['value'];
+              pod['total'] += ent[measures[0].name]['value'];
+            } else if (ent[dimensions[2].name]['value'] == 'B') {
+              pod['B'] += ent[measures[0].name]['value'];
+              pod['total'] += ent[measures[0].name]['value'];
+            }
+          }
+        });
+        positivesVolume.push(pod);
       });
-      buckets['lower_pivot'] = bucket_data;
-      console.log("buckets", buckets); // -------------------------------------------------------
-      // SCALES
-
-      var xScale = d3.scaleBand().domain(buckets.range).range([0, width]).padding(0.05);
-      var yScale = d3.scaleLinear().domain(d3.extent(data_ready, function (d) {
-        return d.value;
-      })).range([height, 0]); // const zScale = d3.scaleOrdinal()
-      //     .domain(buckets.lower_pivot)
-      //     .range(colors)
-      // -------------------------------------------------------
-      // v5 nest/histogram process, instead of d3.bin in v7
-
-      var binsGenerator = d3.histogram().domain(yScale.domain()).value(function (d) {
+      data_keys.forEach(function (entry, i) {
+        var pod = {};
+        pod["group"] = entry;
+        pod["C"] = 0;
+        pod["D"] = 0;
+        pod["E"] = 0;
+        pod["F"] = 0;
+        pod["total"] = 0;
+        data.forEach(function (ent) {
+          if (ent[dimensions[1].name]["value"] == entry) {
+            if (ent[dimensions[2].name]["value"] == "C") {
+              pod["C"] += ent[measures[0].name]["value"];
+              pod["total"] += ent[measures[0].name]["value"];
+            } else if (ent[dimensions[2].name]["value"] == "D") {
+              pod["D"] += ent[measures[0].name]["value"];
+              pod["total"] += ent[measures[0].name]["value"];
+            } else if (ent[dimensions[2].name]["value"] == "E") {
+              pod["E"] += ent[measures[0].name]["value"];
+              pod["total"] += ent[measures[0].name]["value"];
+            } else if (ent[dimensions[2].name]["value"] == "F") {
+              pod["F"] += ent[measures[0].name]["value"];
+              pod["total"] += ent[measures[0].name]["value"];
+            }
+          }
+        });
+        negativesVolume.push(pod);
+      });
+      console.log("data", data);
+      console.log("data_ready", data_ready);
+      console.log("data_keys", data_keys);
+      console.log("positivesVolume", positivesVolume);
+      console.log("negativesVolume", negativesVolume);
+      console.log("positivesUnique", positiveUnique);
+      console.log("negativesUnique", negativeUnique);
+      var stackedPositives = d3.stack().keys(headersPositive)(positivesVolume);
+      var stackedNegatives = d3.stack().keys(headersNegative)(negativesVolume);
+      console.log("stackedPositives", stackedPositives);
+      console.log("stackedNegatives", stackedNegatives);
+      console.log("data_key mapping", data_keys.map(function (d) {
         return d;
-      }).thresholds(+config.thresholds);
-      var groupBins = d3.nest().key(function (d) {
-        return d.group;
-      }).key(function (d) {
-        return d.side;
-      }).rollup(function (r) {
-        var input = r.map(function (g) {
-          return g.value;
-        });
-        var bins = binsGenerator(input);
-        return bins;
-      }).entries(data_ready); // console.log("groupBins", groupBins)
-      // why do we have to loop through - aren't all the x0s the same?
+      })); // SCALES ------------------------------------------------------------
 
-      var yMax = "";
-      groupBins.forEach(function (value, key) {
-        value.values.forEach(function (v, k) {
-          yMax = v.value[v.value.length - 1]["x0"];
-        });
-      });
-      yScale.domain([d3.min(data_ready, function (d) {
-        return d.value;
-      }), yMax]); // get the highest number of data points that are in a single bin
-
-      var maxDepth = 0;
-      groupBins.forEach(function (value, key) {
-        value.values.forEach(function (v, k) {
-          var findLengthFrom = v.value;
-          var lengths = findLengthFrom.map(function (a) {
-            return a.length;
-          });
-          var longest = d3.max(lengths);
-
-          if (longest > maxDepth) {
-            maxDepth = longest;
-          }
-
-          var flat = v.value.flat();
-          var quartileVals = find_median(flat);
-          v["mean"] = flat.reduce(function (acc, c) {
-            return acc + c;
-          }, 0) / flat.length;
-          v["median"] = quartileVals["median"];
-          v["lower"] = quartileVals["lower"];
-          v["upper"] = quartileVals["upper"];
-          v["none"] = 0;
-        });
-      });
-      console.log("groupBins", groupBins); // -------------------------------------------------------
-      // SCALES AGAIN
-
-      if (config.unpin_y == "true") {
-        yScale.domain([d3.min(data_ready, function (d) {
-          return d.value;
-        }), yMax]);
-      } else {
-        yScale.domain([0, yMax]);
-      } // create scale for width of violins
-
-
-      var xNum = d3.scaleLinear().domain([-maxDepth, maxDepth]).range([0, xScale.bandwidth()]); // -------------------------------------------------------
-      // DRAW PERIPHERALS
-
-      console.log("xticklabel format", config.xticklabel_format);
-      console.log("yticklabel format", config.yticklabel_format); // X axis
-
-      var xAxisGenerator = d3.axisBottom().scale(xScale).tickPadding(10); // x ticklabels
-
-      if (config.xticklabels_show == "true") {
-        if (pivotDate[0]) {
-          xAxisGenerator.tickFormat(d3.timeFormat(config.xticklabel_format));
-        }
-      } else {
-        xAxisGenerator.tickFormat("");
-      } // x gridlines
-
-
-      if (config.x_gridlines == "true") {
-        xAxisGenerator.tickSizeInner(-height);
-      } else {
-        xAxisGenerator.tickSizeInner(0);
-      }
-
-      xAxisGenerator.tickSizeOuter(0);
-      var xAxis = group.append("g").call(xAxisGenerator).style("transform", "translateY(".concat(height, "px)")).attr("class", "x-axis");
-
-      if (config.x_rotation == "true") {
-        xAxis.selectAll("text").attr("transform", "rotate(-35)").style("text-anchor", "end").attr("dx", "-.8em").attr("dy", ".15em");
-      }
-
-      if (config.wrap_bottom == "true") {
-        xAxis.selectAll("text").each(wrap);
-      }
-
-      if (config.xticklabels_show == "false") {
-        d3.selectAll(".x-axis text").attr("class", "hide");
-      }
-
-      if (config.x_gridlines == "false") {
-        d3.selectAll(".x-axis line").attr("class", "hide");
-      } // Y axis
-
-
-      var yAxisGenerator = d3.axisLeft().scale(yScale).tickPadding(10); // y ticklabels
-
-      if (config.yticklabels_show == "true") {
-        yAxisGenerator.tickFormat(d3.format(config.yticklabel_format));
-      } else {
-        yAxisGenerator.tickFormat("");
-      } // y gridlines
-
-
-      if (config.y_gridlines == "true") {
-        yAxisGenerator.tickSize(-width);
-      } else {
-        yAxisGenerator.tickSize(0);
-      }
-
-      var yAxis = group.append("g").call(yAxisGenerator).attr("class", "y-axis");
-
-      if (config.wrap_left == "true") {
-        yAxis.selectAll("text").each(wrap);
-      }
-
-      if (config.yticklabels_show == "false") {
-        d3.selectAll(".y-axis text").attr("class", "hide");
-      }
-
-      if (config.y_gridlines == "false") {
-        d3.selectAll(".y-axis line").attr("class", "hide");
-      } // AXIS LABELS
-
-
-      if (config.show_xaxis_name == "true") {
-        console.log("show x axis");
-        var xAxisLabel = xAxis.append("text").attr("class", "axis-label").attr("x", width / 2).attr("y", margin.bottom - 7).text(function () {
-          if (config.xaxis_label) {
-            return config.xaxis_label;
-          } else {
-            return buckets.label;
-          }
-        });
-      } else {
-        console.log("don't show x axis");
-      }
-
-      if (config.show_yaxis_name == "true") {
-        var yAxisLabel = yAxis.append("text").attr("class", "axis-label").attr("x", -height / 2) // + margin.top/2)
-        .attr("y", -margin.left + 18).style("transform", "rotate(-90deg)").text(function () {
-          if (config.yaxis_label) {
-            return config.yaxis_label;
-          } else {
-            return measure.label;
-          }
-        });
-      } // -------------------------------------------------------
-      // DRAW DATA
-      // create a clip-path for when they unpin/pin the y axis
-
-
-      group.append("defs").append("clipPath").attr("id", "plot-area").append("rect").attr("x", 0).attr("y", 0).attr("width", width).attr("height", height); //     const violins = group.selectAll(".violin")
-      //       .data(groupBins)
-      //       .enter()
-      //       .append("g")
-      //           .attr("transform", function(d) {
-      //               return ("translate(" + xScale(d.key) + ",0)")
-      //           })
-      //           .attr("class", "violin")
-      //           .attr("clip-path", "url(#plot-area)")
-      //   const leftViolins = violins
-      //       .append("path")
-      //           .datum(function(d) {
-      //               return (d.values[0])
-      //           })
-      //           .attr("class", "left-violin")
-      //           .style("stroke", "none")
-      //           .style("fill", config.left_color)
-      //           .attr("d", d => d3.area()
-      //               .x0(d => xNum(-d["value"].length))
-      //               .x1(d => xNum(0))
-      //               .y(d => yScale(d["value"].x0))
-      //               .curve(d3.curveMonotoneY))
-      //             .on("mouseover", mouseover)
-      //             .on("mousemove", mousemove)
-      //             .on("mouseleave", mouseleave)
-      //   const rightViolins = violins
-      //       .append("path")
-      //           .datum(function(d) {
-      //               return (d.values[1])
-      //           })
-      //           .attr("class", "right-violin")
-      //           .style("stroke", "none")
-      //           .style("fill", config.right_color)
-      //           .attr("d", d => d3.area()
-      //                 .x0(d => xNum(0))
-      //                 .x1(d => xNum(d["value"].length))
-      //                 .y(d => yScale(d["value"].x0))
-      //               .curve(d3.curveMonotoneY))
-      //             .on("mouseover", mouseover)
-      //             .on("mousemove", mousemove)
-      //             .on("mouseleave", mouseleave)
-
-      var violins = group.selectAll(".violin").data(groupBins).enter().append("g").attr("transform", function (d) {
-        return "translate(" + xScale(d.key) + ",0)";
-      }).attr("class", "violin").attr("clip-path", "url(#plot-area)").on("mouseover", mouseover).on("mousemove", mousemove).on("mouseleave", mouseleave);
-      var leftViolins = violins.append("path").datum(function (d) {
-        return d.values[0].value;
-      }).attr("class", "left-violin").style("stroke", "none").style("fill", config.left_color).attr("d", d3.area().x0(function (d) {
-        return xNum(-d.length);
-      }).x1(function (d) {
-        return xNum(0);
-      }).y(function (d) {
-        return yScale(d.x0);
-      }).curve(d3.curveMonotoneY));
-      var rightViolins = violins.append("path").datum(function (d) {
-        return d.values[1].value;
-      }).attr("class", "right-violin").style("stroke", "none").style("fill", config.right_color).attr("d", d3.area().x0(function (d) {
-        return xNum(0);
-      }).x1(function (d) {
-        return xNum(d.length);
-      }).y(function (d) {
-        return yScale(d.x0);
-      }).curve(d3.curveMonotoneY));
-      var leftStatsMarker = group.selectAll(".left-rect").data(groupBins).enter().append("g").attr("transform", function (d) {
-        return "translate(".concat(xScale(d.key), ", 0)");
-      }).attr("class", "left-rect").append("rect").attr("x", xScale.bandwidth() / 6).attr("y", function (d) {
-        return yScale(d.values[0][config.statistics]);
-      }).attr("width", xScale.bandwidth() / 3).attr("height", 2).attr("stroke", function (d) {
-        if (config.statistics == "none") {
-          return "none";
-        } else {
-          return "#c6cccf";
-        }
-      }).attr("stroke-width", .75).attr("fill", function (d) {
-        if (config.statistics == "none") {
-          return "none";
-        } else {
-          return "#8c8c8c";
-        }
-      }).attr("clip-path", "url(#plot-area)");
-      var rightStatsMarker = group.selectAll(".right-rect").data(groupBins).enter().append("g").attr("transform", function (d) {
-        return "translate(".concat(xScale(d.key), ", 0)");
-      }).attr("class", "right-rect").append("rect").attr("x", xScale.bandwidth() / 2).attr("y", function (d) {
-        return yScale(d.values[1][config.statistics]);
-      }).attr("width", xScale.bandwidth() / 3).attr("height", 2).attr("stroke", function (d) {
-        if (config.statistics == "none") {
-          return "none";
-        } else {
-          return "#c6cccf";
-        }
-      }).attr("stroke-width", .75).attr("fill", function (d) {
-        if (config.statistics == "none") {
-          return "none";
-        } else {
-          return "#8c8c8c";
-        }
-      }).attr("clip-path", "url(#plot-area)");
-
-      if (config.statistics === "median") {
-        var leftLowerQuartileMarker = group.selectAll(".left-lower-quartile").data(groupBins).enter().append('g').attr("transform", function (d) {
-          return "translate(".concat(xScale(d.key), ", 0)");
-        }).attr("class", "left-lower-quartile").append("line").attr("x1", xScale.bandwidth() / 6).attr("x2", xScale.bandwidth() / 2).attr("y1", function (d) {
-          return yScale(d.values[0]["lower"]);
-        }).attr("y2", function (d) {
-          return yScale(d.values[0]["lower"]);
-        }).attr("stroke-dasharray", "5,3").attr("stroke-width", 1.).attr("stroke", "#8c8c8c");
-        var rightLowerQuartileMarker = group.selectAll(".right-lower-quartile").data(groupBins).enter().append('g').attr("transform", function (d) {
-          return "translate(".concat(xScale(d.key), ", 0)");
-        }).attr("class", "right-lower-quartile").append("line").attr("x1", xScale.bandwidth() / 2).attr("x2", xScale.bandwidth() * (5 / 6)).attr("y1", function (d) {
-          return yScale(d.values[1]["lower"]);
-        }).attr("y2", function (d) {
-          return yScale(d.values[1]["lower"]);
-        }).attr("stroke-dasharray", "5,3").attr("stroke-width", 1.).attr("stroke", "#8c8c8c");
-        var leftUpperQuartileMarker = group.selectAll(".left-upper-quartile").data(groupBins).enter().append('g').attr("transform", function (d) {
-          return "translate(".concat(xScale(d.key), ", 0)");
-        }).attr("class", "left-upper-quartile").append("line").attr("x1", xScale.bandwidth() / 6).attr("x2", xScale.bandwidth() / 2).attr("y1", function (d) {
-          return yScale(d.values[0]["upper"]);
-        }).attr("y2", function (d) {
-          return yScale(d.values[0]["upper"]);
-        }).attr("stroke-dasharray", "5,3").attr("stroke-width", 1.).attr("stroke", "#8c8c8c");
-        var rightUpperQuartileMarker = group.selectAll(".right-upper-quartile").data(groupBins).enter().append('g').attr("transform", function (d) {
-          return "translate(".concat(xScale(d.key), ", 0)");
-        }).attr("class", "right-upper-quartile").append("line").attr("x1", xScale.bandwidth() / 2).attr("x2", xScale.bandwidth() * (5 / 6)).attr("y1", function (d) {
-          return yScale(d.values[1]["upper"]);
-        }).attr("y2", function (d) {
-          return yScale(d.values[1]["upper"]);
-        }).attr("stroke-dasharray", "5,3").attr("stroke-width", 1.).attr("stroke", "#8c8c8c");
-      } // -------------------------------------------------------
-      // DRAW LEGEND
-
-
-      var legendContainer = group.append('g').attr("transform", "translate(0, 0)").classed("legendContainer", true);
-      var legend = legendContainer.selectAll(".legend").data(buckets.lower_pivot).enter().append("g").attr("class", "legend").attr("transform", function (d, i) {
-        console.log("d, i", d, i); // console.log("translate", (i+1) * 10)
-
-        return "translate(6, ".concat(-3 + i * 17, ")"); // return "translate(" + (-40 + (i * 110) - width/2.05) + "," + (-margin.top/2) + ")"; 
-      });
-      legendContainer.append("text").attr("x", 10) //(width - margin.left)/2)
-      .attr("y", -8) // .attr("dy", "-0.2em")
-      .style("text-anchor", "start").style("font-size", 10).text(legend_label);
-      legend.append("circle").attr("cx", 10).attr("cy", 9).attr("r", 6).style("fill", function (d, i) {
-        if (i == 0) {
-          return config.left_color;
-        } else {
-          return config.right_color;
-        }
-      });
-      legend.append("text").attr("x", 20).attr("y", 9).attr("dy", ".4em").style("text-anchor", "start").style("font-size", 10).text(function (d, i) {
+      var yScale = d3.scaleBand().domain(data_keys.map(function (d) {
         return d;
+      })).range([height, 0]).padding(0.05);
+      var universalMax = d3.max([d3.max(positivesVolume, function (d) {
+        return d.total;
+      }), d3.max(negativesVolume, function (d) {
+        return d.total;
+      })]);
+      console.log("universalMax", universalMax);
+      var xScale = d3.scaleLinear().domain([0, universalMax]).range([0, width / 2]);
+      var zScale = d3.scaleOrdinal().domain(["A", "B", "C", "F"]).range(["#27566b", "#339f7b", "#007b82", "#f1cc56"]); // DRAW DATA ------------------------------------------------------------
+
+      var groupPos = svg.append('g').attr("transform", "translate(".concat(width / 2 + margin.left, ", ").concat(margin.top, ")")).attr("width", width / 2 + "px").attr("height", height + "px").attr("class", "group-pos");
+      var groupNeg = svg.append('g').attr("transform", "translate(".concat(margin.left, ", ").concat(margin.top, ")")).attr("width", width / 2 + "px").attr("height", height + "px").attr("class", "group-neg");
+      var posGroups = groupPos.selectAll(".bar-groups") // Enter in the stack data = loop key per key = group per group
+      .data(stackedPositives).enter().append("g").attr("class", "bar-groups").attr("fill", function (d, i) {
+        return zScale(d.key);
       });
+      var negGroups = groupNeg.selectAll(".bar-groups-neg").data(stackedNegatives).enter().append('g').attr("class", "bar-groups-neg").attr("fill", function (d, i) {
+        return zScale(d.key);
+      });
+      posGroups.selectAll("rect") // enter a second time = loop subgroup per subgroup to add all rects
+      .data(function (d) {
+        return d;
+      }).enter().append('rect').attr('x', function (d) {
+        return xScale(d[0]);
+      }) // already translated to width/2 so can use xScale as-is
+      .attr('y', function (d) {
+        return yScale(d.data.group);
+      }).attr('height', function (d) {
+        return yScale.bandwidth();
+      }).attr('width', function (d) {
+        return xScale(d[1]) - xScale(d[0]);
+      });
+      console.log("x neg check");
+      console.log("xScale(3145)", xScale(3145));
+      console.log("width/2", width / 2);
+      console.log("diff", width / 2 - xScale(3145));
+      negGroups.selectAll("rect").data(function (d) {
+        return d;
+      }).enter().append('rect').attr('x', function (d) {
+        return width / 2 - xScale(d[1]);
+      }).attr('y', function (d) {
+        return yScale(d.data.group);
+      }).attr('height', function (d) {
+        return yScale.bandwidth();
+      }).attr('width', function (d) {
+        return xScale(d[1]) - xScale(d[0]);
+      }); // SCALES ------------------------------------------------------------
+      // const xScalePos = d3.scaleLinear()
+      //   .domain([0, maxX])
+      //   .range([width/2, width])
+      // const xAxisPos = d3.axisTop()
+      //   .scale(xScalePos)
+      // const xScaleNeg = d3.scaleLinear()
+      //   .domain([0, maxX])
+      //   .range([width/2, 0])
+      // const xAxisNeg = d3.axisTop()
+      //   .scale(xScaleNeg)
+      // const yScale = d3.scaleBand()
+      //   .domain([... new Set(data_ready.map(d => d.group))].sort())
+      //   .range([height, 0])
+      //   .padding(0.2)
+      // const yAxis = d3.axisLeft()
+      //   .scale(yScale)
+      //   .tickSize(0)
+      // console.log("reverse", [... new Set(data_ready.map(d => d.measure))].sort().reverse())
+      // const colorScalePos = d3.scaleOrdinal()
+      //   .domain([... new Set(positives.map(d => d.measure))].sort().reverse())
+      //   .range(d3.schemeTableau10)
+      // const colorScaleNeg = d3.scaleOrdinal()
+      //   .domain([... new Set(negatives.map(d => d.measure))].sort())
+      //   .range(d3.schemeSet3)
+      // console.log(colorScalePos("A"))
+      // console.log(colorScalePos("B"))
+      // console.log(colorScaleNeg("C"))
+      // console.log(colorScaleNeg("F"))
+      // const stackPos = d3.stack()
+      //   .keys([... new Set(positives.map(d => d.measure))].sort())
+      //   .value((obj, key) => obj.total)
+      //   (positives)
+      // const stackNeg = d3.stack()
+      //   .keys([... new Set(negatives.map(d => d.measure))].sort())
+      //   .value((obj, key) => obj.total)
+      //   (negatives)
+      // console.log("stackedData", stackPos, stackNeg)
+      // // colors are not filling in (maybe I can't use a sequential color scheme for categorical)
+      // // also, placement of negatives is not correct... maybe setup xScaleNeg wrong?
+      // const barsPos = group
+      //   .selectAll("g")
+      //   .data(stackPos)
+      //   .enter()
+      //   .append('g')
+      //   .selectAll('rect')
+      //   .data(d => d)
+      //   .enter()
+      //   .append('rect')
+      //     .attr('fill', d => colorScalePos(d.data.measure))
+      //     .attr('x', d => Math.min(xScalePos(d[0]), xScalePos(d[1])))
+      //     .attr('y', d => yScale(d.data.group))
+      //     .attr('width', d => Math.abs(xScalePos(d[0]) - xScalePos(d[1])))
+      //     .attr('height', yScale.bandwidth())
+      //     .classed("rect-pos", true)
+      // const barsNeg = group
+      //   .selectAll("g")
+      //   .data(stackNeg)
+      //   .enter()
+      //   .append('g')
+      //   .selectAll('rect')
+      //   .data(d => d)
+      //   .enter()
+      //   .append('rect')
+      //     .attr('fill', d => {
+      //       console.log(d.data.measure, colorScaleNeg(d.data.measure))
+      //       colorScaleNeg(d.data.measure)
+      //     })
+      //     .attr('x', d => Math.max(xScaleNeg(d[0]), xScaleNeg(d[1])))
+      //     .attr('y', d => yScale(d.data.group))
+      //     .attr('width', d => Math.abs(xScaleNeg(d[0]) - xScaleNeg(d[1])))
+      //     .attr('height', yScale.bandwidth())
+      //     .classed("rect-neg", true)
     } catch (error) {
-      if (queryResponse.fields.dimensions.length > 1 || queryResponse.fields.dimensions.length < 1 || queryResponse.fields.pivots.length > 2 || queryResponse.fields.pivots.length < 2) {
-        this.addError({
-          title: "Dimension/Pivot Error",
-          message: "This chart takes two pivots and one dimension."
-        });
-        return;
-      } else {
-        this.addError({
-          title: "Data Error",
-          message: "Check that your second pivot has only two options"
-        });
-        return;
+      if (environment == "prod") {
+        console.log("somehow got in here");
+
+        if (queryResponse.fields.dimensions.length > 2 || queryResponse.fields.dimensions.length < 1 || queryResponse.fields.dimensions.length == 1 && queryResponse.fields.pivots.length != 1) {
+          this.addError({
+            title: "Dimension/Pivot Error",
+            message: "This chart takes two dimensions or one pivot on a single dimension."
+          });
+          return;
+        }
       }
     } // Callback at the end of the rendering to let Looker know it's finished
 
@@ -21489,24 +21084,24 @@ var done = function done() {
 
 var menuOptions = "<div id='menu'><h1><strong>Menu</strong></h1><div id='menu-options'></div></div></div>";
 jquery("body").append(menuOptions);
-var template_keys = Object.keys(splitViolin_object.options); // console.log("object.options", object.options)
+var template_keys = Object.keys(divergingBar_object.options); // console.log("object.options", object.options)
 // console.log("Object", Object.keys(object.options))
 // console.log("keys", keys)
 
 template_keys.forEach(function (entry, i) {
-  var array_name = splitViolin_object.options[entry].label;
+  var array_name = divergingBar_object.options[entry].label;
   jquery("#menu-options").append("<p>" + array_name + "</p>");
   var form = jquery('<form>', {
     id: 'id-1',
     "class": 'menu-options-entry'
   }).appendTo('#menu-options'); // console.log("display", object.options[entry].display, ["radio","select"].includes(object.options[entry].display))
 
-  if (["radio", "select"].includes(splitViolin_object.options[entry].display)) {
-    var array_values = splitViolin_object.options[entry].values;
+  if (["radio", "select"].includes(divergingBar_object.options[entry].display)) {
+    var array_values = divergingBar_object.options[entry].values;
     array_values.forEach(function (ent) {
       var str;
 
-      if (ent[Object.keys(ent)[0]] == splitViolin_object.options[entry]["default"]) {
+      if (ent[Object.keys(ent)[0]] == divergingBar_object.options[entry]["default"]) {
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent[Object.keys(ent)] + "' id='" + Object.keys(ent)[0] + "' name='" + array_name + "' value='" + Object.keys(ent)[0] + "' checked></input><label class='form-label' for='" + Object.keys(ent)[0] + "'>" + Object.keys(ent)[0] + "</label>";
       } else {
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent[Object.keys(ent)] + "' id='" + Object.keys(ent)[0] + "' name='" + array_name + "' value='" + Object.keys(ent)[0] + "'></input><label class='form-label' for='" + Object.keys(ent)[0] + "'>" + Object.keys(ent)[0] + "</label>";
@@ -21514,22 +21109,22 @@ template_keys.forEach(function (entry, i) {
 
       form.append(str);
     });
-  } else if (splitViolin_object.options[entry].display == "number") {
+  } else if (divergingBar_object.options[entry].display == "number") {
     var str;
-    str = "<input type='number' internal_cat='" + template_keys[i] + "' internal_value='" + splitViolin_object.options[entry]["default"] + "' id='" + template_keys[i] + "' min='0' name='" + splitViolin_object.options[entry]["label"] + "' value='" + splitViolin_object.options[entry]["default"] + "'></input><label class='form-label' for='" + splitViolin_object.options[entry]["label"] + "'>" + splitViolin_object.options[entry]["label"] + "</label>";
+    str = "<input type='number' internal_cat='" + template_keys[i] + "' internal_value='" + divergingBar_object.options[entry]["default"] + "' id='" + template_keys[i] + "' min='0' name='" + divergingBar_object.options[entry]["label"] + "' value='" + divergingBar_object.options[entry]["default"] + "'></input><label class='form-label' for='" + divergingBar_object.options[entry]["label"] + "'>" + divergingBar_object.options[entry]["label"] + "</label>";
     form.append(str);
-  } else if (splitViolin_object.options[entry].display == "text") {
+  } else if (divergingBar_object.options[entry].display == "text") {
     var _str;
 
-    _str = "<input type='text' internal_cat='" + template_keys[i] + "' internal_value='" + splitViolin_object.options[entry]["default"] + "' id='" + template_keys[i] + "' name='" + splitViolin_object.options[entry]["label"] + "' value='" + splitViolin_object.options[entry]["default"] + "'></input><label class='form-label' for='" + splitViolin_object.options[entry]["label"] + "'>" + splitViolin_object.options[entry]["label"] + "</label>";
+    _str = "<input type='text' internal_cat='" + template_keys[i] + "' internal_value='" + divergingBar_object.options[entry]["default"] + "' id='" + template_keys[i] + "' name='" + divergingBar_object.options[entry]["label"] + "' value='" + divergingBar_object.options[entry]["default"] + "'></input><label class='form-label' for='" + divergingBar_object.options[entry]["label"] + "'>" + divergingBar_object.options[entry]["label"] + "</label>";
     form.append(_str);
-  } else if (splitViolin_object.options[entry].type == "boolean") {
+  } else if (divergingBar_object.options[entry].type == "boolean") {
     var _array_values = ["true", "false"];
 
     _array_values.forEach(function (ent) {
       var str;
 
-      if (ent == splitViolin_object.options[entry]["default"]) {
+      if (ent == divergingBar_object.options[entry]["default"]) {
         // console.log("adding default")
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent + "' id='" + template_keys[i] + "' name='" + array_name + "' value='" + ent + "' checked></input><label class='form-label' for ='" + ent + "'>" + ent + "</label>";
       } else {
@@ -21539,8 +21134,8 @@ template_keys.forEach(function (entry, i) {
 
       form.append(str);
     });
-  } else if (splitViolin_object.options[entry].type == "array") {
-    var _array_values2 = splitViolin_object.options[entry]["default"]; // console.log("array_values", array_values)
+  } else if (divergingBar_object.options[entry].type == "array") {
+    var _array_values2 = divergingBar_object.options[entry]["default"]; // console.log("array_values", array_values)
 
     _array_values2.forEach(function (ent) {
       var str; // console.log("ent", ent)
@@ -21555,7 +21150,7 @@ template_keys.forEach(function (entry, i) {
     });
   }
 });
-json("http://localhost:3001/dataSplitViolin").then(function (data) {
+json("http://localhost:3001/dataDivergingBar").then(function (data) {
   var todays_options = {};
   jquery('input:radio:checked').each(function () {
     todays_options[this.attributes.internal_cat.value] = this.attributes.internal_value.value;
@@ -21574,26 +21169,26 @@ json("http://localhost:3001/dataSplitViolin").then(function (data) {
 
   var details = ""; // Fire first instance of chart
 
-  splitViolin_object.updateAsync(data.data, src_select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment); // On change to options, loop through selections and then redraw chart
+  divergingBar_object.updateAsync(data.data, src_select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment); // On change to options, loop through selections and then redraw chart
 
   jquery('input:radio').on("click", function () {
     jquery('input:radio:checked').each(function () {
       todays_options[this.attributes.internal_cat.value] = this.attributes.internal_value.value;
     });
-    splitViolin_object.updateAsync(data.data, src_select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
+    divergingBar_object.updateAsync(data.data, src_select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
   });
   jquery('input[type=number]').on("input", function () {
     // const id = $('input[type=number]').attr("id")
     var id = this.attributes.id.value;
     var num = jquery("#" + id).val();
     todays_options[this.attributes.internal_cat.value] = num;
-    splitViolin_object.updateAsync(data.data, src_select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
+    divergingBar_object.updateAsync(data.data, src_select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
   });
   jquery('input[type=text]').on("input", function () {
     var id = this.attributes.id.value;
     var str = jquery("#" + id).val();
     todays_options[this.attributes.internal_cat.value] = str;
-    splitViolin_object.updateAsync(data.data, src_select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
+    divergingBar_object.updateAsync(data.data, src_select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
   }); // Handle the mousedown event
   // that's triggered when user drags the resizer
 
@@ -21623,7 +21218,7 @@ json("http://localhost:3001/dataSplitViolin").then(function (data) {
     // Remove the handlers of `mousemove` and `mouseup`
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
-    splitViolin_object.updateAsync(data.data, src_select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
+    divergingBar_object.updateAsync(data.data, src_select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
   }; // Query all resizers
 
 
