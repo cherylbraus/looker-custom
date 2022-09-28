@@ -26,9 +26,9 @@ $("body").append(menuOptions)
 
 const keys = Object.keys(object.options)
 
-// console.log("object.options", object.options)
-// console.log("Object", Object.keys(object.options))
-// console.log("keys", keys)
+console.log("object.options", object.options)
+console.log("Object", Object.keys(object.options))
+console.log("keys", keys)
 
 keys.forEach(function(entry, i) {
 

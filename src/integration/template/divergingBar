@@ -105,17 +105,21 @@ export const object = {
       d3.select("#vis")
         .select("svg").html("")
 
-      const margin = {top: 40, right: 40, bottom: 40, left:40};
-    //   const getNode = d3.select("#vis");
+      const margin = {top: 40, right: 40, bottom: 40, left:80};
+      const getNode = d3.select("#vis");
 
-    //   // Update this once we have a better idea how Looker integration will look
-    //   const new_node_width = getNode.select(function() { return this.parentNode; })
-    //   const new_node_height = getNode.select(function() { return this.parentNode; })
-    //   const w = new_node_width.node().getBoundingClientRect().width;
-    //   const h = new_node_height.node().getBoundingClientRect().height;
+      console.log("getNode", getNode)
 
-    const w = element.clientWidth
-    const h = element.clientHeight
+      // Update this once we have a better idea how Looker integration will look
+      const new_node_width = getNode.select(function() { return this.parentNode; })
+      const new_node_height = getNode.select(function() { return this.parentNode; })
+
+      console.log("new node width", new_node_width)
+      console.log(".node", new_node_width.node())
+      console.log("bounding", new_node_width.node().getBoundingClientRect())
+      console.log("width", new_node_width.node().getBoundingClientRect().width)
+      const w = new_node_width.node().getBoundingClientRect().width;
+      const h = new_node_height.node().getBoundingClientRect().height;
 
       const width = w - margin.left - margin.right;
       const height = h - margin.bottom - margin.top;
@@ -202,6 +206,8 @@ export const object = {
             const stackedNegatives = d3.stack()
                .keys(headersNegative)(negativesVolume)
 
+
+          // SCALES --------------------------------------------------------------
           const y = d3.scaleBand().domain(data_keys.map((d)=>{
             return d
           })).range([height, 0]).padding(0.05)
@@ -213,8 +219,10 @@ export const object = {
           })])
 
           const x = d3.scaleLinear().domain([0,universalMax]).range([0, (width/2)])
+          const xneg = d3.scaleLinear().domain([0,universalMax]).range([width/2,0])
 
           const z = d3.scaleOrdinal().domain(["A", "B", "C", "F"]).range(["#27566b","#339f7b","#007b82","#f1cc56"])
+
 
           // append the svg object to the body of the page
           var svg = d3.select("#vis")
@@ -244,6 +252,8 @@ export const object = {
                     return z(d.key)
                     })
 
+            console.log("stackedNegatives", stackedNegatives)
+
             const negGroups = groupNeg  
                 .selectAll(".bar-groups-neg")
                 // Enter in the stack data = loop key per key = group per group
@@ -272,11 +282,53 @@ export const object = {
                   .data(function(d) { return d; })
                   .enter().append("rect")
                     .attr("x", function(d) { 
-                      return ((width/2) - margin.left - x(d[1])); })
+                      return ((width/2) - x(d[1])); })
+                      // return ((width/2) - margin.left - x(d[1])); })
                     .attr("y", function(d) { 
                       return y(d.data.group); })
                     .attr("height", function(d) { return y.bandwidth(); })
                     .attr("width",function(d) { return x(d[1]) - x(d[0])})
+
+            negGroups
+                  .selectAll("text")
+                  .data(function(d) {return d;})
+                  .enter().append('text')
+                      .text(d => d3.format(",.0f")(d[1] - d[0]))
+                      .attr("x", d => (width/2) - x(d[0] + (d[1]-d[0])/2))
+                      .attr("y", d => y(d.data.group) + y.bandwidth()/2)
+                      .style("text-anchor", "middle")
+                      .style("fill", "white")
+                      .style("font-size", "10px")
+
+
+        // AXES --------------------------------------------------------------
+        const xAxisGenerator = d3.axisTop()
+          .scale(x)
+          .tickPadding(10)
+          .tickSizeOuter(0)
+
+        const xAxisGeneratorNeg = d3.axisTop()
+          .scale(xneg)
+          .tickPadding(10)
+          .tickSizeOuter(0)
+
+        const yAxisGenerator = d3.axisLeft()
+          .scale(y)
+          .tickPadding(10)
+
+        const xAxisPos = groupPos.append("g")
+          .call(xAxisGenerator)
+          .attr("class", "x-axis")
+
+        const xAxisNeg = groupNeg.append("g")
+          .call(xAxisGeneratorNeg)
+          .attr("class", "x-axis")
+
+        const yAxis = groupNeg.append("g")
+          .call(yAxisGenerator)
+          .attr("class", "y-axis")
+
+        
 
     done()
   

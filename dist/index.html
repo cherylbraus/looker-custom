@@ -20,11 +20,28 @@
             @font-face { font-family: Roboto; font-weight: 700; font-style: normal;
                 src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');
             }
-
+            tr:first-child {
+              font-weight:500
+            }
             body {
                 font-family: 'Roboto';
             }
-
+            text {
+              font-family: 'Roboto';
+            }
+            .domain {
+              display: none;
+            }
+            .gridline {
+              stroke: rgb(230, 230, 230);
+              shape-rendering: crispEdges;
+              stroke-opacity: .1;
+            }
+            .gridline2 {
+              stroke: white;
+              shape-rendering: crispEdges;
+              stroke-opacity: 1;
+            }
             #viz-container {
               z-index: 9;
               position: relative;
@@ -34,7 +51,15 @@
               width: 600px;
               height: 360px;
             }
-
+            #dimension-header {
+              font-size: 12px;
+            }
+            .value-headers {
+              font-size: 12px;
+            }
+            .value-headers-body {
+              font-weight: 500;
+            }
             #viz {
               font-family: 'Open Sans', 'Helvetica', 'sans-serif';
               cursor: move;
@@ -46,7 +71,6 @@
               fill: black;
               color: black;
             }
-
             .line {
               fill: none;
               stroke-width: 2px;
@@ -112,6 +136,12 @@
                 text-transform: uppercase;
             }
 
+            .tooltip h1 {
+                font-size: 11px;
+                color: #c3c3c3;
+                text-transform: uppercase;
+            }
+
             hr { 
                 margin-top: 1px; 
                 margin-bottom: 1px 
@@ -138,22 +168,24 @@
                 background: #a9a9a9;
                 padding: 4px 0;
             }
-            tr:nth-child(even) { background: #EEE; }
-              .value-down {
-                color: #D76106;
-                font-weight:500;
-                                display:flex;
-                justify-content: center;
-              }
-              .value-up {
-                color: #0072b5;
-                font-weight:500;
-                                display:flex;
-                justify-content: center;
-              }
-              .change-figure {
-                line-height: 36px;
-              }
+            tr:nth-child(even) { 
+              background: #EEE; 
+            }
+            .value-down {
+              color: #D76106;
+              font-weight:500;
+              display:flex;
+              justify-content: center;
+            }
+            .value-up {
+              color: #0072b5;
+              font-weight:500;
+               display:flex;
+              justify-content: center;
+            }
+            .change-figure {
+              line-height: 36px;
+            }
             .first-svg {
                 height: 50px!important;
                 width: 120px!important;
@@ -165,6 +197,18 @@
             #menu-options p {
                 font-weight: 500;
             }
+            #vis-options-container {
+              display: flex;
+              margin: 12px 8px, 4px;
+            }
+            #vis-options-container p {
+              font-size: 14px;
+              margin: 0 4px 0 0;
+            }
+            .backdrop {
+              opacity: .5;
+            }
+            
             #viz {
   -webkit-touch-callout: none; /* iOS Safari */
     -webkit-user-select: none; /* Safari */
@@ -223,7 +267,11 @@
             <div id="viz-container">
                 <div class="resizer resizer-r"></div>
                 <div class="resizer resizer-b"></div>
-                <div id="viz">
+                <div id="vis">
+                  <!-- <div id="vis-options-container"><p>Haul length category: </p>
+                    <select name="vis-options" id="vis-options">
+                    </select>
+                </div> -->
                   <svg></svg>
                   <!-- <svg id="first"></svg>
                   <svg id="second"></svg> -->
