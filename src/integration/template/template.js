@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
-import { object } from './divergingBar'
+import { object } from './topTextTile'
 import * as $ from 'jquery'
 
 // Query the element
@@ -100,7 +100,7 @@ keys.forEach(function(entry, i) {
 })
 
 
-d3.json("http://localhost:3001/dataDivergingBar").then(function(data) {
+d3.json("http://localhost:3001/dataTopTextTile").then(function(data) {
 	let todays_options = {}
 
 	$('input:radio:checked').each(function() {
@@ -121,27 +121,27 @@ d3.json("http://localhost:3001/dataDivergingBar").then(function(data) {
 
 	const details = ""
 	// Fire first instance of chart
-	object.updateAsync(data.data, d3.select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment)
+	object.updateAsync(data.data, d3.select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment)
 	
 	// On change to options, loop through selections and then redraw chart
 	$('input:radio').on("click", function() {
 		$('input:radio:checked').each(function() {
 			todays_options[this.attributes.internal_cat.value] = this.attributes.internal_value.value
 		});
-		object.updateAsync(data.data, d3.select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment)
+		object.updateAsync(data.data, d3.select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment)
 	});
 	$('input[type=number]').on("input", function() {
 		// const id = $('input[type=number]').attr("id")
 		const id = this.attributes.id.value
 		let num = $("#" + id).val()
 		todays_options[this.attributes.internal_cat.value] = num
-		object.updateAsync(data.data, d3.select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment)
+		object.updateAsync(data.data, d3.select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment)
 	});
 	$('input[type=text]').on("input", function() {
 		const id = this.attributes.id.value
 		let str = $("#" + id).val()
 		todays_options[this.attributes.internal_cat.value] = str
-		object.updateAsync(data.data, d3.select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment)
+		object.updateAsync(data.data, d3.select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment)
 	});
 
 
@@ -178,7 +178,7 @@ d3.json("http://localhost:3001/dataDivergingBar").then(function(data) {
 	    // Remove the handlers of `mousemove` and `mouseup`
 	    document.removeEventListener('mousemove', mouseMoveHandler);
 	    document.removeEventListener('mouseup', mouseUpHandler);
-	    object.updateAsync(data.data, d3.select("#viz")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment)
+	    object.updateAsync(data.data, d3.select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment)
 	};
 
 	// Query all resizers

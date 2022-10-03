@@ -208,7 +208,7 @@ export const object = {
             height: 360px;
             }
 
-            #viz {
+            #vis {
             font-family: 'Open Sans', 'Helvetica', 'sans-serif;';
             cursor: move;
             z-index: 10;

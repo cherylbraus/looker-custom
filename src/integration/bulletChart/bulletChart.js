@@ -75,14 +75,6 @@ try {
           return d.getMonth() + 1;
         }
 
-    // Update from here
-       function getQuarter(d) {
-          d = d || new Date();
-          var m = Math.floor(d.getMonth()/3) + 1;
-          return m > 4? m - 4 : m;
-        }
-
-
     const parseTime = d3.timeParse("%Y-%m");
     const dimension = queryResponse.fields.dimension_like[0]
     const measures = queryResponse.fields.measure_like
@@ -96,6 +88,8 @@ try {
     let budget_forecast_dps = {}
 
     let data_remix = []
+
+    
 
     // Slice off only the current year into the chart and package into data_remix array
     data.forEach(function(d,i) {
@@ -120,20 +114,39 @@ try {
         return parseTime(a[dimension.name].value) - parseTime(b[dimension.name].value)
     })
 
+            // Monthly data
             for (let m = 0; m <= (getMonth(new Date()) - 1); m++) {
+                if (m === getMonth(new Date()) - 1) {
+                    console.log("last m", m)
+                    month_dp_fc += data_remix[m][bullet_measures[1]].value // most recent month = forecast
+                } else {
+                    console.log("prior m", m)
+                    month_dp_fc += data_remix[m][bullet_measures[2]].value // prior months = actuals
+                }
+
                 month_dp_bg += data_remix[m][bullet_measures[0]].value
-                month_dp_fc += data_remix[m][bullet_measures[1]].value
-            }
-            // Quarter data
-            for (let j = 0; j <= ((getQuarter(new Date())*3) - 1); j++) {
+            }   
+
+            // Quarterly data
+            for (let j = 0; j <= ((getQuarter(new Date()) * 3) - 1); j++) {
+                if (j >= getMonth(new Date()) - 1) {
+                    quarter_dp_fc += data_remix[j][bullet_measures[1]].value // current + future months = forecasts
+                } else {
+                    quarter_dp_fc += data_remix[j][bullet_measures[2]].value // prior months = actuals
+                }
+
                 quarter_dp_bg += data_remix[j][bullet_measures[0]].value
-                quarter_dp_fc += data_remix[j][bullet_measures[1]].value
             }
-            // Year data
+
+            // Yearly data
             for (let k = 0; k <= 11; k++) {
+                if (k >= getMonth(new Date()) - 1) {
+                    year_dp_fc += data_remix[k][bullet_measures[1]].value // current + figure months = forecasts
+                } else {
+                    year_dp_fc += data_remix[k][bullet_measures[2]].value // prior months = actuals
+                }
 
                 year_dp_bg += data_remix[k][bullet_measures[0]].value
-                year_dp_fc += data_remix[k][bullet_measures[1]].value
                 year_actual += data_remix[k][bullet_measures[2]].value
                 spot_actual += data_remix[k][bullet_measures[3]].value
                 contract_actual += data_remix[k][bullet_measures[4]].value
