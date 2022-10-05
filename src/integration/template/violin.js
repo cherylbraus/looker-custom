@@ -378,34 +378,8 @@ export const object = {
 
         const tooltipHeader = tooltip.select("#tt-header")
         const tooltipBody = tooltip.select("#tt-body")
-
-        const let tt_data;
-        if (d3.mouse(this)[0] < xNum(0)) {
-            tt_data = d.values[0]
-        } else {
-            tt_data = d.values[1]
-        }
-
-        // text in tooltip
-        let title = '';
-        if (pivotDate[0]) {
-            title += `${d3.timeFormat(config.xticklabel_format)(new Date(d.key))}`
-        } else {
-            title += d.key
-        }
-
-        if (pivotDate[1]) {
-            title += ` - ${d3.timeFormat(config.xticklabel_format)(new Date(tt_data.key))}`
-        } else {
-            title += ` - ${tt_data.key}`
-        }
-
-        tooltipHeader.html(title + "<hr>")
-
-        tooltipBody.html('<span style="float:right;">Mean: ' + d3.format(config.yticklabel_format)(tt_data.mean) + '</span>' + '<br>' + 
-        '<span style="float:right;">Median: ' + d3.format(config.yticklabel_format)(tt_data.median) + '</span>' + '<br>' + 
-        '<span style="float:right;">Lower Q: ' + d3.format(config.yticklabel_format)(tt_data.lower) + '</span>' + '<br>' + 
-        '<span style="float:right;">Upper Q: ' + d3.format(config.yticklabel_format)(tt_data.upper) + '</span>')over = function(d) {
+        
+        const mouseover = function(d) {
             tooltip 
                 .transition()
                 .duration(0)
@@ -417,34 +391,6 @@ export const object = {
         }
 
         const mousemove = function(d) {
-            // attempt 1
-            // let x;
-            // let y;
-
-            // if (d3.event.pageX < width * 0.5) {
-            //     x = `${d3.event.pageX}px`
-            // } else {
-            //     x = `calc(-100% + ${d3.event.pageX}px)`
-            // }
-
-            // if (d3.event.pageY < height * 0.7) {
-            //     y = `${d3.event.pageY}px`
-            // } else {
-            //     y = `calc(-50% + ${d3.event.pageY}px)`
-            // }
-
-            // tooltip.style("transform", `translate(`+ x + y + `)`)
-
-            // attempt 2
-            // const xPosition = d3.mouse(this)[0] - 15
-            // const yPosition = d3.mouse(this)[1] - 25
-            // tooltip.attr("transform", "translate(" + xPosition + "," + yPosition + ")")
-
-            // tooltip
-            //     .style("top", d3.event.pageY - 150 + "px")
-            //     .style("left", (d3.mouse(this)[0]) + "px")
-            //     .style("top", (d3.mouse(this)[1]) - 150 + "px")
-
             if (d3.event.pageY < height*.7) {
                 console.log("here less")
                 tooltip

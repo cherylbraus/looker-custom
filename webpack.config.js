@@ -32,8 +32,8 @@ var webpackConfig = {
     // sparklines: './src/integration/sparklines/sparklines.js',
     // fever: './src/integration/fever/fever.js',
     // coloredBar: './src/integration/coloredBar/coloredBar.js',
-    // weekDayBar: './src/integration/weekDayBar/weekDayBar.js',
-    template: './src/integration/template/template.js',
+    weekDayBar: './src/integration/weekDayBar/weekDayBar.js',
+    // template: './src/integration/template/template.js',
   },
   output: {
     filename: "[name].js",
@@ -44,12 +44,12 @@ var webpackConfig = {
   resolve: {
     extensions: [".ts", ".js"]
   },
-  optimization: {
-    minimize: false
-  },
-  // plugins: [
-  //   new UglifyJSPlugin()
-  // ],
+  // optimization: {
+  //   minimize: false
+  // },
+  plugins: [
+    new UglifyJSPlugin()
+  ],
   module: {
     rules: [
       { test: /\.js$/, loader: "babel-loader" },

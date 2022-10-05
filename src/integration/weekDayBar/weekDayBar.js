@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
 
-export const object = {
+looker.plugins.visualizations.add({
 
     id: "week-day-bar",
     label: "ZDev Week & Day Bars",
@@ -27,14 +27,14 @@ export const object = {
         dailylines: {
             type: "boolean",
             label: "Show Daily Avg Goal",
-            default: "true",
+            default: true,
             section: "General",
             order: 4
         },
         show_yaxis_name: {
             type: "boolean",
             label: "Show Y-Axis Name",
-            default: "true",
+            default: true,
             section: "Y",
             order: 1
         },
@@ -42,23 +42,31 @@ export const object = {
             type: "string",
             label: "Y-Axis Label",
             display: "text",
-            default: "",
+            default: "Volume",
             section: "Y",
             order: 2
         },
         yticklabels_show: {
             type: "boolean",
             label: "Show Y Tick Labels",
-            default: "true",
+            default: true,
             section: "Y",
             order: 3
+        },
+        leftmargin: {
+            type: "string",
+            label: "Left Margin",
+            display: "text",
+            default: "80",
+            section: "Y",
+            order: 4
         },
         y_gridlines: {
             type: "boolean",
             label: "Show Y Gridlines",
-            default: "false",
+            default: false,
             section: "Y",
-            order: 4
+            order: 5
         },
     },
 
@@ -87,9 +95,94 @@ export const object = {
                     font-family: 'Roboto';
                     font-size: 12px;
                 }
+
+                #viz-container {
+                    z-index: 9;
+                    position: relative;
+                    background-color: none;
+                    border: 1px solid #d3d3d3;
+                    text-align: center;
+                    width: 600px;
+                    height: 360px;
+                }
+          
+                #vis {
+                    font-family: 'Open Sans', 'Helvetica', 'sans-serif;';
+                    cursor: move;
+                    z-index: 10;
+                    background-color: none;
+                    color: #fff;
+                    height: 100%;
+                    width: 100%;
+                    fill: black;
+                    color: black;
+                }
+
+                .axis-label {
+                    fill: #3a4245;
+                    font-size: 12px;
+                    // font-family: 'sans-serif';
+                    text-anchor: middle;
+                }
+        
+                .y-axis, .x-axis {
+                    // font-family: "sans-serif";
+                }
+        
+                .x-axis .domain {
+                    stroke: #ccd6eb;
+                    stroke-width: 1;
+                }
+        
+                .y-axis .domain {
+                    stroke: none;
+                }
+        
+                .x-axis text, .y-axis text {
+                    font-size: 12px;
+                    color: #3a4245;
+                    visibility: visible;
+                }
+        
+                .x-axis text .hide, .y-axis text .hide {
+                    visibility: hidden;
+                }
+        
+                .x-axis line, .y-axis line {
+                    stroke: #e6e6e6;
+                    stroke-width: 1;
+                    opacity: 1;
+                }
+        
+                .x-axis line .hide, .y-axis line .hide {
+                    opacity: 0;
+                }
+
+                .tooltip {
+                    box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;
+                    font-size: 12px;
+                    pointer-events: none;
+                }
+        
+                .tooltip #tt-header {
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #c3c3c3;
+                    text-transform: uppercase;
+                }
+        
+                hr { 
+                    margin-top: 1px; 
+                    margin-bottom: 1px 
+                }
+        
+                #tt-body {
+                  margin-top: 5px;
+                }
             </style>
             <svg>
-            </svg>`;
+            </svg>
+            <div class="tooltip"></div>`;
         element.style.fontFamily = `"Open Sans", "Helvetica", sans-serif`       
     },
 
@@ -102,9 +195,15 @@ export const object = {
             })) return
         }
 
-        // function group_by_week(d) {
-        //     d.reduce
-        // }
+        const options = { ...this.options}
+
+        if (config.show_yaxis_name) {
+            options.yaxis_label.hidden = false
+        } else {
+            options.yaxis_label.hidden = true
+        }
+
+        this.trigger('registerOptions', options)
         
         try {
 
@@ -113,7 +212,7 @@ export const object = {
                     top: 30,
                     right: 10,
                     bottom: 60,
-                    left: 80
+                    left: +config.leftmargin,
             }
 
             const width = element.clientWidth;
@@ -344,6 +443,60 @@ export const object = {
                 .tickSizeOuter(0)
                 .tickSizeInner(0)
 
+            // peripherals (axes)
+            const xAxisGenerator = d3.axisBottom()
+                .scale(xScale)
+                .tickPadding(30)
+                .tickSizeOuter(0)
+                .tickSizeInner(0)
+                .tickFormat((d, i) => `Week: ${d3.timeFormat("%b %-d")(d)}`)
+
+            const yAxisGenerator = d3.axisLeft()
+                .scale(yScale)
+                .tickPadding(10)
+
+            if (config.yticklabels_show == true) {
+                yAxisGenerator
+                    .tickFormat(d3.format(config.metric_format))
+            } else {
+                yAxisGenerator
+                    .tickFormat("")
+            }
+
+            if (config.y_gridlines == true) {
+                yAxisGenerator
+                    .tickSize(-boundedWidth)
+            } else {
+                yAxisGenerator
+                    .tickSize(0)
+            }
+
+            const xAxis = group.append("g")
+                .call(xAxisGenerator)
+                    .style("transform", `translateY(${boundedHeight}px)`)
+                    .attr("class", "x-axis")
+
+            const yAxis = group.append("g")
+                .call(yAxisGenerator)
+                    .attr("class", "y-axis")
+
+            // axis labels
+            if (config.show_yaxis_name == true) {
+                const yAxisLabel = yAxis.append("text")
+                    .attr("class", "axis-label")
+                    .attr("x", (-boundedHeight/2))
+                    .attr("y", -margin.left + 18)
+                    .style("transform", "rotate(-90deg)")
+                    // .text("Metric Name")
+                    .text(function() {
+                        if (config.yaxis_label != "") {
+                            return config.yaxis_label
+                        } else {
+                            return measures[1].label_short.split(" ")[0]
+                        }
+                    })
+            }
+
             
             // draw large/week bars
             const weekGroups = group.append("g")
@@ -394,7 +547,7 @@ export const object = {
                     .on("mouseleave", mouseleave)
 
             // draw simple daily goal
-            if (config.dailylines === "true" ) {
+            if (config.dailylines == true ) {
                 const dayGoalLine = weekGroups
                     .append("line")
                         .attr("x1", d => xScale(weekAccessor(d)))
@@ -464,59 +617,7 @@ export const object = {
 
 
 
-            // peripherals (axes)
-            const xAxisGenerator = d3.axisBottom()
-                .scale(xScale)
-                .tickPadding(30)
-                .tickSizeOuter(0)
-                .tickSizeInner(0)
-                .tickFormat((d, i) => `Week: ${d3.timeFormat("%b %-d")(d)}`)
-
-            const yAxisGenerator = d3.axisLeft()
-                .scale(yScale)
-                .tickPadding(10)
-
-            if (config.yticklabels_show === "true") {
-                yAxisGenerator
-                    .tickFormat(d3.format(config.metric_format))
-            } else {
-                yAxisGenerator
-                    .tickFormat("")
-            }
-
-            if (config.y_gridlines === "true") {
-                yAxisGenerator
-                    .tickSize(-boundedWidth)
-            } else {
-                yAxisGenerator
-                    .tickSize(0)
-            }
-
-            const xAxis = group.append("g")
-                .call(xAxisGenerator)
-                    .style("transform", `translateY(${boundedHeight}px)`)
-                    .attr("class", "x-axis")
-
-            const yAxis = group.append("g")
-                .call(yAxisGenerator)
-                    .attr("class", "y-axis")
-
-            // axis labels
-            if (config.show_yaxis_name == "true") {
-                const yAxisLabel = yAxis.append("text")
-                    .attr("class", "axis-label")
-                    .attr("x", (-boundedHeight/2))
-                    .attr("y", -margin.left + 18)
-                    .style("transform", "rotate(-90deg)")
-                    // .text("Metric Name")
-                    .text(function() {
-                        if (config.yaxis_label != "") {
-                            return config.yaxis_label
-                        } else {
-                            return measures[1].label_short.split(" ")[0]
-                        }
-                    })
-            }
+            
             
 
 
@@ -535,4 +636,4 @@ export const object = {
         done()
     }
 }
-};
+});

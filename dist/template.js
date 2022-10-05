@@ -20613,40 +20613,61 @@ var handleErrors = function (vis, res, options) {
 
 
 var weekDayBar_object = {
-  id: "top-text-tile",
-  label: "ZDev Top Text Tile",
+  id: "week-day-bar",
+  label: "ZDev Week & Day Bars",
   options: {
-    metric: {
+    metric_format: {
       type: "string",
-      label: "Metric Name",
+      label: "Metric Value Format",
       display: "text",
-      "default": "Volume",
-      section: "Options"
-    },
-    currency: {
-      type: "boolean",
-      label: "Metric is Currency",
-      "default": "false",
-      section: "Options"
+      "default": ",.0f",
+      placeholder: "#,###",
+      section: "General",
+      order: 2
     },
     comparison: {
       type: "string",
       label: "Comparison Metric Label",
       display: "text",
-      "default": "YTD Target",
-      section: "Options"
+      "default": "Forecast",
+      section: "General",
+      order: 3
     },
-    colorTop: {
+    dailylines: {
       type: "boolean",
-      label: "Color Main #",
+      label: "Show Daily Avg Goal",
       "default": "true",
-      section: "Options"
+      section: "General",
+      order: 4
     },
-    colorBottom: {
+    show_yaxis_name: {
       type: "boolean",
-      label: "Color Bottom #",
+      label: "Show Y-Axis Name",
       "default": "true",
-      section: "Options"
+      section: "Y",
+      order: 1
+    },
+    yaxis_label: {
+      type: "string",
+      label: "Y-Axis Label",
+      display: "text",
+      "default": "",
+      section: "Y",
+      order: 2
+    },
+    yticklabels_show: {
+      type: "boolean",
+      label: "Show Y Tick Labels",
+      "default": "true",
+      section: "Y",
+      order: 3
+    },
+    y_gridlines: {
+      type: "boolean",
+      label: "Show Y Gridlines",
+      "default": "false",
+      section: "Y",
+      order: 4
     }
   },
   // Set up the initial state of the visualization
@@ -20673,13 +20694,14 @@ var weekDayBar_object = {
 
 
     try {
+      // group the data by week
       var group_by_week = function group_by_week(arr) {
-        return Object.values(data_ready.reduce(function (a, _ref) {
-          var weekStart = _ref.week,
-              compVal = _ref.comp,
-              actualVal = _ref.actual,
-              dayVal = _ref.day,
-              dayofwk = _ref.dayofwk;
+        return Object.values(data_ready.reduce(function (a, _ref2) {
+          var weekStart = _ref2.week,
+              compVal = _ref2.comp,
+              actualVal = _ref2.actual,
+              dayVal = _ref2.day,
+              dayofwk = _ref2.dayofwk;
           var key = weekStart;
 
           if (a[key] === undefined) {
@@ -20715,7 +20737,76 @@ var weekDayBar_object = {
       var boundedWidth = width - margin.left - margin.right;
       var boundedHeight = height - margin.top - margin.bottom;
       var svg = src_select(element).select("svg").html("").attr("width", "100%").attr("height", "100%");
-      var group = svg.append("g").attr("transform", "translate(".concat(margin.left, ", ").concat(margin.top, ")")).attr("width", "100%").attr("height", boundedHeight + "px").classed("group", true); // load data
+      var group = svg.append("g").attr("transform", "translate(".concat(margin.left, ", ").concat(margin.top, ")")).attr("width", "100%").attr("height", boundedHeight + "px").classed("group", true); // TOOLTIPS ---------------------------------------------------------------
+
+      var tooltip = src_select(".tooltip").style("position", "absolute").style("padding", "5px").style("background-color", "white").style("opacity", 0).style("border-radius", "4px").style("display", "block").style("border", "solid").style("border-color", "lightgrey").style("border-width", ".5px");
+      tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>');
+      var tooltipHeader = tooltip.select("#tt-header");
+      var tooltipBody = tooltip.select("#tt-body");
+
+      var mouseover = function mouseover(d) {
+        tooltip.transition().duration(0).style("opacity", 0.95);
+        src_select(this).style("opacity", 1);
+        console.log("mouseover", mouse(this));
+      };
+
+      var mouseleave = function mouseleave(d) {
+        tooltip.transition().duration(0).style("opacity", 0);
+        src_select(this).style("opacity", 1);
+        console.log("mouseleave", mouse(this));
+      }; // const mousemove = function(d) {
+      //     console.log("mousemove", d3.mouse(this))
+      // }
+
+
+      var mousemove = function mousemove() {
+        var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+            _ref$data = _ref.data,
+            data = _ref$data === void 0 ? {} : _ref$data,
+            _ref$label = _ref.label,
+            label = _ref$label === void 0 ? "weekbar" : _ref$label;
+
+        console.log("tooltip0"); // console.log(d3.mouse(this))
+        // console.log(d3.mouse(this)[1])
+        // console.log(d3.event.pageX)
+        // tooltip
+        //     .style("top", (d3.event.pageY - 10 + "px"))
+        //     .style("left", d3.event.pageX - 50 + "px")
+
+        if (on_event.pageY < boundedHeight * .7) {
+          console.log("here less");
+          tooltip.style("top", on_event.pageY - 60 + "px");
+        } else {
+          tooltip.style("top", on_event.pageY - 120 + "px");
+        }
+
+        if (on_event.pageX < boundedWidth * .7) {
+          tooltip.style("left", on_event.pageX + 10 + "px");
+        } else {
+          if (label === "daycircle") {
+            tooltip.style("left", on_event.pageX - 100 + "px");
+          } else {
+            tooltip.style("left", on_event.pageX - 170 + "px");
+          }
+        }
+
+        console.log("tooltip1");
+        var title;
+        var metricName;
+        var metricRef;
+
+        if (label === 'daycircle') {
+          tooltipHeader.html("Day: ".concat(timeFormat("%b %-d")(data.day), "<hr>"));
+          tooltipBody.html('<span style="float:left;">Actual:&nbsp</span>' + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["actualVal"]), "</span>"));
+        } else {
+          tooltipHeader.html("Week: ".concat(timeFormat("%b %-d")(data.week), "<hr>"));
+          tooltipBody.html("<span style=\"float:left;\">Actual:&nbsp</span>" + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["actualVal"]), "</span><br>") + "<span style=\"float:left;\">".concat(config.comparison, ":&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["compVal"]), "</span><br>") + "<span style=\"float:left;\">% to ".concat(config.comparison, ":&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(",.0%")(data["actualVal"] / data["compVal"]), "</span><br>") + "<span style=\"float:left;\">Avg Daily ".concat(config.comparison, ":&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["compVal"] / 7), "</span>"));
+        }
+
+        console.log("mousemove");
+      }; // END TOOLTIPS -----------------------------------------------------------
+      // load data
+
 
       var dimensions = queryResponse.fields.dimension_like;
       var measures = queryResponse.fields.measure_like;
@@ -20784,7 +20875,6 @@ var weekDayBar_object = {
       var data_group = group_by_week(data_ready);
       console.log("data group", data_group); // scales
 
-      var dayDomain = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
       var xScale = band().domain(data_group.map(function (d) {
         return weekAccessor(d);
       })).range([0, boundedWidth]).padding(0.15);
@@ -20795,7 +20885,10 @@ var weekDayBar_object = {
         return actualAccessor(d);
       }), src_max(data_group, function (d) {
         return compAccessor(d);
-      }))]).range([boundedHeight, 0]); // draw large bars
+      }))]).range([boundedHeight, 0]);
+      var dayDomain = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      var xDailyScale = band_point().domain(dayDomain).padding(0.5);
+      var xDailyAxisGenerator = axisBottom().scale(xDailyScale).tickPadding(5).tickSizeOuter(0).tickSizeInner(0); // draw large/week bars
 
       var weekGroups = group.append("g").attr("class", "week-groups").selectAll("g").data(data_group).enter().append("g").attr("class", function (d) {
         return "singleweek ".concat(timeFormat('%b%d')(weekAccessor(d)));
@@ -20806,40 +20899,68 @@ var weekDayBar_object = {
         return yScale(actualAccessor(d));
       }).attr("width", xScale.bandwidth()).attr("height", function (d) {
         return boundedHeight - yScale(actualAccessor(d));
-      }).attr("fill-opacity", 0.2) // .attr("fill", "#0072b5")
-      .attr("fill", function (d, i) {
+      }).attr("fill-opacity", 0.2).attr("fill", function (d, i) {
         if (actualAccessor(d) < compAccessor(d)) {
           return "#D76106";
         } else {
           return "#0072b5";
         }
-      }) // .attr("stroke", "#007b82")
-      .attr("stroke", function (d, i) {
+      }).attr("stroke", function (d, i) {
         if (actualAccessor(d) < compAccessor(d)) {
           return "#D76106";
         } else {
           return "#0072b5";
         }
-      }).attr("stroke-width", 4).attr("stroke-opacity", 1.0);
+      }).attr("stroke-width", 4).attr("stroke-opacity", 1.0).on("mouseover", mouseover).on("mousemove", function (d) {
+        return mousemove({
+          data: d,
+          label: "weekbar"
+        });
+      }).on("mouseleave", mouseleave); // draw weekly comp lines
+
       var compBars = weekGroups.append("rect").attr("x", function (d) {
         return xScale(weekAccessor(d)) - 0.045 * xScale.bandwidth();
       }).attr("y", function (d) {
         return yScale(compAccessor(d));
-      }).attr("width", xScale.bandwidth() + 0.09 * xScale.bandwidth()).attr("height", 3).attr("fill", "black"); // add daily lines
+      }).attr("width", xScale.bandwidth() + 0.09 * xScale.bandwidth()).attr("height", 3).attr("fill", "black").on("mouseover", mouseover).on("mousemove", function (d) {
+        return mousemove({
+          data: d,
+          label: "compbar"
+        });
+      }).on("mouseleave", mouseleave); // draw simple daily goal
 
-      var xDailyScale = band_point().domain(dayDomain).padding(0.5);
-      var xDailyAxisGenerator = axisBottom().scale(xDailyScale).tickPadding(5).tickSizeOuter(0);
+      if (config.dailylines === "true") {
+        var dayGoalLine = weekGroups.append("line").attr("x1", function (d) {
+          return xScale(weekAccessor(d));
+        }).attr("x2", function (d) {
+          return xScale(weekAccessor(d)) + xScale.bandwidth();
+        }).attr("y1", function (d) {
+          return yScale(compAccessor(d) / 7);
+        }).attr("y2", function (d) {
+          return yScale(compAccessor(d) / 7);
+        }).attr("stroke", "grey").attr("stroke-wdith", 2).attr("stroke-dasharray", "5,3").attr("class", "daily-average-goal").on("mouseover", mouseover).on("mousemove", function (d) {
+          return mousemove({
+            data: d,
+            label: "daygoalline"
+          });
+        }).on("mouseleave", mouseleave);
+      } // add daily lines for day that has passed
+
+
       src_selectAll(".singleweek").each(function (e, i) {
         xDailyScale.range([xScale(e.week), xScale(e.week) + xScale.bandwidth()]);
-        src_select(this).selectAll("line").data(data_group[i].days).enter().append("line").attr("x1", function (d) {
+        src_select(this).selectAll("line .daily-lines").data(data_group[i].days).enter().append("line").attr("x1", function (d) {
           return xDailyScale(dayofwkAccessor(d));
         }).attr("x2", function (d) {
           return xDailyScale(dayofwkAccessor(d));
         }).attr("y1", function (d) {
           return yScale(actualAccessor(d));
-        }).attr("y2", yScale(0)).attr("stroke", "black").attr("stroke-width", 3).attr("class", function (d) {
-          return dayofwkAccessor(d);
-        });
+        }).attr("y2", yScale(0)).attr("stroke", "black").attr("stroke-width", 3).attr("class", "daily-lines").on("mouseover", mouseover).on("mousemove", function (d) {
+          return mousemove({
+            data: d,
+            label: "daycircle"
+          });
+        }).on("mouseleave", mouseleave);
         src_select(this).selectAll("circle").data(data_group[i].days).enter().append("circle").attr("cx", function (d) {
           return xDailyScale(dayofwkAccessor(d));
         }).attr("cy", function (d) {
@@ -20850,15 +20971,46 @@ var weekDayBar_object = {
           } else {
             return 6;
           }
-        }).attr("fill", "black");
+        }).attr("fill", "black").on("mouseover", mouseover).on("mousemove", function (d) {
+          return mousemove({
+            data: d,
+            label: "daycircle"
+          });
+        }).on("mouseleave", mouseleave);
         src_select(this).append("g").call(xDailyAxisGenerator).style("transform", "translateY(".concat(boundedHeight, "px)"));
       });
       console.log("here2"); // peripherals (axes)
 
-      var xAxisGenerator = axisBottom().scale(xScale).tickPadding(30).tickSizeOuter(0).tickFormat(timeFormat("%b %-d"));
+      var xAxisGenerator = axisBottom().scale(xScale).tickPadding(30).tickSizeOuter(0).tickSizeInner(0).tickFormat(function (d, i) {
+        return "Week: ".concat(timeFormat("%b %-d")(d));
+      });
       var yAxisGenerator = axisLeft().scale(yScale).tickPadding(10);
+
+      if (config.yticklabels_show === "true") {
+        yAxisGenerator.tickFormat(defaultLocale_format(config.metric_format));
+      } else {
+        yAxisGenerator.tickFormat("");
+      }
+
+      if (config.y_gridlines === "true") {
+        yAxisGenerator.tickSize(-boundedWidth);
+      } else {
+        yAxisGenerator.tickSize(0);
+      }
+
       var xAxis = group.append("g").call(xAxisGenerator).style("transform", "translateY(".concat(boundedHeight, "px)")).attr("class", "x-axis");
-      var yAxis = group.append("g").call(yAxisGenerator).attr("class", "y-axis");
+      var yAxis = group.append("g").call(yAxisGenerator).attr("class", "y-axis"); // axis labels
+
+      if (config.show_yaxis_name == "true") {
+        var yAxisLabel = yAxis.append("text").attr("class", "axis-label").attr("x", -boundedHeight / 2).attr("y", -margin.left + 18).style("transform", "rotate(-90deg)") // .text("Metric Name")
+        .text(function () {
+          if (config.yaxis_label != "") {
+            return config.yaxis_label;
+          } else {
+            return measures[1].label_short.split(" ")[0];
+          }
+        });
+      }
     } catch (error) {
       if (environment == "prod") {
         if (queryResponse.fields.dimensions.length < 3) {
