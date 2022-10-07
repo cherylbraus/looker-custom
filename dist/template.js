@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 27);
+/******/ 	return __webpack_require__(__webpack_require__.s = 67);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -9559,7 +9559,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 /***/ }),
 
-/***/ 27:
+/***/ 67:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10761,7 +10761,7 @@ function bindKey(parent, group, enter, update, exit, data, key) {
   return new Selection(merges, this._parents);
 });
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/selection/order.js
-/* harmony default export */ var order = (function () {
+/* harmony default export */ var selection_order = (function () {
   for (var groups = this._groups, j = -1, m = groups.length; ++j < m;) {
     for (var group = groups[j], i = group.length - 1, next = group[i], node; --i >= 0;) {
       if (node = group[i]) {
@@ -11410,7 +11410,7 @@ Selection.prototype = selection_selection.prototype = {
   exit: selection_exit,
   join: join,
   merge: selection_merge,
-  order: order,
+  order: selection_order,
   sort: sort,
   call: call,
   nodes: selection_nodes,
@@ -18946,12 +18946,141 @@ function divergingSqrt() {
 
 
 
-// CONCATENATED MODULE: ./node_modules/d3-selection/src/selectAll.js
-
-/* harmony default export */ var src_selectAll = (function (selector) {
-  return typeof selector === "string" ? new Selection([document.querySelectorAll(selector)], [document.documentElement]) : new Selection([selector == null ? [] : selector], selection_root);
-});
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/index.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/array.js
+var d3_shape_src_array_slice = Array.prototype.slice;
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/constant.js
+/* harmony default export */ var d3_shape_src_constant = (function (x) {
+  return function constant() {
+    return x;
+  };
+});
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/offset/none.js
+/* harmony default export */ var offset_none = (function (series, order) {
+  if (!((n = series.length) > 1)) return;
+
+  for (var i = 1, j, s0, s1 = series[order[0]], n, m = s1.length; i < n; ++i) {
+    s0 = s1, s1 = series[order[i]];
+
+    for (j = 0; j < m; ++j) {
+      s1[j][1] += s1[j][0] = isNaN(s0[j][1]) ? s0[j][0] : s0[j][1];
+    }
+  }
+});
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/order/none.js
+/* harmony default export */ var order_none = (function (series) {
+  var n = series.length,
+      o = new Array(n);
+
+  while (--n >= 0) o[n] = n;
+
+  return o;
+});
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/stack.js
+
+
+
+
+
+function stackValue(d, key) {
+  return d[key];
+}
+
+/* harmony default export */ var src_stack = (function () {
+  var keys = d3_shape_src_constant([]),
+      order = order_none,
+      offset = offset_none,
+      value = stackValue;
+
+  function stack(data) {
+    var kz = keys.apply(this, arguments),
+        i,
+        m = data.length,
+        n = kz.length,
+        sz = new Array(n),
+        oz;
+
+    for (i = 0; i < n; ++i) {
+      for (var ki = kz[i], si = sz[i] = new Array(m), j = 0, sij; j < m; ++j) {
+        si[j] = sij = [0, +value(data[j], ki, j, data)];
+        sij.data = data[j];
+      }
+
+      si.key = ki;
+    }
+
+    for (i = 0, oz = order(sz); i < n; ++i) {
+      sz[oz[i]].index = i;
+    }
+
+    offset(sz, oz);
+    return sz;
+  }
+
+  stack.keys = function (_) {
+    return arguments.length ? (keys = typeof _ === "function" ? _ : d3_shape_src_constant(d3_shape_src_array_slice.call(_)), stack) : keys;
+  };
+
+  stack.value = function (_) {
+    return arguments.length ? (value = typeof _ === "function" ? _ : d3_shape_src_constant(+_), stack) : value;
+  };
+
+  stack.order = function (_) {
+    return arguments.length ? (order = _ == null ? order_none : typeof _ === "function" ? _ : d3_shape_src_constant(d3_shape_src_array_slice.call(_)), stack) : order;
+  };
+
+  stack.offset = function (_) {
+    return arguments.length ? (offset = _ == null ? offset_none : _, stack) : offset;
+  };
+
+  return stack;
+});
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/index.js
+
+
+
+
+ // Note: radialArea is deprecated!
+
+ // Note: radialLine is deprecated!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -20608,11 +20737,11 @@ var handleErrors = function (vis, res, options) {
         && check('mes-req', 'Measure', measures.length, options.min_measures, options.max_measures));
 };
 
-// CONCATENATED MODULE: ./src/integration/template/weekDayBar.js
+// CONCATENATED MODULE: ./src/integration/template/weekCumulative.js
 
 
 
-var weekDayBar_object = {
+var weekCumulative_object = {
   id: "week-day-bar",
   label: "ZDev Week & Day Bars",
   options: {
@@ -20632,13 +20761,6 @@ var weekDayBar_object = {
       "default": "Forecast",
       section: "General",
       order: 3
-    },
-    dailylines: {
-      type: "boolean",
-      label: "Show Daily Avg Goal",
-      "default": "true",
-      section: "General",
-      order: 4
     },
     show_yaxis_name: {
       type: "boolean",
@@ -20673,7 +20795,7 @@ var weekDayBar_object = {
   // Set up the initial state of the visualization
   create: function create(element, config) {
     // Insert a <style> tag with some styles we'll use later
-    element.innerHTML = "\n            <style>\n                @font-face {\n                    font-family: Roboto;\n                    font-weight: 300;\n                    font-style: normal;\n                    src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');\n                }\n                @font-face { font-family: Roboto; font-weight: 400; font-style: normal;\n                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');\n                }\n                    @font-face { font-family: Roboto; font-weight: 500; font-style: normal;\n                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');\n                }\n                @font-face { font-family: Roboto; font-weight: 700; font-style: normal;\n                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');\n                }\n\n                body {\n                    font-family: 'Roboto';\n                    font-size: 12px;\n                }\n            </style>\n            <svg>\n            </svg>";
+    element.innerHTML = "\n        <style>\n            @font-face {\n                font-family: Roboto;\n                font-weight: 300;\n                font-style: normal;\n                src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');\n            }\n            @font-face { font-family: Roboto; font-weight: 400; font-style: normal;\n                src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');\n            }\n                @font-face { font-family: Roboto; font-weight: 500; font-style: normal;\n                src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');\n            }\n            @font-face { font-family: Roboto; font-weight: 700; font-style: normal;\n                src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');\n            }\n\n            body {\n                font-family: 'Roboto';\n                font-size: 12px;\n            }\n\n            #viz-container {\n                z-index: 9;\n                position: relative;\n                background-color: none;\n                border: 1px solid #d3d3d3;\n                text-align: center;\n                width: 600px;\n                height: 360px;\n            }\n    \n            #vis {\n                font-family: 'Open Sans', 'Helvetica', 'sans-serif;';\n                cursor: move;\n                z-index: 10;\n                background-color: none;\n                color: #fff;\n                height: 100%;\n                width: 100%;\n                fill: black;\n                color: black;\n            }\n\n            .axis-label {\n                fill: #3a4245;\n                font-size: 12px;\n                // font-family: 'sans-serif';\n                text-anchor: middle;\n            }\n\n            .y-axis, .x-axis {\n                // font-family: \"sans-serif\";\n            }\n\n            .x-axis .domain {\n                stroke: #ccd6eb;\n                stroke-width: 1;\n            }\n\n            .y-axis .domain {\n                stroke: none;\n            }\n\n            .x-axis text, .y-axis text {\n                font-size: 12px;\n                color: #3a4245;\n                visibility: visible;\n            }\n\n            .x-axis text .hide, .y-axis text .hide {\n                visibility: hidden;\n            }\n\n            .x-axis line, .y-axis line {\n                stroke: #e6e6e6;\n                stroke-width: 1;\n                opacity: 1;\n            }\n\n            .x-axis line .hide, .y-axis line .hide {\n                opacity: 0;\n            }\n\n            .tooltip {\n                box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;\n                font-size: 12px;\n                pointer-events: none;\n            }\n\n            .tooltip #tt-header {\n                font-size: 12px;\n                font-weight: 600;\n                color: #c3c3c3;\n                text-transform: uppercase;\n            }\n\n            hr { \n                margin-top: 1px; \n                margin-bottom: 1px \n            }\n\n            #tt-body {\n            margin-top: 5px;\n            }\n        </style>\n        <svg>\n        </svg>\n        <div class=\"tooltip\"></div>";
     element.style.fontFamily = "\"Open Sans\", \"Helvetica\", sans-serif";
   },
   updateAsync: function updateAsync(data, element, config, queryResponse, details, done) {
@@ -20688,46 +20810,42 @@ var weekDayBar_object = {
         min_measures: 0,
         max_measures: 11
       })) return;
-    } // function group_by_week(d) {
-    //     d.reduce
-    // }
-
+    }
 
     try {
-      // group the data by week
+      // group data by week
       var group_by_week = function group_by_week(arr) {
-        return Object.values(data_ready.reduce(function (a, _ref2) {
-          var weekStart = _ref2.week,
-              compVal = _ref2.comp,
-              actualVal = _ref2.actual,
-              dayVal = _ref2.day,
-              dayofwk = _ref2.dayofwk;
-          var key = weekStart;
+        return Object.values(data_ready.reduce(function (a, _ref) {
+          var week = _ref.week,
+              comp = _ref.comp,
+              actual = _ref.actual,
+              actcontract = _ref.actcontract,
+              actspot = _ref.actspot;
+          var key = week;
 
           if (a[key] === undefined) {
             a[key] = {
               week: key,
-              compVal: 0,
-              actualVal: 0,
-              days: []
+              comp: 0,
+              actual: 0,
+              actcontract: 0,
+              actspot: 0,
+              actcum: 0,
+              compcum: 0
             };
           }
 
-          a[key].compVal += compVal;
-          a[key].actualVal += actualVal;
-          a[key].days.push({
-            day: dayVal,
-            actualVal: actualVal,
-            compVal: compVal,
-            dayofwk: dayofwk
-          });
+          a[key].comp += comp;
+          a[key].actual += actual;
+          a[key].actcontract += actcontract;
+          a[key].actspot += actspot;
           return a;
         }, {}));
       };
 
       // set dimensions
       var margin = {
-        top: 30,
+        top: 40,
         right: 10,
         bottom: 60,
         left: 80
@@ -20738,81 +20856,14 @@ var weekDayBar_object = {
       var boundedHeight = height - margin.top - margin.bottom;
       var svg = src_select(element).select("svg").html("").attr("width", "100%").attr("height", "100%");
       var group = svg.append("g").attr("transform", "translate(".concat(margin.left, ", ").concat(margin.top, ")")).attr("width", "100%").attr("height", boundedHeight + "px").classed("group", true); // TOOLTIPS ---------------------------------------------------------------
-
-      var tooltip = src_select(".tooltip").style("position", "absolute").style("padding", "5px").style("background-color", "white").style("opacity", 0).style("border-radius", "4px").style("display", "block").style("border", "solid").style("border-color", "lightgrey").style("border-width", ".5px");
-      tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>');
-      var tooltipHeader = tooltip.select("#tt-header");
-      var tooltipBody = tooltip.select("#tt-body");
-
-      var mouseover = function mouseover(d) {
-        tooltip.transition().duration(0).style("opacity", 0.95);
-        src_select(this).style("opacity", 1);
-        console.log("mouseover", mouse(this));
-      };
-
-      var mouseleave = function mouseleave(d) {
-        tooltip.transition().duration(0).style("opacity", 0);
-        src_select(this).style("opacity", 1);
-        console.log("mouseleave", mouse(this));
-      }; // const mousemove = function(d) {
-      //     console.log("mousemove", d3.mouse(this))
-      // }
-
-
-      var mousemove = function mousemove() {
-        var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-            _ref$data = _ref.data,
-            data = _ref$data === void 0 ? {} : _ref$data,
-            _ref$label = _ref.label,
-            label = _ref$label === void 0 ? "weekbar" : _ref$label;
-
-        console.log("tooltip0"); // console.log(d3.mouse(this))
-        // console.log(d3.mouse(this)[1])
-        // console.log(d3.event.pageX)
-        // tooltip
-        //     .style("top", (d3.event.pageY - 10 + "px"))
-        //     .style("left", d3.event.pageX - 50 + "px")
-
-        if (on_event.pageY < boundedHeight * .7) {
-          console.log("here less");
-          tooltip.style("top", on_event.pageY - 60 + "px");
-        } else {
-          tooltip.style("top", on_event.pageY - 120 + "px");
-        }
-
-        if (on_event.pageX < boundedWidth * .7) {
-          tooltip.style("left", on_event.pageX + 10 + "px");
-        } else {
-          if (label === "daycircle") {
-            tooltip.style("left", on_event.pageX - 100 + "px");
-          } else {
-            tooltip.style("left", on_event.pageX - 170 + "px");
-          }
-        }
-
-        console.log("tooltip1");
-        var title;
-        var metricName;
-        var metricRef;
-
-        if (label === 'daycircle') {
-          tooltipHeader.html("Day: ".concat(timeFormat("%b %-d")(data.day), "<hr>"));
-          tooltipBody.html('<span style="float:left;">Actual:&nbsp</span>' + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["actualVal"]), "</span>"));
-        } else {
-          tooltipHeader.html("Week: ".concat(timeFormat("%b %-d")(data.week), "<hr>"));
-          tooltipBody.html("<span style=\"float:left;\">Actual:&nbsp</span>" + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["actualVal"]), "</span><br>") + "<span style=\"float:left;\">".concat(config.comparison, ":&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["compVal"]), "</span><br>") + "<span style=\"float:left;\">% to ".concat(config.comparison, ":&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(",.0%")(data["actualVal"] / data["compVal"]), "</span><br>") + "<span style=\"float:left;\">Avg Daily ".concat(config.comparison, ":&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["compVal"] / 7), "</span>"));
-        }
-
-        console.log("mousemove");
-      }; // END TOOLTIPS -----------------------------------------------------------
-      // load data
-
+      // END TOOLTIPS -----------------------------------------------------------
+      // LOAD DATA
 
       var dimensions = queryResponse.fields.dimension_like;
       var measures = queryResponse.fields.measure_like;
       console.log("dimension", dimensions);
       console.log("measure", measures);
-      console.log('data', data); // manipulate data
+      console.log('data', data); // MANIPULATE DATA
 
       var week;
       var day;
@@ -20830,9 +20881,10 @@ var weekDayBar_object = {
         var entry = {};
         entry['week'] = new Date(d[week].value + 'T00:00');
         entry['day'] = new Date(d[day].value + 'T00:00');
-        entry['dayofwk'] = timeFormat("%a")(entry['day']);
         entry['comp'] = d[measures[0].name].value;
         entry['actual'] = d[measures[1].name].value;
+        entry['actcontract'] = d[measures[2].name].value;
+        entry['actspot'] = d[measures[3].name].value;
         data_ready.push(entry);
       });
       console.log("data_ready", data_ready);
@@ -20845,16 +20897,20 @@ var weekDayBar_object = {
         return d.day;
       };
 
-      var dayofwkAccessor = function dayofwkAccessor(d) {
-        return d.dayofwk;
+      var compAccessor = function compAccessor(d) {
+        return d.comp;
       };
 
       var actualAccessor = function actualAccessor(d) {
-        return d.actualVal;
+        return d.actual;
       };
 
-      var compAccessor = function compAccessor(d) {
-        return d.compVal;
+      var actContractAccessor = function actContractAccessor(d) {
+        return d.actcontract;
+      };
+
+      var actSpotAccessor = function actSpotAccessor(d) {
+        return d.actspot;
       }; // filter data - might want to check this?
 
 
@@ -20868,122 +20924,81 @@ var weekDayBar_object = {
         var weekDate = element.week;
         return weekDate >= firstWeek && weekDate <= lastWeek;
       });
-      console.log("data_ready filtered", data_ready);
       data_ready = data_ready.sort(function (a, b) {
         return dayAccessor(a) - dayAccessor(b);
       });
-      var data_group = group_by_week(data_ready);
-      console.log("data group", data_group); // scales
+      console.log("data_ready filtered", data_ready);
+      var data_grp = group_by_week(data_ready);
+      console.log("data_grp", data_grp); // calculate cumulative actuals
 
-      var xScale = band().domain(data_group.map(function (d) {
-        return weekAccessor(d);
-      })).range([0, boundedWidth]).padding(0.15);
-      var xCompScale = band().domain(data_group.map(function (d) {
-        return weekAccessor(d);
-      })).range([0, boundedWidth]).padding(0.03);
-      var yScale = linear_linear().domain([0, Math.max(src_max(data_group, function (d) {
-        return actualAccessor(d);
-      }), src_max(data_group, function (d) {
-        return compAccessor(d);
-      }))]).range([boundedHeight, 0]);
-      var dayDomain = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-      var xDailyScale = band_point().domain(dayDomain).padding(0.5);
-      var xDailyAxisGenerator = axisBottom().scale(xDailyScale).tickPadding(5).tickSizeOuter(0).tickSizeInner(0); // draw large/week bars
-
-      var weekGroups = group.append("g").attr("class", "week-groups").selectAll("g").data(data_group).enter().append("g").attr("class", function (d) {
-        return "singleweek ".concat(timeFormat('%b%d')(weekAccessor(d)));
+      var c = data_grp.map(function (d, i) {
+        return {
+          week: d.week,
+          // actcum: data_grp.slice(0, i+1).map(({actual}) => actual).reduce((x,y) => x + y)
+          actcum: function () {
+            if (i > 0) {
+              return data_grp.slice(0, i).map(function (_ref2) {
+                var actual = _ref2.actual;
+                return actual;
+              }).reduce(function (x, y) {
+                return x + y;
+              });
+            } else {
+              return 0;
+            }
+          }(),
+          compcum: data_grp.slice(0, i + 1).map(function (_ref3) {
+            var comp = _ref3.comp;
+            return comp;
+          }).reduce(function (x, y) {
+            return x + y;
+          })
+        };
       });
-      var weekBars = weekGroups.append("rect").attr("x", function (d) {
-        return xScale(weekAccessor(d));
-      }).attr("y", function (d) {
-        return yScale(actualAccessor(d));
-      }).attr("width", xScale.bandwidth()).attr("height", function (d) {
-        return boundedHeight - yScale(actualAccessor(d));
-      }).attr("fill-opacity", 0.2).attr("fill", function (d, i) {
-        if (actualAccessor(d) < compAccessor(d)) {
-          return "#D76106";
-        } else {
-          return "#0072b5";
-        }
-      }).attr("stroke", function (d, i) {
-        if (actualAccessor(d) < compAccessor(d)) {
-          return "#D76106";
-        } else {
-          return "#0072b5";
-        }
-      }).attr("stroke-width", 4).attr("stroke-opacity", 1.0).on("mouseover", mouseover).on("mousemove", function (d) {
-        return mousemove({
-          data: d,
-          label: "weekbar"
-        });
-      }).on("mouseleave", mouseleave); // draw weekly comp lines
 
-      var compBars = weekGroups.append("rect").attr("x", function (d) {
-        return xScale(weekAccessor(d)) - 0.045 * xScale.bandwidth();
-      }).attr("y", function (d) {
-        return yScale(compAccessor(d));
-      }).attr("width", xScale.bandwidth() + 0.09 * xScale.bandwidth()).attr("height", 3).attr("fill", "black").on("mouseover", mouseover).on("mousemove", function (d) {
-        return mousemove({
-          data: d,
-          label: "compbar"
-        });
-      }).on("mouseleave", mouseleave); // draw simple daily goal
+      var actcumAccessor = function actcumAccessor(d) {
+        return d.actcum;
+      };
 
-      if (config.dailylines === "true") {
-        var dayGoalLine = weekGroups.append("line").attr("x1", function (d) {
-          return xScale(weekAccessor(d));
-        }).attr("x2", function (d) {
-          return xScale(weekAccessor(d)) + xScale.bandwidth();
-        }).attr("y1", function (d) {
-          return yScale(compAccessor(d) / 7);
-        }).attr("y2", function (d) {
-          return yScale(compAccessor(d) / 7);
-        }).attr("stroke", "grey").attr("stroke-wdith", 2).attr("stroke-dasharray", "5,3").attr("class", "daily-average-goal").on("mouseover", mouseover).on("mousemove", function (d) {
-          return mousemove({
-            data: d,
-            label: "daygoalline"
-          });
-        }).on("mouseleave", mouseleave);
-      } // add daily lines for day that has passed
+      var compcumAccessor = function compcumAccessor(d) {
+        return d.compcum;
+      };
 
-
-      src_selectAll(".singleweek").each(function (e, i) {
-        xDailyScale.range([xScale(e.week), xScale(e.week) + xScale.bandwidth()]);
-        src_select(this).selectAll("line .daily-lines").data(data_group[i].days).enter().append("line").attr("x1", function (d) {
-          return xDailyScale(dayofwkAccessor(d));
-        }).attr("x2", function (d) {
-          return xDailyScale(dayofwkAccessor(d));
-        }).attr("y1", function (d) {
-          return yScale(actualAccessor(d));
-        }).attr("y2", yScale(0)).attr("stroke", "black").attr("stroke-width", 3).attr("class", "daily-lines").on("mouseover", mouseover).on("mousemove", function (d) {
-          return mousemove({
-            data: d,
-            label: "daycircle"
-          });
-        }).on("mouseleave", mouseleave);
-        src_select(this).selectAll("circle").data(data_group[i].days).enter().append("circle").attr("cx", function (d) {
-          return xDailyScale(dayofwkAccessor(d));
-        }).attr("cy", function (d) {
-          return yScale(actualAccessor(d));
-        }).attr("r", function (d) {
-          if (actualAccessor(d) === 0) {
-            return 0;
-          } else {
-            return 6;
-          }
-        }).attr("fill", "black").on("mouseover", mouseover).on("mousemove", function (d) {
-          return mousemove({
-            data: d,
-            label: "daycircle"
-          });
-        }).on("mouseleave", mouseleave);
-        src_select(this).append("g").call(xDailyAxisGenerator).style("transform", "translateY(".concat(boundedHeight, "px)"));
+      console.log("c", c);
+      var data_groups = data_grp.map(function (item, i) {
+        return Object.assign({}, item, c[i]);
       });
-      console.log("here2"); // peripherals (axes)
+      console.log("data_groups", data_groups);
+      var groups = [];
+      data_groups.forEach(function (d) {
+        if (groups.includes(d.week)) {
+          return;
+        } else if (d.week != null) {
+          groups.push(d.week);
+        }
+      });
+      var subgroups = ['actcum', 'actspot', 'actcontract'];
+      console.log("groups", groups);
+      var data_stacked = src_stack().keys(subgroups)(data_groups);
+      data_stacked.forEach(function (d) {
+        var subgroup = d.key;
+        d.forEach(function (s, i) {
+          s['subgroup'] = subgroup;
+        });
+      });
+      console.log("data_stacked", data_stacked); // X-AXIS
 
-      var xAxisGenerator = axisBottom().scale(xScale).tickPadding(30).tickSizeOuter(0).tickSizeInner(0).tickFormat(function (d, i) {
+      var xScale = band().domain(groups).range([0, boundedWidth]).padding(.2);
+      var xAxisGenerator = axisBottom().scale(xScale).tickPadding(10).tickSize(0).tickFormat(function (d, i) {
         return "Week: ".concat(timeFormat("%b %-d")(d));
       });
+      var xAxis = group.append('g').call(xAxisGenerator).style("transform", "translateY(".concat(boundedHeight, "px)")).attr("class", "x-axis"); // Y-AXIS
+
+      var maxActualY = data_groups[data_groups.length - 1].actcum + data_groups[data_groups.length - 1].actual;
+      var maxCompCumY = data_groups[data_groups.length - 1].compcum;
+      var maxY = Math.max(maxActualY, maxCompCumY);
+      console.log("maxY", maxY);
+      var yScale = linear_linear().domain([0, maxY]).range([boundedHeight, 0]);
       var yAxisGenerator = axisLeft().scale(yScale).tickPadding(10);
 
       if (config.yticklabels_show === "true") {
@@ -20998,8 +21013,7 @@ var weekDayBar_object = {
         yAxisGenerator.tickSize(0);
       }
 
-      var xAxis = group.append("g").call(xAxisGenerator).style("transform", "translateY(".concat(boundedHeight, "px)")).attr("class", "x-axis");
-      var yAxis = group.append("g").call(yAxisGenerator).attr("class", "y-axis"); // axis labels
+      var yAxis = group.append('g').call(yAxisGenerator).attr("class", "y-axis"); // axis labels
 
       if (config.show_yaxis_name == "true") {
         var yAxisLabel = yAxis.append("text").attr("class", "axis-label").attr("x", -boundedHeight / 2).attr("y", -margin.left + 18).style("transform", "rotate(-90deg)") // .text("Metric Name")
@@ -21010,7 +21024,76 @@ var weekDayBar_object = {
             return measures[1].label_short.split(" ")[0];
           }
         });
-      }
+      } // DRAW DATA
+
+
+      var biggroup = group.append('g');
+      var colormap = {
+        'positive': {
+          'actcum': 'white',
+          'actspot': 'rgba(0,115,181,0.75)',
+          'actcontract': '#0072b5'
+        },
+        'negative': {
+          'actcum': 'white',
+          'actspot': 'rgba(215,97,6,0.75)',
+          'actcontract': '#D76106'
+        }
+      };
+      var bars = biggroup.selectAll('g .subgroupbars').data(data_stacked).enter().append('g').attr("stroke", "black").attr("class", "subgroupbars");
+      var stacks = bars.selectAll("rect .stack").data(function (d) {
+        return d;
+      }).enter().append('rect').attr("x", function (d) {
+        return xScale(d.data.week);
+      }).attr("y", function (d) {
+        return yScale(d[1]);
+      }).attr("width", xScale.bandwidth()).attr("height", function (d) {
+        return yScale(d[0]) - yScale(d[1]);
+      }).attr("class", "stack").attr("fill", function (d) {
+        if (+d.data.actcum + +d.data.actual < d.data.compcum) {
+          console.log("negative/orange");
+          return colormap['negative'][d.subgroup];
+        } else {
+          return colormap['positive'][d.subgroup];
+        }
+      });
+      var innerlabels = bars.selectAll("text .stacked-label").data(function (d) {
+        return d;
+      }).enter().append("text").attr("x", function (d) {
+        return xScale(d.data.week) + 4;
+      }).attr("y", function (d) {
+        return yScale(d[1]) + 4;
+      }).text(function (d) {
+        if (+d.data.actcum === +d[1]) {
+          return "";
+        } else if (+d.data.actcum + +d.data.actspot === +d[1]) {
+          return "S";
+        } else {
+          return "C";
+        }
+      }).attr("text-anchor", "left").style("dominant-baseline", "hanging").attr("stroke", "white").attr("font-size", "0.6em").attr("font-weight", "200").attr("font-family", "sans-serif").attr("class", "stacked-label");
+      var toGoal = biggroup.selectAll("text .togoallabel").data(data_groups).enter().append("text").attr("x", function (d) {
+        return xScale(d.week) + xScale.bandwidth() / 2;
+      }).attr("y", 0 - 10).text(function (d) {
+        var tempVal = (d.actcum + d.actual) / d.compcum;
+
+        if (tempVal >= 1) {
+          return "+".concat(defaultLocale_format(",.0%")(tempVal - 1));
+        } else {
+          return "-".concat(defaultLocale_format(",.0%")(1 - tempVal));
+        }
+      }).attr("text-anchor", "middle").attr("stroke", function (d) {
+        if ((d.actcum + d.actual) / d.compcum >= 1.0) {
+          return "#0072b5";
+        } else {
+          return "#d76106";
+        }
+      }).attr("class", "togoallabel").attr("font-size", "12px");
+      var comps = group.append('g').selectAll("rect .goalbar").data(data_groups).enter().append("rect").attr("x", function (d) {
+        return xScale(weekAccessor(d)) - 0.045 * xScale.bandwidth();
+      }).attr("y", function (d) {
+        return yScale(compcumAccessor(d));
+      }).attr("width", xScale.bandwidth() + 0.09 * xScale.bandwidth()).attr("height", 3).attr("fill", "grey").attr("fill-opacity", 0.6).attr("class", "goalbar").attr("stroke", "black");
     } catch (error) {
       if (environment == "prod") {
         if (queryResponse.fields.dimensions.length < 3) {
@@ -21054,24 +21137,24 @@ var template_done = function done() {
 
 var menuOptions = "<div id='menu'><h1><strong>Menu</strong></h1><div id='menu-options'></div></div></div>";
 jquery("body").append(menuOptions);
-var template_keys = Object.keys(weekDayBar_object.options);
-console.log("object.options", weekDayBar_object.options);
-console.log("Object", Object.keys(weekDayBar_object.options));
+var template_keys = Object.keys(weekCumulative_object.options);
+console.log("object.options", weekCumulative_object.options);
+console.log("Object", Object.keys(weekCumulative_object.options));
 console.log("keys", template_keys);
 template_keys.forEach(function (entry, i) {
-  var array_name = weekDayBar_object.options[entry].label;
+  var array_name = weekCumulative_object.options[entry].label;
   jquery("#menu-options").append("<p>" + array_name + "</p>");
   var form = jquery('<form>', {
     id: 'id-1',
     "class": 'menu-options-entry'
   }).appendTo('#menu-options'); // console.log("display", object.options[entry].display, ["radio","select"].includes(object.options[entry].display))
 
-  if (["radio", "select"].includes(weekDayBar_object.options[entry].display)) {
-    var array_values = weekDayBar_object.options[entry].values;
+  if (["radio", "select"].includes(weekCumulative_object.options[entry].display)) {
+    var array_values = weekCumulative_object.options[entry].values;
     array_values.forEach(function (ent) {
       var str;
 
-      if (ent[Object.keys(ent)[0]] == weekDayBar_object.options[entry]["default"]) {
+      if (ent[Object.keys(ent)[0]] == weekCumulative_object.options[entry]["default"]) {
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent[Object.keys(ent)] + "' id='" + Object.keys(ent)[0] + "' name='" + array_name + "' value='" + Object.keys(ent)[0] + "' checked></input><label class='form-label' for='" + Object.keys(ent)[0] + "'>" + Object.keys(ent)[0] + "</label>";
       } else {
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent[Object.keys(ent)] + "' id='" + Object.keys(ent)[0] + "' name='" + array_name + "' value='" + Object.keys(ent)[0] + "'></input><label class='form-label' for='" + Object.keys(ent)[0] + "'>" + Object.keys(ent)[0] + "</label>";
@@ -21079,22 +21162,22 @@ template_keys.forEach(function (entry, i) {
 
       form.append(str);
     });
-  } else if (weekDayBar_object.options[entry].display == "number") {
+  } else if (weekCumulative_object.options[entry].display == "number") {
     var str;
-    str = "<input type='number' internal_cat='" + template_keys[i] + "' internal_value='" + weekDayBar_object.options[entry]["default"] + "' id='" + template_keys[i] + "' min='0' name='" + weekDayBar_object.options[entry]["label"] + "' value='" + weekDayBar_object.options[entry]["default"] + "'></input><label class='form-label' for='" + weekDayBar_object.options[entry]["label"] + "'>" + weekDayBar_object.options[entry]["label"] + "</label>";
+    str = "<input type='number' internal_cat='" + template_keys[i] + "' internal_value='" + weekCumulative_object.options[entry]["default"] + "' id='" + template_keys[i] + "' min='0' name='" + weekCumulative_object.options[entry]["label"] + "' value='" + weekCumulative_object.options[entry]["default"] + "'></input><label class='form-label' for='" + weekCumulative_object.options[entry]["label"] + "'>" + weekCumulative_object.options[entry]["label"] + "</label>";
     form.append(str);
-  } else if (weekDayBar_object.options[entry].display == "text") {
+  } else if (weekCumulative_object.options[entry].display == "text") {
     var _str;
 
-    _str = "<input type='text' internal_cat='" + template_keys[i] + "' internal_value='" + weekDayBar_object.options[entry]["default"] + "' id='" + template_keys[i] + "' name='" + weekDayBar_object.options[entry]["label"] + "' value='" + weekDayBar_object.options[entry]["default"] + "'></input><label class='form-label' for='" + weekDayBar_object.options[entry]["label"] + "'>" + weekDayBar_object.options[entry]["label"] + "</label>";
+    _str = "<input type='text' internal_cat='" + template_keys[i] + "' internal_value='" + weekCumulative_object.options[entry]["default"] + "' id='" + template_keys[i] + "' name='" + weekCumulative_object.options[entry]["label"] + "' value='" + weekCumulative_object.options[entry]["default"] + "'></input><label class='form-label' for='" + weekCumulative_object.options[entry]["label"] + "'>" + weekCumulative_object.options[entry]["label"] + "</label>";
     form.append(_str);
-  } else if (weekDayBar_object.options[entry].type == "boolean") {
+  } else if (weekCumulative_object.options[entry].type == "boolean") {
     var _array_values = ["true", "false"];
 
     _array_values.forEach(function (ent) {
       var str;
 
-      if (ent == weekDayBar_object.options[entry]["default"]) {
+      if (ent == weekCumulative_object.options[entry]["default"]) {
         // console.log("adding default")
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent + "' id='" + template_keys[i] + "' name='" + array_name + "' value='" + ent + "' checked></input><label class='form-label' for ='" + ent + "'>" + ent + "</label>";
       } else {
@@ -21104,8 +21187,8 @@ template_keys.forEach(function (entry, i) {
 
       form.append(str);
     });
-  } else if (weekDayBar_object.options[entry].type == "array") {
-    var _array_values2 = weekDayBar_object.options[entry]["default"]; // console.log("array_values", array_values)
+  } else if (weekCumulative_object.options[entry].type == "array") {
+    var _array_values2 = weekCumulative_object.options[entry]["default"]; // console.log("array_values", array_values)
 
     _array_values2.forEach(function (ent) {
       var str; // console.log("ent", ent)
@@ -21120,7 +21203,7 @@ template_keys.forEach(function (entry, i) {
     });
   }
 });
-json("http://localhost:3001/dataWeekDay").then(function (data) {
+json("http://localhost:3001/dataWeekCumulative").then(function (data) {
   var todays_options = {};
   jquery('input:radio:checked').each(function () {
     todays_options[this.attributes.internal_cat.value] = this.attributes.internal_value.value;
@@ -21139,26 +21222,26 @@ json("http://localhost:3001/dataWeekDay").then(function (data) {
 
   var details = ""; // Fire first instance of chart
 
-  weekDayBar_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment); // On change to options, loop through selections and then redraw chart
+  weekCumulative_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment); // On change to options, loop through selections and then redraw chart
 
   jquery('input:radio').on("click", function () {
     jquery('input:radio:checked').each(function () {
       todays_options[this.attributes.internal_cat.value] = this.attributes.internal_value.value;
     });
-    weekDayBar_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    weekCumulative_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
   });
   jquery('input[type=number]').on("input", function () {
     // const id = $('input[type=number]').attr("id")
     var id = this.attributes.id.value;
     var num = jquery("#" + id).val();
     todays_options[this.attributes.internal_cat.value] = num;
-    weekDayBar_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    weekCumulative_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
   });
   jquery('input[type=text]').on("input", function () {
     var id = this.attributes.id.value;
     var str = jquery("#" + id).val();
     todays_options[this.attributes.internal_cat.value] = str;
-    weekDayBar_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    weekCumulative_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
   }); // Handle the mousedown event
   // that's triggered when user drags the resizer
 
@@ -21188,7 +21271,7 @@ json("http://localhost:3001/dataWeekDay").then(function (data) {
     // Remove the handlers of `mousemove` and `mouseup`
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
-    weekDayBar_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    weekCumulative_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
   }; // Query all resizers
 
 

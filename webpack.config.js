@@ -32,7 +32,8 @@ var webpackConfig = {
     // sparklines: './src/integration/sparklines/sparklines.js',
     // fever: './src/integration/fever/fever.js',
     // coloredBar: './src/integration/coloredBar/coloredBar.js',
-    weekDayBar: './src/integration/weekDayBar/weekDayBar.js',
+    // weekDayBar: './src/integration/weekDayBar/weekDayBar.js',
+    weekCumulative: './src/integration/weekCumulative/weekCumulative.js',
     // template: './src/integration/template/template.js',
   },
   output: {
