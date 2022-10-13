@@ -91,7 +91,7 @@ looker.plugins.visualizations.add({
                 height: 360px;
             }
     
-            #vis {
+            #viz {
                 font-family: 'Open Sans', 'Helvetica', 'sans-serif;';
                 cursor: move;
                 z-index: 10;

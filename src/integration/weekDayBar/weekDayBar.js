@@ -106,7 +106,7 @@ looker.plugins.visualizations.add({
                     height: 360px;
                 }
           
-                #vis {
+                #viz {
                     font-family: 'Open Sans', 'Helvetica', 'sans-serif;';
                     cursor: move;
                     z-index: 10;
@@ -209,7 +209,7 @@ looker.plugins.visualizations.add({
 
              // set dimensions
              let margin = {
-                    top: 30,
+                    top: 45,
                     right: 10,
                     bottom: 60,
                     left: +config.leftmargin,
@@ -292,10 +292,10 @@ looker.plugins.visualizations.add({
                 if (d3.event.pageY < boundedHeight*.7) {
                     console.log("here less")
                     tooltip
-                        .style("top", (d3.event.pageY - 60 + "px"))
+                        .style("top", (d3.event.pageY - 30 + "px"))
                 } else {
                     tooltip
-                        .style("top", (d3.event.pageY - 120 + "px"))
+                        .style("top", (d3.event.pageY - 110 + "px"))
                 }
     
                 if (d3.event.pageX < boundedWidth*.7) {
@@ -442,6 +442,7 @@ looker.plugins.visualizations.add({
                 .tickPadding(5)
                 .tickSizeOuter(0)
                 .tickSizeInner(0)
+                .tickFormat((d, i) => d.slice(0,1))
 
             // peripherals (axes)
             const xAxisGenerator = d3.axisBottom()
@@ -555,7 +556,7 @@ looker.plugins.visualizations.add({
                         .attr("y1", d => yScale(compAccessor(d)/7))
                         .attr("y2", d => yScale(compAccessor(d)/7))
                         .attr("stroke", "grey")
-                        .attr("stroke-wdith", 2)
+                        .attr("stroke-width", 1)
                         .attr("stroke-dasharray", ("5,3"))
                         .attr("class", "daily-average-goal")
                         .on("mouseover", mouseover)
@@ -599,7 +600,7 @@ looker.plugins.visualizations.add({
                             if (actualAccessor(d) === 0) {
                                 return 0
                             } else {
-                                return 6
+                                return 5
                             }
                         })
                         .attr("fill", "black")
@@ -615,11 +616,65 @@ looker.plugins.visualizations.add({
 
             console.log("here2")
 
+            // legend
+            const legendContainer = group.append("g")
+                .attr("transform", "translate(0,0)")
+                .classed("legendContainer", true)
 
+            const legendGoal = legendContainer.append('g')
+                .classed("legend", true)
+                .attr("transform", `translate(6, -25)`)
+
+            legendGoal.append("text")
+                .attr("x", 20)
+                .attr("y", 0)
+                .style("text-anchor", "start")
+                .style("dominant-baseline", "middle")
+                .style("font-size", 11)
+                .text(() => {
+                    if (config.comparison) {
+                        return `Weekly ${config.comparison}`
+                    } else {
+                        return 'Weekly Goal'
+                    }
+                })
+
+            legendGoal.append("rect")
+                .attr("x", 0)
+                .attr("y", -2)
+                .attr("width", 15)
+                .attr("height", 3)
+                .attr("fill", "black")
 
             
-            
+            if (config.dailylines === true ) {
+                const legendDayGoal = legendContainer.append('g')
+                    .classed("legend", true)
+                    .attr("transform", `translate(130, -25)`)
 
+                legendDayGoal.append("text")
+                    .attr("x", 20)
+                    .attr("y", 0)
+                    .style("text-anchor", "start")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 11)
+                    .text(() => {
+                        if (config.comparison) {
+                            return `Daily ${config.comparison}`
+                        } else {
+                            return `Daily Goal`
+                        }
+                    })
+
+                legendDayGoal.append("line")
+                    .attr("x1", 0)
+                    .attr("x2", 15)
+                    .attr("y1", -2)
+                    .attr("y2", -2)
+                    .attr("stroke", "grey")
+                    .attr("stroke-width", 2)
+                    .attr("stroke-dasharray", ("5,3"))
+            }
 
 
         } catch(error) {

@@ -110,7 +110,7 @@ export const object = {
 
              // set dimensions
              let margin = {
-                    top: 30,
+                    top: 45,
                     right: 10,
                     bottom: 60,
                     left: 80
@@ -343,6 +343,61 @@ export const object = {
                 .tickPadding(5)
                 .tickSizeOuter(0)
                 .tickSizeInner(0)
+                .tickFormat((d, i) => d.slice(0,1))
+
+             // peripherals (axes)
+             const xAxisGenerator = d3.axisBottom()
+                .scale(xScale)
+                .tickPadding(30)
+                .tickSizeOuter(0)
+                .tickSizeInner(0)
+                .tickFormat((d, i) => `Week: ${d3.timeFormat("%b %-d")(d)}`)
+
+            const yAxisGenerator = d3.axisLeft()
+                .scale(yScale)
+                .tickPadding(10)
+
+            if (config.yticklabels_show === "true") {
+                yAxisGenerator
+                    .tickFormat(d3.format(config.metric_format))
+            } else {
+                yAxisGenerator
+                    .tickFormat("")
+            }
+
+            if (config.y_gridlines === "true") {
+                yAxisGenerator
+                    .tickSize(-boundedWidth)
+            } else {
+                yAxisGenerator
+                    .tickSize(0)
+            }
+
+            const xAxis = group.append("g")
+                .call(xAxisGenerator)
+                    .style("transform", `translateY(${boundedHeight}px)`)
+                    .attr("class", "x-axis")
+
+            const yAxis = group.append("g")
+                .call(yAxisGenerator)
+                    .attr("class", "y-axis")
+
+            // axis labels
+            if (config.show_yaxis_name == "true") {
+                const yAxisLabel = yAxis.append("text")
+                    .attr("class", "axis-label")
+                    .attr("x", (-boundedHeight/2))
+                    .attr("y", -margin.left + 18)
+                    .style("transform", "rotate(-90deg)")
+                    // .text("Metric Name")
+                    .text(function() {
+                        if (config.yaxis_label != "") {
+                            return config.yaxis_label
+                        } else {
+                            return measures[1].label_short.split(" ")[0]
+                        }
+                    })
+            }
 
             
             // draw large/week bars
@@ -402,7 +457,7 @@ export const object = {
                         .attr("y1", d => yScale(compAccessor(d)/7))
                         .attr("y2", d => yScale(compAccessor(d)/7))
                         .attr("stroke", "grey")
-                        .attr("stroke-wdith", 2)
+                        .attr("stroke-width", 1)
                         .attr("stroke-dasharray", ("5,3"))
                         .attr("class", "daily-average-goal")
                         .on("mouseover", mouseover)
@@ -446,7 +501,7 @@ export const object = {
                             if (actualAccessor(d) === 0) {
                                 return 0
                             } else {
-                                return 6
+                                return 5
                             }
                         })
                         .attr("fill", "black")
@@ -463,62 +518,65 @@ export const object = {
             console.log("here2")
 
 
+            // legend
+            const legendContainer = group.append("g")
+                .attr("transform", "translate(0,0)")
+                .classed("legendContainer", true)
 
-            // peripherals (axes)
-            const xAxisGenerator = d3.axisBottom()
-                .scale(xScale)
-                .tickPadding(30)
-                .tickSizeOuter(0)
-                .tickSizeInner(0)
-                .tickFormat((d, i) => `Week: ${d3.timeFormat("%b %-d")(d)}`)
+            const legendGoal = legendContainer.append('g')
+                .classed("legend", true)
+                .attr("transform", `translate(6, -25)`)
 
-            const yAxisGenerator = d3.axisLeft()
-                .scale(yScale)
-                .tickPadding(10)
+            legendGoal.append("text")
+                .attr("x", 20)
+                .attr("y", 0)
+                .style("text-anchor", "start")
+                .style("dominant-baseline", "middle")
+                .style("font-size", 11)
+                .text(() => {
+                    if (config.comparison) {
+                        return `Weekly ${config.comparison}`
+                    } else {
+                        return 'Weekly Goal'
+                    }
+                })
 
-            if (config.yticklabels_show === "true") {
-                yAxisGenerator
-                    .tickFormat(d3.format(config.metric_format))
-            } else {
-                yAxisGenerator
-                    .tickFormat("")
-            }
+            legendGoal.append("rect")
+                .attr("x", 0)
+                .attr("y", -2)
+                .attr("width", 15)
+                .attr("height", 3)
+                .attr("fill", "black")
 
-            if (config.y_gridlines === "true") {
-                yAxisGenerator
-                    .tickSize(-boundedWidth)
-            } else {
-                yAxisGenerator
-                    .tickSize(0)
-            }
+            
+            if (config.dailylines === "true" ) {
+                const legendDayGoal = legendContainer.append('g')
+                    .classed("legend", true)
+                    .attr("transform", `translate(130, -25)`)
 
-            const xAxis = group.append("g")
-                .call(xAxisGenerator)
-                    .style("transform", `translateY(${boundedHeight}px)`)
-                    .attr("class", "x-axis")
-
-            const yAxis = group.append("g")
-                .call(yAxisGenerator)
-                    .attr("class", "y-axis")
-
-            // axis labels
-            if (config.show_yaxis_name == "true") {
-                const yAxisLabel = yAxis.append("text")
-                    .attr("class", "axis-label")
-                    .attr("x", (-boundedHeight/2))
-                    .attr("y", -margin.left + 18)
-                    .style("transform", "rotate(-90deg)")
-                    // .text("Metric Name")
-                    .text(function() {
-                        if (config.yaxis_label != "") {
-                            return config.yaxis_label
+                legendDayGoal.append("text")
+                    .attr("x", 20)
+                    .attr("y", 0)
+                    .style("text-anchor", "start")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 11)
+                    .text(() => {
+                        if (config.comparison) {
+                            return `Daily ${config.comparison}`
                         } else {
-                            return measures[1].label_short.split(" ")[0]
+                            return `Daily Goal`
                         }
                     })
-            }
-            
 
+                legendDayGoal.append("line")
+                    .attr("x1", 0)
+                    .attr("x2", 15)
+                    .attr("y1", -2)
+                    .attr("y2", -2)
+                    .attr("stroke", "grey")
+                    .attr("stroke-width", 2)
+                    .attr("stroke-dasharray", ("5,3"))
+            }
 
 
         } catch(error) {

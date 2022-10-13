@@ -424,8 +424,8 @@ export const object = {
 
 
             // TRANSITIONS
-            let defaultView = "cumulative"
-            let defaultData = data_stacked
+            defaultView = "cumulative"
+            defaultData = data_stacked
             function transitionToRaw() {
                 if (defaultView === "cumulative") {
                     defaultView = "raw"
@@ -452,7 +452,7 @@ export const object = {
 
             const bars = biggroup
                 .selectAll('g .subgroupbars')
-                .data(defaultData)
+                .data(data_stacked)
                 .enter()
                 .append('g')
                     .attr("stroke", d => {
@@ -475,79 +475,78 @@ export const object = {
                         .attr("width", xScale.bandwidth())
                         .attr("height", d => yScale(d[0]) - yScale(d[1]))
                         .attr("class", "stack")
-                        .attr('fill', 'blue')
-                        // .attr("fill", (d) => {
-                        //     if (+d.data.actcum + +d.data.actual < d.data.compcum) {
-                        //         console.log("negative/orange")
-                        //         return colormap['negative'][d.subgroup]
-                        //     } else {
-                        //         return colormap['positive'][d.subgroup]
-                        //     }
-                        // })
+                        .attr("fill", (d) => {
+                            if (+d.data.actcum + +d.data.actual < d.data.compcum) {
+                                console.log("negative/orange")
+                                return colormap['negative'][d.subgroup]
+                            } else {
+                                return colormap['positive'][d.subgroup]
+                            }
+                        })
 
-            // const innerlabels = bars
-            //         .selectAll("text .stacked-label")
-            //         .data(d => d)
-            //         .enter()
-            //         .append("text")
-            //             .attr("x", d => xScale(d.data.week) + 4)
-            //             .attr("y", d => yScale(d[1]) + 4)
-            //             .text(d => {
-            //                 if (+d.data.actcum === +d[1]) {
-            //                     return ""
-            //                 } else if (+d.data.actcum + +d.data.actspot === +d[1]) {
-            //                     return "S"
-            //                 } else {
-            //                     return "C"
-            //                 }
-            //             })
-            //             .attr("text-anchor", "left")
-            //             .style("dominant-baseline", "hanging")
-            //             .attr("stroke", "white")
-            //             .attr("font-size", "0.6em")
-            //             .attr("font-weight", "200")
-            //             .attr("font-family", "sans-serif")
-            //             .attr("class", "stacked-label")
+            const innerlabels = bars
+                    .selectAll("text .stacked-label")
+                    .data(d => d)
+                    .enter()
+                    .append("text")
+                        .attr("x", d => xScale(d.data.week) + 4)
+                        .attr("y", d => yScale(d[1]) + 4)
+                        .text(d => {
+                            if (+d.data.actcum === +d[1]) {
+                                return ""
+                            } else if (+d.data.actcum + +d.data.actspot === +d[1]) {
+                                return "S"
+                            } else {
+                                return "C"
+                            }
+                        })
+                        .attr("text-anchor", "left")
+                        .style("dominant-baseline", "hanging")
+                        .attr("stroke", "white")
+                        .attr("font-size", "0.6em")
+                        .attr("font-weight", "200")
+                        .attr("font-family", "sans-serif")
+                        .attr("class", "stacked-label")
 
-            // const toGoal = biggroup
-            //     .selectAll("text .togoallabel")
-            //     .data(data_groups)
-            //     .enter()
-            //     .append("text")
-            //         .attr("x", d => xScale(d.week) + xScale.bandwidth()/2)
-            //         .attr("y", 0 - 10)
-            //         .text(d => {
-            //             const tempVal = (d.actcum + d.actual)/d.compcum
-            //             if (tempVal >= 1) {
-            //                 return `+${d3.format(",.0%")(tempVal-1)}`
-            //             } else {
-            //                 return `-${d3.format(",.0%")(1-tempVal)}`
-            //             }
-            //         })
-            //         .attr("text-anchor", "middle")
-            //         .attr("stroke", d => {
-            //             if ((d.actcum + d.actual)/d.compcum >= 1.0) {
-            //                 return "#0072b5"
-            //             } else {
-            //                 return "#d76106"
-            //             }
-            //         })
-            //         .attr("class", "togoallabel")
-            //         .attr("font-size", "12px")
+            const toGoal = biggroup
+                .selectAll("text .togoallabel")
+                .data(data_groups)
+                .enter()
+                .append("text")
+                    .attr("x", d => xScale(d.week) + xScale.bandwidth()/2)
+                    .attr("y", 0 - 10)
+                    .text(d => {
+                        const tempVal = (d.actcum + d.actual)/d.compcum
+                        if (tempVal >= 1) {
+                            return `+${d3.format(",.0%")(tempVal-1)}`
+                        } else {
+                            return `-${d3.format(",.0%")(1-tempVal)}`
+                        }
+                    })
+                    .attr("text-anchor", "middle")
+                    .attr("stroke", d => {
+                        if ((d.actcum + d.actual)/d.compcum >= 1.0) {
+                            return "#0072b5"
+                        } else {
+                            return "#d76106"
+                        }
+                    })
+                    .attr("class", "togoallabel")
+                    .attr("font-size", "12px")
 
-            // const comps = group.append('g')
-            //     .selectAll("rect .goalbar")
-            //     .data(data_groups)
-            //     .enter()
-            //     .append("rect")
-            //         .attr("x", d => xScale(weekAccessor(d)) - 0.045*(xScale.bandwidth()))
-            //         .attr("y", d => yScale(compcumAccessor(d)))
-            //         .attr("width", xScale.bandwidth() + 0.09*(xScale.bandwidth()))
-            //         .attr("height", 3)
-            //         .attr("fill", "grey")
-            //         .attr("fill-opacity", 0.6)
-            //         .attr("class", "goalbar")
-            //         .attr("stroke", "black")
+            const comps = group.append('g')
+                .selectAll("rect .goalbar")
+                .data(data_groups)
+                .enter()
+                .append("rect")
+                    .attr("x", d => xScale(weekAccessor(d)) - 0.045*(xScale.bandwidth()))
+                    .attr("y", d => yScale(compcumAccessor(d)))
+                    .attr("width", xScale.bandwidth() + 0.09*(xScale.bandwidth()))
+                    .attr("height", 3)
+                    .attr("fill", "grey")
+                    .attr("fill-opacity", 0.6)
+                    .attr("class", "goalbar")
+                    .attr("stroke", "black")
 
 
         } catch(error) {

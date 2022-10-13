@@ -130,7 +130,7 @@ try {
     let dimensions = {
         margin: {
             top: 15,
-            right: 155,
+            right: 100,
             bottom: 15,
             left: 20
         }
@@ -303,7 +303,7 @@ try {
         .enter()
         .append("text")
             .attr("x", (d,i) => xScale(0) + 2)
-            .attr("y", d => yScale("metric") + yScale.bandwidth()/2)
+            .attr("y", d => yScale("metric") + yScale.bandwidth()/1.8) // 2
             .text((d) => 
                 { 
                     if (config.currency_type == "dollar") {
@@ -315,11 +315,19 @@ try {
                 })
             .attr("text-anchor", "left")
             .style("dominant-baseline", "middle")
-            .attr("fill", "#ffffff")
-            .attr("font-size", "0.7em")
+            .attr("font-size", "0.85em") // 0.7em
             .attr("font-weight", "500")
             .attr("font-family", "sans-serif")
             .attr("class", "inner-text")
+
+    innerBarText
+        .attr("fill", (d) => {
+            if (d3.select('.inner-text').node().getComputedTextLength() < xScale(parseInt(d['monthly-actual']))) {
+                return "#ffffff"
+            } else {
+                return "black"
+            }
+        })
 
 
    
@@ -341,23 +349,7 @@ try {
 
     const monthlyTargetText = monthlyTarget.append("text")
             .attr("x", 4)
-            .attr("y", -8)
-            .text(()=>{
-                const res = d3.timeFormat("%b")(new Date()) + " target";
-                return res;
-            })
-            .attr("text-anchor", "end")
-            .style("text-transform", "uppercase")
-            .style("dominant-baseline", "middle")
-            .attr("fill", "#523130")
-            .attr("font-size", "0.6em")
-            .attr("font-weight", "700")
-            .attr("font-family", "sans-serif")
-            .attr("class", "visible")
-
-    const monthlyTargetHiddenText = monthlyTarget.append("text")
-            .attr("x", 4)
-            .attr("y", -8)
+            .attr("y", -10) // -8
             .text((d) => 
                 { 
                     if (config.currency_type == "dollar") {
@@ -371,7 +363,23 @@ try {
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#523130")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.9em") // 0.6em
+            .attr("font-weight", "700")
+            .attr("font-family", "sans-serif")
+            .attr("class", "visible")
+
+    const monthlyTargetHiddenText = monthlyTarget.append("text")
+            .attr("x", 4)
+            .attr("y", -10) // -8
+            .text(()=>{
+                const res = d3.timeFormat("%b")(new Date()) + " target";
+                return res;
+            })
+            .attr("text-anchor", "end")
+            .style("text-transform", "uppercase")
+            .style("dominant-baseline", "middle")
+            .attr("fill", "#523130")
+            .attr("font-size", "0.9em") // 0.6em
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "hidden")
@@ -393,23 +401,7 @@ try {
 
     const monthlyForecastText = monthlyForecast.append("text")
             .attr("x", 4)
-            .attr("y", 10)
-            .text(()=>{
-                const res = d3.timeFormat("%b")(new Date()) + " forecast";
-                return res;
-            })
-            .attr("text-anchor", "end")
-            .style("text-transform", "uppercase")
-            .style("dominant-baseline", "middle")
-            .attr("fill", "#856b69")
-            .attr("font-size", "0.6em")
-            .attr("font-weight", "700")
-            .attr("font-family", "sans-serif")
-            .attr("class", "visible")
-
-        const monthlyForecastHiddenText = monthlyForecast.append("text")
-            .attr("x", 4)
-            .attr("y", 10)
+            .attr("y", 12) // 10
             .text((d) => 
                 { 
                     if (config.currency_type == "dollar") {
@@ -423,7 +415,23 @@ try {
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#856b69")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.9em")
+            .attr("font-weight", "700")
+            .attr("font-family", "sans-serif")
+            .attr("class", "visible")
+
+        const monthlyForecastHiddenText = monthlyForecast.append("text")
+            .attr("x", 4)
+            .attr("y", 12) // 10
+            .text(()=>{
+                const res = d3.timeFormat("%b")(new Date()) + " forecast";
+                return res;
+            })
+            .attr("text-anchor", "end")
+            .style("text-transform", "uppercase")
+            .style("dominant-baseline", "middle")
+            .attr("fill", "#856b69")
+            .attr("font-size", "0.9em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "hidden")
@@ -450,8 +458,8 @@ try {
         .data([budget_forecast_dps])
         .enter()
             .append("text")
-            .attr("x", (d,i) => xScale(Math.max(d["monthly-budget"], d["monthly-forecast"])) + 40)
-            .attr("y", d => yScale("metric") + yScale.bandwidth()/2 - 3)
+            .attr("x", (d,i) => xScale(Math.max(d["monthly-budget"], d["monthly-forecast"])) + 45) // 40
+            .attr("y", d => yScale("metric") + yScale.bandwidth()/2 - 1) // 3
             .text(d => d3.format(".0%")(d["monthly-actual"]/d[`monthly-${config.comparison}`]))
             .attr("text-anchor", "middle")
             .style("dominant-baseline", "middle")
@@ -471,8 +479,8 @@ try {
             .attr("font-family", "sans-serif")
             .attr("class", "perc-label")
         .append("tspan")
-            .attr("x", (d,i) => xScale(Math.max(d["monthly-budget"], d["monthly-forecast"])) + 40)
-            .attr("y", d => yScale("metric") + yScale.bandwidth()/2 + 16)
+            .attr("x", (d,i) => xScale(Math.max(d["monthly-budget"], d["monthly-forecast"])) + 45) // 40
+            .attr("y", d => yScale("metric") + yScale.bandwidth()/2 + 18) // 16
             .text(`of ${metricLabel}`)
             .style("text-transform", "uppercase")
             .attr("text-anchor", "middle")
@@ -492,40 +500,40 @@ try {
             .attr("font-weight", "500")
             .attr("font-family", "sans-serif")
 
-    const planLabels = rightLabels
-        .selectAll(".plan-label")
-        .data([budget_forecast_dps])
-        .enter()
-        .append("text")
-            .attr("x", (d,i) => xScale(Math.max(d["monthly-budget"], d["monthly-forecast"])) + 112)
-            .attr("y", d => yScale("metric") + yScale.bandwidth()/2 - 2)
-            .text((d) => 
-                { 
-                    if (config.currency_type == "dollar") {
-                        return d3.format("$,.0f")(parseInt(d[`monthly-${config.comparison}`]))
-                    } else {
-                        return d3.format(",.0f")(parseInt(d[`monthly-${config.comparison}`]))
-                    }
+    // const planLabels = rightLabels
+    //     .selectAll(".plan-label")
+    //     .data([budget_forecast_dps])
+    //     .enter()
+    //     .append("text")
+    //         .attr("x", (d,i) => xScale(Math.max(d["monthly-budget"], d["monthly-forecast"])) + 112)
+    //         .attr("y", d => yScale("metric") + yScale.bandwidth()/2 - 2)
+    //         .text((d) => 
+    //             { 
+    //                 if (config.currency_type == "dollar") {
+    //                     return d3.format("$,.0f")(parseInt(d[`monthly-${config.comparison}`]))
+    //                 } else {
+    //                     return d3.format(",.0f")(parseInt(d[`monthly-${config.comparison}`]))
+    //                 }
                     
-                })
-            .attr("text-anchor", "middle")
-            .style("text-transform", "uppercase")
-            .style("dominant-baseline", "middle")
-            .attr("fill", "#323232")
-            .attr("font-size", "1em")
-            .attr("font-weight", "500")
-            .attr("font-family", "sans-serif")
-            .attr("class", "plan-label")
-        .append("tspan")
-            .attr("x", (d,i) => xScale(Math.max(d["monthly-budget"], d["monthly-forecast"])) + 112)
-            .attr("y", d => yScale("metric") + yScale.bandwidth()/2 + 12)
-            .text(metricLabel)
-            .attr("text-anchor", "middle")
-            .style("dominant-baseline", "middle")
-            .attr("fill", "#323232")
-            .attr("font-size", "0.65em")
-            .attr("font-weight", "500")
-            .attr("font-family", "sans-serif")
+    //             })
+    //         .attr("text-anchor", "middle")
+    //         .style("text-transform", "uppercase")
+    //         .style("dominant-baseline", "middle")
+    //         .attr("fill", "#323232")
+    //         .attr("font-size", "1em")
+    //         .attr("font-weight", "500")
+    //         .attr("font-family", "sans-serif")
+    //         .attr("class", "plan-label")
+    //     .append("tspan")
+    //         .attr("x", (d,i) => xScale(Math.max(d["monthly-budget"], d["monthly-forecast"])) + 112)
+    //         .attr("y", d => yScale("metric") + yScale.bandwidth()/2 + 12)
+    //         .text(metricLabel)
+    //         .attr("text-anchor", "middle")
+    //         .style("dominant-baseline", "middle")
+    //         .attr("fill", "#323232")
+    //         .attr("font-size", "0.65em")
+    //         .attr("font-weight", "500")
+    //         .attr("font-family", "sans-serif")
 
         } catch(error) {
             if (environment == "prod") {
