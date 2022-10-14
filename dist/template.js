@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 27);
+/******/ 	return __webpack_require__(__webpack_require__.s = 66);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -9559,7 +9559,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 /***/ }),
 
-/***/ 27:
+/***/ 66:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10761,7 +10761,7 @@ function bindKey(parent, group, enter, update, exit, data, key) {
   return new Selection(merges, this._parents);
 });
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/selection/order.js
-/* harmony default export */ var order = (function () {
+/* harmony default export */ var selection_order = (function () {
   for (var groups = this._groups, j = -1, m = groups.length; ++j < m;) {
     for (var group = groups[j], i = group.length - 1, next = group[i], node; --i >= 0;) {
       if (node = group[i]) {
@@ -11410,7 +11410,7 @@ Selection.prototype = selection_selection.prototype = {
   exit: selection_exit,
   join: join,
   merge: selection_merge,
-  order: order,
+  order: selection_order,
   sort: sort,
   call: call,
   nodes: selection_nodes,
@@ -18970,6 +18970,140 @@ function divergingSqrt() {
 
 
 
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/array.js
+var d3_shape_src_array_slice = Array.prototype.slice;
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/constant.js
+/* harmony default export */ var d3_shape_src_constant = (function (x) {
+  return function constant() {
+    return x;
+  };
+});
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/offset/none.js
+/* harmony default export */ var offset_none = (function (series, order) {
+  if (!((n = series.length) > 1)) return;
+
+  for (var i = 1, j, s0, s1 = series[order[0]], n, m = s1.length; i < n; ++i) {
+    s0 = s1, s1 = series[order[i]];
+
+    for (j = 0; j < m; ++j) {
+      s1[j][1] += s1[j][0] = isNaN(s0[j][1]) ? s0[j][0] : s0[j][1];
+    }
+  }
+});
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/order/none.js
+/* harmony default export */ var order_none = (function (series) {
+  var n = series.length,
+      o = new Array(n);
+
+  while (--n >= 0) o[n] = n;
+
+  return o;
+});
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/stack.js
+
+
+
+
+
+function stackValue(d, key) {
+  return d[key];
+}
+
+/* harmony default export */ var src_stack = (function () {
+  var keys = d3_shape_src_constant([]),
+      order = order_none,
+      offset = offset_none,
+      value = stackValue;
+
+  function stack(data) {
+    var kz = keys.apply(this, arguments),
+        i,
+        m = data.length,
+        n = kz.length,
+        sz = new Array(n),
+        oz;
+
+    for (i = 0; i < n; ++i) {
+      for (var ki = kz[i], si = sz[i] = new Array(m), j = 0, sij; j < m; ++j) {
+        si[j] = sij = [0, +value(data[j], ki, j, data)];
+        sij.data = data[j];
+      }
+
+      si.key = ki;
+    }
+
+    for (i = 0, oz = order(sz); i < n; ++i) {
+      sz[oz[i]].index = i;
+    }
+
+    offset(sz, oz);
+    return sz;
+  }
+
+  stack.keys = function (_) {
+    return arguments.length ? (keys = typeof _ === "function" ? _ : d3_shape_src_constant(d3_shape_src_array_slice.call(_)), stack) : keys;
+  };
+
+  stack.value = function (_) {
+    return arguments.length ? (value = typeof _ === "function" ? _ : d3_shape_src_constant(+_), stack) : value;
+  };
+
+  stack.order = function (_) {
+    return arguments.length ? (order = _ == null ? order_none : typeof _ === "function" ? _ : d3_shape_src_constant(d3_shape_src_array_slice.call(_)), stack) : order;
+  };
+
+  stack.offset = function (_) {
+    return arguments.length ? (offset = _ == null ? offset_none : _, stack) : offset;
+  };
+
+  return stack;
+});
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/index.js
+
+
+
+
+ // Note: radialArea is deprecated!
+
+ // Note: radialLine is deprecated!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // CONCATENATED MODULE: ./node_modules/d3-time-format/src/index.js
 
 
@@ -20771,7 +20905,7 @@ var weekDayBar_object = {
 
       // set dimensions
       var margin = {
-        top: 45,
+        top: 60,
         right: 10,
         bottom: 60,
         left: 70
@@ -20844,15 +20978,19 @@ var weekDayBar_object = {
           tooltipBody.html('<span style="float:left;">Actual:&nbsp</span>' + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["actual"]), "</span>"));
         } else {
           var prefix;
+          var prefix2;
+          console.log("legend check", data.week.getTime(), lastWeek.getTime());
 
-          if (data.week === lastWeek) {
+          if (data.week.getTime() === lastWeek.getTime()) {
             prefix = "WTD ";
+            prefix2 = "Tot ";
           } else {
             prefix = "";
+            prefix2 = "";
           }
 
           tooltipHeader.html("Week: ".concat(timeFormat("%b %-d")(data.week), "<hr>"));
-          tooltipBody.html("<span style=\"float:left;\">Actual:&nbsp</span>" + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["actual"]), "</span><br>") + "<span style=\"float:left;\">Actual-Contract:&nbsp</span>" + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["actualContract"]), "</span><br>") + "<span style=\"float:left;\">Actual-Spot:&nbsp</span>" + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["actualSpot"]), "</span><br>") + "<span style=\"float:left;\">".concat(prefix, "Budget:&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["budgetTD"]), "</span><br>") + "<span style=\"float:left;\">".concat(prefix, "Forecast:&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["forecastTD"]), "</span><br>") + "<span style=\"float:left;\">% to Budget:&nbsp</span>" + "<span style=\"float:right;\">".concat(defaultLocale_format(",.0%")(data["actual"] / data["budget"]), "</span><br>") + "<span style=\"float:left;\">Daily Budget:&nbsp</span>" + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["budget"] / 7), "</span>"));
+          tooltipBody.html("<span style=\"float:left;\">Actual:&nbsp&nbsp</span>" + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["actual"]), "</span><br>") + "<span style=\"float:left;\">Actual-Contract:&nbsp&nbsp</span>" + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["actualContract"]), "</span><br>") + "<span style=\"float:left;\">Actual-Spot:&nbsp&nbsp</span>" + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["actualSpot"]), "</span><br>") + "<span style=\"float:left;\">".concat(prefix, "Budget:&nbsp&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["budgetTD"]), "</span><br>") + "<span style=\"float:left;\">% to ".concat(prefix, "Budget:&nbsp&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(",.0%")(data["actual"] / data["budgetTD"]), "</span><br>") + "<span style=\"float:left;\">".concat(prefix, "Forecast:&nbsp&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["forecastTD"]), "</span><br>") + "<span style=\"float:left;\">% to ".concat(prefix, "Forecast:&nbsp&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(",.0%")(data["actual"] / data["forecastTD"]), "</span><br>") + "<span style=\"float:left;\">Daily Budget:&nbsp&nbsp</span>" + "<span style=\"float:right;\">".concat(defaultLocale_format(config.metric_format)(data["budget"] / 7), "</span>"));
         }
 
         console.log("mousemove");
@@ -20955,7 +21093,16 @@ var weekDayBar_object = {
         return dayAccessor(a) - dayAccessor(b);
       });
       var data_group = group_by_week(data_ready);
-      console.log("data group", data_group); // scales
+      console.log("data group", data_group);
+      var subgroups = ['actualContract', 'actualSpot'];
+      var data_stacked = src_stack().keys(subgroups)(data_group);
+      data_stacked.forEach(function (d) {
+        var subgroup = d.key;
+        d.forEach(function (s, i) {
+          s['subgroup'] = subgroup;
+        });
+      });
+      console.log("data_stacked", data_stacked); // scales
 
       var xScale = band().domain(data_group.map(function (d) {
         return weekAccessor(d);
@@ -21017,28 +21164,42 @@ var weekDayBar_object = {
       } // draw large/week bars
 
 
+      var stackGroups = group.append('g');
+      var setupStacks = stackGroups.selectAll('g .subgroupbars').data(data_stacked).enter().append('g').attr("class", "subgroupbars");
+      var stacks = setupStacks.selectAll("rect .stack").data(function (d) {
+        return d;
+      }).enter().append("rect").attr("x", function (d) {
+        return xScale(d.data.week);
+      }).attr("y", function (d) {
+        return yScale(d[1]);
+      }).attr("width", xScale.bandwidth()).attr("height", function (d) {
+        return yScale(d[0]) - yScale(d[1]);
+      }).attr("class", "stack").attr("fill", function (d) {
+        if (d.data.actual < d.data.forecastTD) {
+          return "#D76106";
+        } else {
+          return "#0072B5";
+        }
+      }).attr("fill-opacity", function (d) {
+        if (d.subgroup === "actualSpot") {
+          return 0.6;
+        } else {
+          return 0.3;
+        }
+      }).attr("stroke", function (d) {
+        if (d.data.actual < d.data.forecastTD) {
+          return "#D76106";
+        } else {
+          return "#0072B5";
+        }
+      }).attr("stroke-width", 1);
       var weekGroups = group.append("g").attr("class", "week-groups").selectAll("g").data(data_group).enter().append("g").attr("class", function (d) {
         return "singleweek ".concat(timeFormat('%b%d')(weekAccessor(d)));
-      });
+      }); // add columns just for tooltip purposes
+
       var weekBars = weekGroups.append("rect").attr("x", function (d) {
         return xScale(weekAccessor(d));
-      }).attr("y", function (d) {
-        return yScale(actualAccessor(d));
-      }).attr("width", xScale.bandwidth()).attr("height", function (d) {
-        return boundedHeight - yScale(actualAccessor(d));
-      }).attr("fill-opacity", 0.2).attr("fill", function (d, i) {
-        if (actualAccessor(d) < forecastTDAccessor(d)) {
-          return "#D76106";
-        } else {
-          return "#0072b5";
-        }
-      }).attr("stroke", function (d, i) {
-        if (actualAccessor(d) < forecastTDAccessor(d)) {
-          return "#D76106";
-        } else {
-          return "#0072b5";
-        }
-      }).attr("stroke-width", 4).attr("stroke-opacity", 1.0).on("mouseover", mouseover).on("mousemove", function (d) {
+      }).attr("y", 0).attr("width", xScale.bandwidth()).attr("height", boundedHeight).attr("fill-opacity", 0.0).on("mouseover", mouseover).on("mousemove", function (d) {
         return mousemove({
           data: d,
           label: "weekbar"
@@ -21079,7 +21240,7 @@ var weekDayBar_object = {
           return yScale(budgetAccessor(d) / 7);
         }).attr("y2", function (d) {
           return yScale(budgetAccessor(d) / 7);
-        }).attr("stroke", "grey").attr("stroke-width", 1).attr("stroke-dasharray", "5,3").attr("class", "daily-average-goal").on("mouseover", mouseover).on("mousemove", function (d) {
+        }).attr("stroke", "grey").attr("stroke-width", 2).attr("stroke-dasharray", "5,3").attr("class", "daily-average-goal").on("mouseover", mouseover).on("mousemove", function (d) {
           return mousemove({
             data: d,
             label: "daygoalline"
@@ -21123,6 +21284,14 @@ var weekDayBar_object = {
       console.log("here2"); // legend
 
       var legendContainer = group.append("g").attr("transform", "translate(0,0)").classed("legendContainer", true);
+      var legendSpot = legendContainer.append('g').classed("legend", true).attr("transform", "translate(6, -45)");
+      legendSpot.append("text").attr("x", 20).attr("y", 0).style("text-anchor", "start").style("dominant-baseline", "middle").style("font-size", 11).text("Spot");
+      legendSpot.append("rect").attr("x", 0).attr("y", -5.2).attr("width", 15).attr("height", 4).attr("fill", "#0072B5").attr("fill-opacity", 0.6).attr("stroke", "#0072b5").attr("stroke-width", 0.5);
+      legendSpot.append("rect").attr("x", 0).attr("y", -.5).attr("width", 15).attr("height", 4).attr("fill", "#D76106").attr("fill-opacity", 0.6).attr("stroke", "#D76106").attr("stroke-width", 0.5);
+      var legendContract = legendContainer.append('g').classed("legend", true).attr("transform", "translate(60, -45)");
+      legendContract.append("text").attr("x", 20).attr("y", 0).style("text-anchor", "start").style("dominant-baseline", "middle").style("font-size", 11).text("Contract");
+      legendContract.append("rect").attr("x", 0).attr("y", -5.4).attr("width", 15).attr("height", 4).attr("fill", "#0072B5").attr("fill-opacity", 0.3).attr("stroke", "#0072b5").attr("stroke-width", 0.5);
+      legendContract.append("rect").attr("x", 0).attr("y", -.5).attr("width", 15).attr("height", 4).attr("fill", "#D76106").attr("fill-opacity", 0.3).attr("stroke", "#D76106").attr("stroke-width", 0.5);
       var legendGoal = legendContainer.append('g').classed("legend", true).attr("transform", "translate(6, -25)");
       legendGoal.append("text").attr("x", 20).attr("y", 0).style("text-anchor", "start").style("dominant-baseline", "middle").style("font-size", 11).text("WTD Forecast");
       legendGoal.append("rect").attr("x", 0).attr("y", -3).attr("width", 15).attr("height", 3).attr("fill", "lightgrey").attr("stroke", "black").attr("stroke-width", 1);

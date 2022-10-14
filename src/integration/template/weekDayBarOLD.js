@@ -126,7 +126,7 @@ export const object = {
 
              // set dimensions
              let margin = {
-                    top: 60,
+                    top: 45,
                     right: 10,
                     bottom: 60,
                     left: 70
@@ -254,9 +254,9 @@ export const object = {
                         `<span style="float:left;">Actual-Contract:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["actualContract"])}</span><br>` + 
                         `<span style="float:left;">Actual-Spot:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["actualSpot"])}</span><br>` + 
                         `<span style="float:left;">${prefix}Budget:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["budgetTD"])}</span><br>` +
-                        `<span style="float:left;">% to ${prefix}Budget:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(data["actual"]/data["budgetTD"])}</span><br>` + 
+                        `<span style="float:left;">% to ${prefix2}Budget:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(data["actual"]/data["budget"])}</span><br>` + 
                         `<span style="float:left;">${prefix}Forecast:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["forecastTD"])}</span><br>` +
-                        `<span style="float:left;">% to ${prefix}Forecast:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(data["actual"]/data["forecastTD"])}</span><br>` + 
+                        `<span style="float:left;">% to ${prefix2}Forecast:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(data["actual"]/data["forecast"])}</span><br>` + 
                         `<span style="float:left;">Daily Budget:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["budget"]/7)}</span>`
                     )
                 }
@@ -385,21 +385,6 @@ export const object = {
             const data_group = group_by_week(data_ready)
             console.log("data group", data_group)
 
-            const subgroups = ['actualContract', 'actualSpot']
-
-            const data_stacked = d3.stack()
-                .keys(subgroups)
-                (data_group)
-
-            data_stacked.forEach((d) => {
-                const subgroup = d.key
-                d.forEach((s,i) => {
-                    s['subgroup'] = subgroup
-                })
-            })
-
-            console.log("data_stacked", data_stacked)
-
             
             // scales
             const xScale = d3.scaleBand()
@@ -495,48 +480,6 @@ export const object = {
 
             
             // draw large/week bars
-            const stackGroups = group.append('g')
-
-            const setupStacks = stackGroups
-                .selectAll('g .subgroupbars')
-                .data(data_stacked)
-                .enter()
-                .append('g')
-                    .attr("class", "subgroupbars")
-
-            const stacks = setupStacks
-                .selectAll("rect .stack")
-                .data(d => d)
-                .enter()
-                .append("rect")
-                    .attr("x", d => xScale(d.data.week))
-                    .attr("y", d => yScale(d[1]))
-                    .attr("width", xScale.bandwidth())
-                    .attr("height", d => yScale(d[0]) - yScale(d[1]))
-                    .attr("class", "stack")
-                    .attr("fill", (d) => {
-                        if (d.data.actual < d.data.forecastTD) {
-                            return "#D76106"
-                        } else {
-                            return "#0072B5"
-                        }
-                    })
-                    .attr("fill-opacity", (d) => {
-                        if (d.subgroup === "actualSpot") {
-                            return 0.6
-                        } else {
-                            return 0.3
-                        }
-                    })
-                    .attr("stroke", (d) => {
-                        if (d.data.actual < d.data.forecastTD) {
-                            return "#D76106"
-                        } else {
-                            return "#0072B5"
-                        }
-                    })
-                    .attr("stroke-width", 1)
-
             const weekGroups = group.append("g")
                 .attr("class", "week-groups")
                 .selectAll("g")
@@ -544,15 +487,30 @@ export const object = {
                 .enter()
                 .append("g")
                     .attr("class", d => `singleweek ${d3.timeFormat('%b%d')(weekAccessor(d))}`)
-
-            // add columns just for tooltip purposes
+                    
             const weekBars = weekGroups
                 .append("rect")
                     .attr("x", d => xScale(weekAccessor(d)))
-                    .attr("y", 0)
+                    .attr("y", d => yScale(actualAccessor(d)))
                     .attr("width", xScale.bandwidth())
-                    .attr("height", boundedHeight)
-                    .attr("fill-opacity", 0.0)
+                    .attr("height", d => boundedHeight - yScale(actualAccessor(d)))
+                    .attr("fill-opacity", 0.2)
+                    .attr("fill", function(d,i) {
+                        if (actualAccessor(d) < forecastTDAccessor(d)) {
+                            return "#D76106"
+                        } else {
+                            return "#0072b5"
+                        }
+                    })
+                    .attr("stroke", function(d,i) {
+                        if (actualAccessor(d) < forecastTDAccessor(d)) {
+                            return "#D76106"
+                        } else {
+                            return "#0072b5"
+                        }
+                    })
+                    .attr("stroke-width", 4)
+                    .attr("stroke-opacity", 1.0)
                     .on("mouseover", mouseover)
                     .on("mousemove", d => mousemove({ data: d, label: "weekbar" }))
                     .on("mouseleave", mouseleave)
@@ -594,7 +552,7 @@ export const object = {
                         .attr("y1", d => yScale(budgetAccessor(d)/7))
                         .attr("y2", d => yScale(budgetAccessor(d)/7))
                         .attr("stroke", "grey")
-                        .attr("stroke-width", 2)
+                        .attr("stroke-width", 1)
                         .attr("stroke-dasharray", ("5,3"))
                         .attr("class", "daily-average-goal")
                         .on("mouseover", mouseover)
@@ -659,71 +617,6 @@ export const object = {
             const legendContainer = group.append("g")
                 .attr("transform", "translate(0,0)")
                 .classed("legendContainer", true)
-
-            const legendSpot = legendContainer.append('g')
-                .classed("legend", true)
-                .attr("transform", `translate(6, -45)`)
-
-            legendSpot.append("text")
-                .attr("x", 20)
-                .attr("y", 0)
-                .style("text-anchor", "start")
-                .style("dominant-baseline", "middle")
-                .style("font-size", 11)
-                .text(`Spot`)
-            
-            legendSpot.append("rect")
-                .attr("x", 0)
-                .attr("y", -5.2)
-                .attr("width", 15)
-                .attr("height", 4)
-                .attr("fill", "#0072B5")
-                .attr("fill-opacity", 0.6)
-                .attr("stroke", "#0072b5")
-                .attr("stroke-width", 0.5)
-
-            legendSpot.append("rect")
-                .attr("x", 0)
-                .attr("y", -.5)
-                .attr("width", 15)
-                .attr("height", 4)
-                .attr("fill", "#D76106")
-                .attr("fill-opacity", 0.6)
-                .attr("stroke", "#D76106")
-                .attr("stroke-width", 0.5)
-
-            const legendContract = legendContainer.append('g')
-                .classed("legend", true)
-                .attr("transform", `translate(60, -45)`)
-
-            legendContract.append("text")
-                .attr("x", 20)
-                .attr("y", 0)
-                .style("text-anchor", "start")
-                .style("dominant-baseline", "middle")
-                .style("font-size", 11)
-                .text(`Contract`)
-            
-            legendContract.append("rect")
-                .attr("x", 0)
-                .attr("y", -5.4)
-                .attr("width", 15)
-                .attr("height", 4)
-                .attr("fill", "#0072B5")
-                .attr("fill-opacity", 0.3)
-                .attr("stroke", "#0072b5")
-                .attr("stroke-width", 0.5)
-
-            legendContract.append("rect")
-                .attr("x", 0)
-                .attr("y", -.5)
-                .attr("width", 15)
-                .attr("height", 4)
-                .attr("fill", "#D76106")
-                .attr("fill-opacity", 0.3)
-                .attr("stroke", "#D76106")
-                .attr("stroke-width", 0.5)
-
 
             const legendGoal = legendContainer.append('g')
                 .classed("legend", true)
