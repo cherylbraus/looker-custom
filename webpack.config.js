@@ -24,7 +24,7 @@ var webpackConfig = {
     // test: './src/integration/test/test.js',
     // splitViolin: './src/integration/splitViolin/splitViolin.js',
     // bulletChart: './src/integration/bulletChart/bulletChart.js',
-    bulletChartMTD: './src/integration/bulletChart/bulletChartMTD.js',
+    // bulletChartMTD: './src/integration/bulletChart/bulletChartMTD.js',
     // topTextTile: './src/integration/topTextTile/topTextTile.js',
     // coloredBars: './src/integration/coloredBars/coloredBars.js',
     // coloredBarsPerc: './src/integration/coloredBarsPerc/coloredBarsPerc.js',
@@ -45,12 +45,12 @@ var webpackConfig = {
   resolve: {
     extensions: [".ts", ".js"]
   },
-  // optimization: {
-  //   minimize: false
-  // },
-  plugins: [
-    new UglifyJSPlugin()
-  ],
+  optimization: {
+    minimize: false
+  },
+  // plugins: [
+  //   new UglifyJSPlugin()
+  // ],
   module: {
     rules: [
       { test: /\.js$/, loader: "babel-loader" },

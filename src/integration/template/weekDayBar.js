@@ -16,17 +16,24 @@ export const object = {
             section: "General",
             order: 2
         },
-        comparison: {
-            type: "string",
-            label: "Comparison Metric Label",
-            display: "text",
-            default: "Forecast",
+        // comparison: {
+        //     type: "string",
+        //     label: "Comparison Metric Label",
+        //     display: "text",
+        //     default: "Forecast",
+        //     section: "General",
+        //     order: 3
+        // },
+        budgetlines: {
+            type: "boolean",
+            label: "Show Budget Goals",
+            default: "true",
             section: "General",
             order: 3
         },
         dailylines: {
             type: "boolean",
-            label: "Show Daily Avg Goal",
+            label: "Show Daily Avg Budget",
             default: "true",
             section: "General",
             order: 4
@@ -52,6 +59,15 @@ export const object = {
             default: "true",
             section: "Y",
             order: 3
+        },
+        ytick_format: {
+            type: "string",
+            label: "Metric Value Format",
+            display: "text",
+            default: "~s",
+            placeholder: "#,###",
+            section: "General",
+            order: 2
         },
         y_gridlines: {
             type: "boolean",
@@ -113,7 +129,7 @@ export const object = {
                     top: 45,
                     right: 10,
                     bottom: 60,
-                    left: 80
+                    left: 70
             }
 
             const width = element.clientWidth;
@@ -196,7 +212,7 @@ export const object = {
                         .style("top", (d3.event.pageY - 60 + "px"))
                 } else {
                     tooltip
-                        .style("top", (d3.event.pageY - 120 + "px"))
+                        .style("top", (d3.event.pageY - 160 + "px"))
                 }
     
                 if (d3.event.pageX < boundedWidth*.7) {
@@ -219,14 +235,24 @@ export const object = {
                 let metricRef;
                 if (label === 'daycircle') {
                     tooltipHeader.html(`Day: ${d3.timeFormat("%b %-d")(data.day)}<hr>`)
-                    tooltipBody.html('<span style="float:left;">Actual:&nbsp</span>' + `<span style="float:right;">${d3.format(config.metric_format)(data["actualVal"])}</span>`)
+                    tooltipBody.html('<span style="float:left;">Actual:&nbsp</span>' + `<span style="float:right;">${d3.format(config.metric_format)(data["actual"])}</span>`)
                 } else {
+                    let prefix;
+                    if (data.week === lastWeek) {
+                        prefix = "WTD "
+                    } else {
+                        prefix = ""
+                    }
+
                     tooltipHeader.html(`Week: ${d3.timeFormat("%b %-d")(data.week)}<hr>`)
                     tooltipBody.html(
-                        `<span style="float:left;">Actual:&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["actualVal"])}</span><br>` + 
-                        `<span style="float:left;">${config.comparison}:&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["compVal"])}</span><br>` +
-                        `<span style="float:left;">% to ${config.comparison}:&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(data["actualVal"]/data["compVal"])}</span><br>` + 
-                        `<span style="float:left;">Avg Daily ${config.comparison}:&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["compVal"]/7)}</span>`
+                        `<span style="float:left;">Actual:&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["actual"])}</span><br>` + 
+                        `<span style="float:left;">Actual-Contract:&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["actualContract"])}</span><br>` + 
+                        `<span style="float:left;">Actual-Spot:&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["actualSpot"])}</span><br>` + 
+                        `<span style="float:left;">${prefix}Budget:&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["budgetTD"])}</span><br>` +
+                        `<span style="float:left;">${prefix}Forecast:&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["forecastTD"])}</span><br>` +
+                        `<span style="float:left;">% to Budget:&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(data["actual"]/data["budget"])}</span><br>` + 
+                        `<span style="float:left;">Daily Budget:&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["budget"]/7)}</span>`
                     )
                 }
 
@@ -262,8 +288,13 @@ export const object = {
                 entry['week'] = new Date(d[week].value + 'T00:00')
                 entry['day'] = new Date(d[day].value + 'T00:00')
                 entry['dayofwk'] = d3.timeFormat("%a")(entry['day'])
-                entry['comp'] = d[measures[0].name].value
-                entry['actual'] = d[measures[1].name].value
+                entry['budget'] = d[measures[0].name].value
+                entry['forecast'] = d[measures[1].name].value
+                entry['budgetTD'] = d[measures[2].name].value
+                entry['forecastTD'] = d[measures[3].name].value
+                entry['actual'] = d[measures[4].name].value
+                entry['actualContract'] = d[measures[5].name].value
+                entry['actualSpot'] = d[measures[6].name].value
                 data_ready.push(entry)          
             })
 
@@ -272,12 +303,21 @@ export const object = {
             const weekAccessor = d => d.week
             const dayAccessor = d => d.day
             const dayofwkAccessor = d => d.dayofwk
-            const actualAccessor = d => d.actualVal
-            const compAccessor = d => d.compVal
+            const budgetAccessor = d => d.budget
+            const forecastAccessor = d => d.forecast
+            const budgetTDAccessor = d => d.budgetTD
+            const forecastTDAccessor = d => d.forecastTD
+            const actualAccessor = d => d.actual
+            const actualContractAccessor = d => d.actualContract
+            const actualSpotAccessor = d => d.actualSpot
 
             // filter data - might want to check this?
+            const uniqueWeeks = [... new Set(data_ready.map(obj => +obj.week))].sort() // .map(tv => new Date(tv)).sort()
             const lastWeek = data_ready.filter(element => element.day.getTime() === new Date(new Date().setHours(0,0,0,0)).getTime())[0]['week']
-            const firstWeek = data_ready.filter(element => element.day.getTime() === new Date(new Date(new Date().getFullYear(), new Date().getMonth(), 1).setHours(0,0,0,0)).getTime())[0]['week']
+            const indexFourWkAgo = uniqueWeeks.indexOf(+lastWeek) - 3
+            const firstWeek = new Date(uniqueWeeks[indexFourWkAgo])
+
+            // const firstWeek = data_ready.filter(element => element.day.getTime() === new Date(new Date(new Date().getFullYear(), new Date().getMonth(), 1).setHours(0,0,0,0)).getTime())[0]['week']
             data_ready = data_ready.filter(element => {
                 const weekDate = element.week;
                 return (weekDate >= firstWeek && weekDate <= lastWeek)
@@ -292,19 +332,43 @@ export const object = {
             // group the data by week
             function group_by_week(arr) {
                 return Object.values(
-                    data_ready.reduce((a, {week: weekStart, comp: compVal, actual: actualVal, day: dayVal, dayofwk: dayofwk}) => {
+                    data_ready.reduce((a, {week: weekStart, 
+                                    day: dayVal, 
+                                    dayofwk: dayofwk,
+                                    budget: budgetVal,
+                                    forecast: forecastVal,
+                                    budgetTD: budgetTDVal,
+                                    forecastTD: forecastTDVal,
+                                    actual: actualVal,
+                                    actualContract: actualContractVal,
+                                    actualSpot: actualSpotVal
+                                }) => {
                         const key = weekStart;
         
                         if (a[key] === undefined) {
-                            a[key] = {week: key, compVal: 0, actualVal: 0, days: []};
+                            a[key] = {week: key, 
+                                budget: 0, 
+                                forecast: 0,
+                                budgetTD: 0,
+                                forecastTD: 0, 
+                                actual: 0, 
+                                actualContract: 0,
+                                actualSpot: 0,
+                                days: []};
                         }
         
-                        a[key].compVal += compVal;
-                        a[key].actualVal += actualVal;
+                        a[key].budget += budgetVal;
+                        a[key].forecast += forecastVal;
+                        a[key].budgetTD += budgetTDVal;
+                        a[key].forecastTD += forecastTDVal;
+                        a[key].actual += actualVal;
+                        a[key].actualContract += actualContractVal;
+                        a[key].actualSpot += actualSpotVal;
                         a[key].days.push({
                             day: dayVal,
-                            actualVal: actualVal,
-                            compVal: compVal,
+                            budget: budgetVal,
+                            forecast: forecastVal,
+                            actual: actualVal,
                             dayofwk: dayofwk
                         })
         
@@ -328,9 +392,18 @@ export const object = {
                 .range([0, boundedWidth])
                 .padding(0.03)
 
-            const yScale = d3.scaleLinear()
-                .domain([0, Math.max(d3.max(data_group, d => actualAccessor(d)), d3.max(data_group, d => compAccessor(d)))])
+
+            let yScale = d3.scaleLinear()
                 .range([boundedHeight, 0])
+                
+            if (config.budgetlines == "true") {
+                yScale
+                    .domain([0, Math.max(d3.max(data_group, d => actualAccessor(d)), d3.max(data_group, d => budgetAccessor(d)))])
+            } else {
+                yScale
+                    .domain([0, Math.max(d3.max(data_group, d => actualAccessor(d)), d3.max(data_group, d => forecastAccessor(d)))])
+            }
+            
 
             const dayDomain = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
@@ -356,10 +429,11 @@ export const object = {
             const yAxisGenerator = d3.axisLeft()
                 .scale(yScale)
                 .tickPadding(10)
+                .ticks(9)
 
             if (config.yticklabels_show === "true") {
                 yAxisGenerator
-                    .tickFormat(d3.format(config.metric_format))
+                    .tickFormat(d3.format(config.ytick_format))
             } else {
                 yAxisGenerator
                     .tickFormat("")
@@ -394,7 +468,7 @@ export const object = {
                         if (config.yaxis_label != "") {
                             return config.yaxis_label
                         } else {
-                            return measures[1].label_short.split(" ")[0]
+                            return measures[0].label_short.split(" ")[0]
                         }
                     })
             }
@@ -417,14 +491,14 @@ export const object = {
                     .attr("height", d => boundedHeight - yScale(actualAccessor(d)))
                     .attr("fill-opacity", 0.2)
                     .attr("fill", function(d,i) {
-                        if (actualAccessor(d) < compAccessor(d)) {
+                        if (actualAccessor(d) < forecastTDAccessor(d)) {
                             return "#D76106"
                         } else {
                             return "#0072b5"
                         }
                     })
                     .attr("stroke", function(d,i) {
-                        if (actualAccessor(d) < compAccessor(d)) {
+                        if (actualAccessor(d) < forecastTDAccessor(d)) {
                             return "#D76106"
                         } else {
                             return "#0072b5"
@@ -436,17 +510,33 @@ export const object = {
                     .on("mousemove", d => mousemove({ data: d, label: "weekbar" }))
                     .on("mouseleave", mouseleave)
 
-            // draw weekly comp lines
+            // draw weekly forecast lines
             const compBars = weekGroups 
                 .append("rect")
                     .attr("x", d => xScale(weekAccessor(d)) - 0.045*(xScale.bandwidth()))
-                    .attr("y", d => yScale(compAccessor(d)))
+                    .attr("y", d => yScale(forecastTDAccessor(d)))
                     .attr("width", xScale.bandwidth() + 0.09*(xScale.bandwidth()))
                     .attr("height", 3)
-                    .attr("fill", "black")
+                    .attr("fill", "lightgrey")
+                    .attr("stroke", "black")
+                    .attr("stroke-width", 1)
                     .on("mouseover", mouseover)
-                    .on("mousemove", d => mousemove({ data: d, label: "compbar" }))
+                    .on("mousemove", d => mousemove({ data: d, label: "forecastrect" }))
                     .on("mouseleave", mouseleave)
+
+            // draw monthly budget lines
+            if (config.budgetlines === "true" ) {
+                const budgetGoalLine = weekGroups 
+                    .append("rect")
+                        .attr("x", d => xScale(weekAccessor(d)) - 0.045*(xScale.bandwidth()))
+                        .attr("y", d => yScale(budgetTDAccessor(d)))
+                        .attr("width", xScale.bandwidth() + 0.09*(xScale.bandwidth()))
+                        .attr("height", 3)
+                        .attr("fill", "black")
+                        .on("mouseover", mouseover)
+                        .on("mousemove", d => mousemove({ data: d, label: "budgetline" }))
+                        .on("mouseleave", mouseleave)
+            }   
 
             // draw simple daily goal
             if (config.dailylines === "true" ) {
@@ -454,8 +544,8 @@ export const object = {
                     .append("line")
                         .attr("x1", d => xScale(weekAccessor(d)))
                         .attr("x2", d => xScale(weekAccessor(d)) + xScale.bandwidth())
-                        .attr("y1", d => yScale(compAccessor(d)/7))
-                        .attr("y2", d => yScale(compAccessor(d)/7))
+                        .attr("y1", d => yScale(budgetAccessor(d)/7))
+                        .attr("y2", d => yScale(budgetAccessor(d)/7))
                         .attr("stroke", "grey")
                         .attr("stroke-width", 1)
                         .attr("stroke-dasharray", ("5,3"))
@@ -484,7 +574,7 @@ export const object = {
                         .attr("y1", d => yScale(actualAccessor(d)))
                         .attr("y2", yScale(0))
                         .attr("stroke", "black")
-                        .attr("stroke-width", 3)
+                        .attr("stroke-width", 2.5)
                         .attr("class", "daily-lines")
                         .on("mouseover", mouseover)
                         .on("mousemove", d => mousemove({ data: d, label: "daycircle" }))
@@ -501,7 +591,7 @@ export const object = {
                             if (actualAccessor(d) === 0) {
                                 return 0
                             } else {
-                                return 5
+                                return 4
                             }
                         })
                         .attr("fill", "black")
@@ -533,26 +623,55 @@ export const object = {
                 .style("text-anchor", "start")
                 .style("dominant-baseline", "middle")
                 .style("font-size", 11)
-                .text(() => {
-                    if (config.comparison) {
-                        return `Weekly ${config.comparison}`
-                    } else {
-                        return 'Weekly Goal'
-                    }
-                })
+                .text(`WTD Forecast`)
 
             legendGoal.append("rect")
                 .attr("x", 0)
-                .attr("y", -2)
+                .attr("y", -3)
                 .attr("width", 15)
                 .attr("height", 3)
-                .attr("fill", "black")
+                .attr("fill", "lightgrey")
+                .attr("stroke", "black")
+                .attr("stroke-width", 1)
+
+            const legendXcoord = (() => {
+                if (config.dailylines == "true" && config.budgetlines == "true") {
+                    return 208
+                } else if (config.dailylines == "true" || config.budgetlines == "true") {
+                    return 110
+                } else {
+                    return 0
+                }
+            })();
+
+            console.log("legendXcoord", legendXcoord)
+
+            if (config.budgetlines == "true" ) {
+                const legendBudget = legendContainer.append('g')
+                    .classed("legend", true)
+                    .attr("transform", `translate(110, -25)`)
+
+                legendBudget.append("text")
+                    .attr("x", 20)
+                    .attr("y", 0)
+                    .style("text-anchor", "start")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 11)
+                    .text(`WTD Budget`)
+
+                legendBudget.append("rect")
+                    .attr("x", 0)
+                    .attr("y", -2)
+                    .attr("width", 15)
+                    .attr("height", 3)
+                    .attr("fill", "black")
+            }
 
             
-            if (config.dailylines === "true" ) {
+            if (config.dailylines == "true" ) {
                 const legendDayGoal = legendContainer.append('g')
                     .classed("legend", true)
-                    .attr("transform", `translate(130, -25)`)
+                    .attr("transform", `translate(${legendXcoord}, -25)`)
 
                 legendDayGoal.append("text")
                     .attr("x", 20)
@@ -560,19 +679,13 @@ export const object = {
                     .style("text-anchor", "start")
                     .style("dominant-baseline", "middle")
                     .style("font-size", 11)
-                    .text(() => {
-                        if (config.comparison) {
-                            return `Daily ${config.comparison}`
-                        } else {
-                            return `Daily Goal`
-                        }
-                    })
+                    .text('Daily Budget')
 
                 legendDayGoal.append("line")
                     .attr("x1", 0)
                     .attr("x2", 15)
-                    .attr("y1", -2)
-                    .attr("y2", -2)
+                    .attr("y1", -1)
+                    .attr("y2", -1)
                     .attr("stroke", "grey")
                     .attr("stroke-width", 2)
                     .attr("stroke-dasharray", ("5,3"))
