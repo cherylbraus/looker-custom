@@ -199,8 +199,8 @@ try {
     const xMetrics = ["metric"]
 
     const xScale = d3.scaleLinear()
-                 .domain([0, budget_forecast_dps["monthly-budget"]])
-                 .range([0, dimensions.boundedWidth])
+        .domain([0, Math.max(budget_forecast_dps["monthly-budget"], budget_forecast_dps["monthly-forecast"])])
+        .range([0, dimensions.boundedWidth])
 
     const yScale = d3.scaleBand()
         .domain(xMetrics.map(d => d))

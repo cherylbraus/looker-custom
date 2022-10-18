@@ -223,7 +223,7 @@ looker.plugins.visualizations.add({
 
              // set dimensions
              let margin = {
-                    top: 60,
+                    top: 45,
                     right: 10,
                     bottom: 60,
                     left: 70
@@ -762,7 +762,7 @@ looker.plugins.visualizations.add({
 
             const legendSpot = legendContainer.append('g')
                 .classed("legend", true)
-                .attr("transform", `translate(6, -35)`)
+                .attr("transform", `translate(6, -30)`)
 
             legendSpot.append("text")
                 .attr("x", 20)
@@ -794,7 +794,7 @@ looker.plugins.visualizations.add({
 
             const legendContract = legendContainer.append('g')
                 .classed("legend", true)
-                .attr("transform", `translate(60, -35)`)
+                .attr("transform", `translate(60, -30)`)
 
             legendContract.append("text")
                 .attr("x", 20)
@@ -827,7 +827,7 @@ looker.plugins.visualizations.add({
 
             const legendGoal = legendContainer.append('g')
                 .classed("legend", true)
-                .attr("transform", `translate(140, -35)`)
+                .attr("transform", `translate(140, -30)`)
 
             legendGoal.append("text")
                 .attr("x", 20)
@@ -861,7 +861,7 @@ looker.plugins.visualizations.add({
             if (config.budgetlines) {
                 const legendBudget = legendContainer.append('g')
                     .classed("legend", true)
-                    .attr("transform", `translate(220, -35)`)
+                    .attr("transform", `translate(220, -30)`)
 
                 legendBudget.append("text")
                     .attr("x", 20)
@@ -883,7 +883,7 @@ looker.plugins.visualizations.add({
             if (config.dailylines) {
                 const legendDayGoal = legendContainer.append('g')
                     .classed("legend", true)
-                    .attr("transform", `translate(${legendXcoord}, -35)`)
+                    .attr("transform", `translate(${legendXcoord}, -30)`)
 
                 legendDayGoal.append("text")
                     .attr("x", 20)
