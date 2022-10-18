@@ -518,7 +518,7 @@ looker.plugins.visualizations.add({
 
             if (config.budgetlines) {
                 yScale
-                    .domain([0, Math.max(d3.max(data_group, d => actualAccessor(d)), d3.max(data_group, d => budgetAccessor(d)))])
+                    .domain([0, Math.max(d3.max(data_group, d => actualAccessor(d)), d3.max(data_group, d => budgetAccessor(d)), d3.max(data_group, d => forecastAccessor(d)))])
             } else {
                 yScale
                     .domain([0, Math.max(d3.max(data_group, d => actualAccessor(d)), d3.max(data_group, d => forecastAccessor(d)))])

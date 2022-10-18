@@ -780,8 +780,8 @@ try {
             .text("Hover to see what each value represents.")
             .attr("text-anchor", "start")
             .attr("dominant-baseline", "middle")
-            .attr("font-size", "0.7em")
-            .attr("font-weight", 300)
+            .attr("font-size", "0.8em")
+            .attr("font-weight", 400)
             .attr("font-family", "sans-serif")
             .attr("fill", "#323232")
 
