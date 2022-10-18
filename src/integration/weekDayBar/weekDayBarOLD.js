@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
 
-export const object = {
+looker.plugins.visualizations.add({
 
     id: "week-day-bar",
     label: "ZDev Week & Day Bars",
@@ -16,32 +16,25 @@ export const object = {
             section: "General",
             order: 2
         },
-        // comparison: {
-        //     type: "string",
-        //     label: "Comparison Metric Label",
-        //     display: "text",
-        //     default: "Forecast",
-        //     section: "General",
-        //     order: 3
-        // },
-        budgetlines: {
-            type: "boolean",
-            label: "Show Budget Goals",
-            default: "true",
+        comparison: {
+            type: "string",
+            label: "Comparison Metric Label",
+            display: "text",
+            default: "Forecast",
             section: "General",
             order: 3
         },
         dailylines: {
             type: "boolean",
-            label: "Show Daily Avg Budget",
-            default: "true",
+            label: "Show Daily Avg Goal",
+            default: true,
             section: "General",
             order: 4
         },
         show_yaxis_name: {
             type: "boolean",
             label: "Show Y-Axis Name",
-            default: "true",
+            default: true,
             section: "Y",
             order: 1
         },
@@ -49,32 +42,31 @@ export const object = {
             type: "string",
             label: "Y-Axis Label",
             display: "text",
-            default: "",
+            default: "Volume",
             section: "Y",
             order: 2
         },
         yticklabels_show: {
             type: "boolean",
             label: "Show Y Tick Labels",
-            default: "true",
+            default: true,
             section: "Y",
             order: 3
         },
-        ytick_format: {
+        leftmargin: {
             type: "string",
-            label: "Metric Value Format",
+            label: "Left Margin",
             display: "text",
-            default: "~s",
-            placeholder: "#,###",
-            section: "General",
-            order: 2
+            default: "80",
+            section: "Y",
+            order: 4
         },
         y_gridlines: {
             type: "boolean",
             label: "Show Y Gridlines",
-            default: "false",
+            default: false,
             section: "Y",
-            order: 4
+            order: 5
         },
     },
 
@@ -103,9 +95,94 @@ export const object = {
                     font-family: 'Roboto';
                     font-size: 12px;
                 }
+
+                #viz-container {
+                    z-index: 9;
+                    position: relative;
+                    background-color: none;
+                    border: 1px solid #d3d3d3;
+                    text-align: center;
+                    width: 600px;
+                    height: 360px;
+                }
+          
+                #viz {
+                    font-family: 'Open Sans', 'Helvetica', 'sans-serif;';
+                    cursor: move;
+                    z-index: 10;
+                    background-color: none;
+                    color: #fff;
+                    height: 100%;
+                    width: 100%;
+                    fill: black;
+                    color: black;
+                }
+
+                .axis-label {
+                    fill: #3a4245;
+                    font-size: 12px;
+                    // font-family: 'sans-serif';
+                    text-anchor: middle;
+                }
+        
+                .y-axis, .x-axis {
+                    // font-family: "sans-serif";
+                }
+        
+                .x-axis .domain {
+                    stroke: #ccd6eb;
+                    stroke-width: 1;
+                }
+        
+                .y-axis .domain {
+                    stroke: none;
+                }
+        
+                .x-axis text, .y-axis text {
+                    font-size: 12px;
+                    color: #3a4245;
+                    visibility: visible;
+                }
+        
+                .x-axis text .hide, .y-axis text .hide {
+                    visibility: hidden;
+                }
+        
+                .x-axis line, .y-axis line {
+                    stroke: #e6e6e6;
+                    stroke-width: 1;
+                    opacity: 1;
+                }
+        
+                .x-axis line .hide, .y-axis line .hide {
+                    opacity: 0;
+                }
+
+                .tooltip {
+                    box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;
+                    font-size: 12px;
+                    pointer-events: none;
+                }
+        
+                .tooltip #tt-header {
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #c3c3c3;
+                    text-transform: uppercase;
+                }
+        
+                hr { 
+                    margin-top: 1px; 
+                    margin-bottom: 1px 
+                }
+        
+                #tt-body {
+                  margin-top: 5px;
+                }
             </style>
             <svg>
-            </svg>`;
+            </svg>
+            <div class="tooltip"></div>`;
         element.style.fontFamily = `"Open Sans", "Helvetica", sans-serif`       
     },
 
@@ -118,18 +195,24 @@ export const object = {
             })) return
         }
 
-        // function group_by_week(d) {
-        //     d.reduce
-        // }
+        const options = { ...this.options}
+
+        if (config.show_yaxis_name) {
+            options.yaxis_label.hidden = false
+        } else {
+            options.yaxis_label.hidden = true
+        }
+
+        this.trigger('registerOptions', options)
         
         try {
 
              // set dimensions
              let margin = {
-                    top: 60,
+                    top: 45,
                     right: 10,
                     bottom: 60,
-                    left: 70
+                    left: +config.leftmargin,
             }
 
             const width = element.clientWidth;
@@ -209,10 +292,10 @@ export const object = {
                 if (d3.event.pageY < boundedHeight*.7) {
                     console.log("here less")
                     tooltip
-                        .style("top", (d3.event.pageY - 60 + "px"))
+                        .style("top", (d3.event.pageY - 30 + "px"))
                 } else {
                     tooltip
-                        .style("top", (d3.event.pageY - 160 + "px"))
+                        .style("top", (d3.event.pageY - 110 + "px"))
                 }
     
                 if (d3.event.pageX < boundedWidth*.7) {
@@ -235,29 +318,14 @@ export const object = {
                 let metricRef;
                 if (label === 'daycircle') {
                     tooltipHeader.html(`Day: ${d3.timeFormat("%b %-d")(data.day)}<hr>`)
-                    tooltipBody.html('<span style="float:left;">Actual:&nbsp</span>' + `<span style="float:right;">${d3.format(config.metric_format)(data["actual"])}</span>`)
+                    tooltipBody.html('<span style="float:left;">Actual:&nbsp</span>' + `<span style="float:right;">${d3.format(config.metric_format)(data["actualVal"])}</span>`)
                 } else {
-                    let prefix;
-                    let prefix2
-                    console.log("legend check", data.week.getTime(), lastWeek.getTime())
-                    if (data.week.getTime() === lastWeek.getTime()) {
-                        prefix = "WTD "
-                        prefix2 = "Tot "
-                    } else {
-                        prefix = ""
-                        prefix2 = ""
-                    }
-
                     tooltipHeader.html(`Week: ${d3.timeFormat("%b %-d")(data.week)}<hr>`)
                     tooltipBody.html(
-                        `<span style="float:left;">Actual:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["actual"])}</span><br>` + 
-                        `<span style="float:left;">Actual-Contract:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["actualContract"])}</span><br>` + 
-                        `<span style="float:left;">Actual-Spot:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["actualSpot"])}</span><br>` + 
-                        `<span style="float:left;">${prefix}Budget:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["budgetTD"])}</span><br>` +
-                        `<span style="float:left;">% to ${prefix}Budget:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(data["actual"]/data["budgetTD"])}</span><br>` + 
-                        `<span style="float:left;">${prefix}Forecast:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["forecastTD"])}</span><br>` +
-                        `<span style="float:left;">% to ${prefix}Forecast:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(data["actual"]/data["forecastTD"])}</span><br>` + 
-                        `<span style="float:left;">Daily Budget:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["budget"]/7)}</span>`
+                        `<span style="float:left;">Actual:&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["actualVal"])}</span><br>` + 
+                        `<span style="float:left;">${config.comparison}:&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["compVal"])}</span><br>` +
+                        `<span style="float:left;">% to ${config.comparison}:&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(data["actualVal"]/data["compVal"])}</span><br>` + 
+                        `<span style="float:left;">Avg Daily ${config.comparison}:&nbsp</span>` + `<span style="float:right;">${d3.format(config.metric_format)(data["compVal"]/7)}</span>`
                     )
                 }
 
@@ -293,13 +361,8 @@ export const object = {
                 entry['week'] = new Date(d[week].value + 'T00:00')
                 entry['day'] = new Date(d[day].value + 'T00:00')
                 entry['dayofwk'] = d3.timeFormat("%a")(entry['day'])
-                entry['budget'] = d[measures[0].name].value
-                entry['forecast'] = d[measures[1].name].value
-                entry['budgetTD'] = d[measures[2].name].value
-                entry['forecastTD'] = d[measures[3].name].value
-                entry['actual'] = d[measures[4].name].value
-                entry['actualContract'] = d[measures[5].name].value
-                entry['actualSpot'] = d[measures[6].name].value
+                entry['comp'] = d[measures[0].name].value
+                entry['actual'] = d[measures[1].name].value
                 data_ready.push(entry)          
             })
 
@@ -308,21 +371,12 @@ export const object = {
             const weekAccessor = d => d.week
             const dayAccessor = d => d.day
             const dayofwkAccessor = d => d.dayofwk
-            const budgetAccessor = d => d.budget
-            const forecastAccessor = d => d.forecast
-            const budgetTDAccessor = d => d.budgetTD
-            const forecastTDAccessor = d => d.forecastTD
-            const actualAccessor = d => d.actual
-            const actualContractAccessor = d => d.actualContract
-            const actualSpotAccessor = d => d.actualSpot
+            const actualAccessor = d => d.actualVal
+            const compAccessor = d => d.compVal
 
             // filter data - might want to check this?
-            const uniqueWeeks = [... new Set(data_ready.map(obj => +obj.week))].sort() // .map(tv => new Date(tv)).sort()
             const lastWeek = data_ready.filter(element => element.day.getTime() === new Date(new Date().setHours(0,0,0,0)).getTime())[0]['week']
-            const indexFourWkAgo = uniqueWeeks.indexOf(+lastWeek) - 3
-            const firstWeek = new Date(uniqueWeeks[indexFourWkAgo])
-
-            // const firstWeek = data_ready.filter(element => element.day.getTime() === new Date(new Date(new Date().getFullYear(), new Date().getMonth(), 1).setHours(0,0,0,0)).getTime())[0]['week']
+            const firstWeek = data_ready.filter(element => element.day.getTime() === new Date(new Date(new Date().getFullYear(), new Date().getMonth(), 1).setHours(0,0,0,0)).getTime())[0]['week']
             data_ready = data_ready.filter(element => {
                 const weekDate = element.week;
                 return (weekDate >= firstWeek && weekDate <= lastWeek)
@@ -337,43 +391,19 @@ export const object = {
             // group the data by week
             function group_by_week(arr) {
                 return Object.values(
-                    data_ready.reduce((a, {week: weekStart, 
-                                    day: dayVal, 
-                                    dayofwk: dayofwk,
-                                    budget: budgetVal,
-                                    forecast: forecastVal,
-                                    budgetTD: budgetTDVal,
-                                    forecastTD: forecastTDVal,
-                                    actual: actualVal,
-                                    actualContract: actualContractVal,
-                                    actualSpot: actualSpotVal
-                                }) => {
+                    data_ready.reduce((a, {week: weekStart, comp: compVal, actual: actualVal, day: dayVal, dayofwk: dayofwk}) => {
                         const key = weekStart;
         
                         if (a[key] === undefined) {
-                            a[key] = {week: key, 
-                                budget: 0, 
-                                forecast: 0,
-                                budgetTD: 0,
-                                forecastTD: 0, 
-                                actual: 0, 
-                                actualContract: 0,
-                                actualSpot: 0,
-                                days: []};
+                            a[key] = {week: key, compVal: 0, actualVal: 0, days: []};
                         }
         
-                        a[key].budget += budgetVal;
-                        a[key].forecast += forecastVal;
-                        a[key].budgetTD += budgetTDVal;
-                        a[key].forecastTD += forecastTDVal;
-                        a[key].actual += actualVal;
-                        a[key].actualContract += actualContractVal;
-                        a[key].actualSpot += actualSpotVal;
+                        a[key].compVal += compVal;
+                        a[key].actualVal += actualVal;
                         a[key].days.push({
                             day: dayVal,
-                            budget: budgetVal,
-                            forecast: forecastVal,
-                            actual: actualVal,
+                            actualVal: actualVal,
+                            compVal: compVal,
                             dayofwk: dayofwk
                         })
         
@@ -384,21 +414,6 @@ export const object = {
                 
             const data_group = group_by_week(data_ready)
             console.log("data group", data_group)
-
-            const subgroups = ['actualContract', 'actualSpot']
-
-            const data_stacked = d3.stack()
-                .keys(subgroups)
-                (data_group)
-
-            data_stacked.forEach((d) => {
-                const subgroup = d.key
-                d.forEach((s,i) => {
-                    s['subgroup'] = subgroup
-                })
-            })
-
-            console.log("data_stacked", data_stacked)
 
             
             // scales
@@ -412,18 +427,9 @@ export const object = {
                 .range([0, boundedWidth])
                 .padding(0.03)
 
-
-            let yScale = d3.scaleLinear()
+            const yScale = d3.scaleLinear()
+                .domain([0, Math.max(d3.max(data_group, d => actualAccessor(d)), d3.max(data_group, d => compAccessor(d)))])
                 .range([boundedHeight, 0])
-
-            if (config.budgetlines == "true") {
-                yScale
-                    .domain([0, Math.max(d3.max(data_group, d => actualAccessor(d)), d3.max(data_group, d => budgetAccessor(d)), d3.max(data_group, d => forecastAccessor(d)))])
-            } else {
-                yScale
-                    .domain([0, Math.max(d3.max(data_group, d => actualAccessor(d)), d3.max(data_group, d => forecastAccessor(d)))])
-            }
-            
 
             const dayDomain = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
@@ -438,8 +444,8 @@ export const object = {
                 .tickSizeInner(0)
                 .tickFormat((d, i) => d.slice(0,1))
 
-             // peripherals (axes)
-             const xAxisGenerator = d3.axisBottom()
+            // peripherals (axes)
+            const xAxisGenerator = d3.axisBottom()
                 .scale(xScale)
                 .tickPadding(30)
                 .tickSizeOuter(0)
@@ -449,17 +455,16 @@ export const object = {
             const yAxisGenerator = d3.axisLeft()
                 .scale(yScale)
                 .tickPadding(10)
-                .ticks(9)
 
-            if (config.yticklabels_show === "true") {
+            if (config.yticklabels_show == true) {
                 yAxisGenerator
-                    .tickFormat(d3.format(config.ytick_format))
+                    .tickFormat(d3.format(config.metric_format))
             } else {
                 yAxisGenerator
                     .tickFormat("")
             }
 
-            if (config.y_gridlines === "true") {
+            if (config.y_gridlines == true) {
                 yAxisGenerator
                     .tickSize(-boundedWidth)
             } else {
@@ -477,7 +482,7 @@ export const object = {
                     .attr("class", "y-axis")
 
             // axis labels
-            if (config.show_yaxis_name == "true") {
+            if (config.show_yaxis_name == true) {
                 const yAxisLabel = yAxis.append("text")
                     .attr("class", "axis-label")
                     .attr("x", (-boundedHeight/2))
@@ -488,55 +493,13 @@ export const object = {
                         if (config.yaxis_label != "") {
                             return config.yaxis_label
                         } else {
-                            return measures[0].label_short.split(" ")[0]
+                            return measures[1].label_short.split(" ")[0]
                         }
                     })
             }
 
             
             // draw large/week bars
-            const stackGroups = group.append('g')
-
-            const setupStacks = stackGroups
-                .selectAll('g .subgroupbars')
-                .data(data_stacked)
-                .enter()
-                .append('g')
-                    .attr("class", "subgroupbars")
-
-            const stacks = setupStacks
-                .selectAll("rect .stack")
-                .data(d => d)
-                .enter()
-                .append("rect")
-                    .attr("x", d => xScale(d.data.week))
-                    .attr("y", d => yScale(d[1]))
-                    .attr("width", xScale.bandwidth())
-                    .attr("height", d => yScale(d[0]) - yScale(d[1]))
-                    .attr("class", "stack")
-                    .attr("fill", (d) => {
-                        if (d.data.actual < d.data.budgetTD) {
-                            return "#D76106"
-                        } else {
-                            return "#0072B5"
-                        }
-                    })
-                    .attr("fill-opacity", (d) => {
-                        if (d.subgroup === "actualSpot") {
-                            return 0.6
-                        } else {
-                            return 0.3
-                        }
-                    })
-                    .attr("stroke", (d) => {
-                        if (d.data.actual < d.data.budgetTD) {
-                            return "#D76106"
-                        } else {
-                            return "#0072B5"
-                        }
-                    })
-                    .attr("stroke-width", 1)
-
             const weekGroups = group.append("g")
                 .attr("class", "week-groups")
                 .selectAll("g")
@@ -544,57 +507,56 @@ export const object = {
                 .enter()
                 .append("g")
                     .attr("class", d => `singleweek ${d3.timeFormat('%b%d')(weekAccessor(d))}`)
-
-            // add columns just for tooltip purposes
+                    
             const weekBars = weekGroups
                 .append("rect")
                     .attr("x", d => xScale(weekAccessor(d)))
-                    .attr("y", 0)
+                    .attr("y", d => yScale(actualAccessor(d)))
                     .attr("width", xScale.bandwidth())
-                    .attr("height", boundedHeight)
-                    .attr("fill-opacity", 0.0)
+                    .attr("height", d => boundedHeight - yScale(actualAccessor(d)))
+                    .attr("fill-opacity", 0.2)
+                    .attr("fill", function(d,i) {
+                        if (actualAccessor(d) < compAccessor(d)) {
+                            return "#D76106"
+                        } else {
+                            return "#0072b5"
+                        }
+                    })
+                    .attr("stroke", function(d,i) {
+                        if (actualAccessor(d) < compAccessor(d)) {
+                            return "#D76106"
+                        } else {
+                            return "#0072b5"
+                        }
+                    })
+                    .attr("stroke-width", 4)
+                    .attr("stroke-opacity", 1.0)
                     .on("mouseover", mouseover)
                     .on("mousemove", d => mousemove({ data: d, label: "weekbar" }))
                     .on("mouseleave", mouseleave)
 
-            // draw weekly forecast lines
+            // draw weekly comp lines
             const compBars = weekGroups 
                 .append("rect")
                     .attr("x", d => xScale(weekAccessor(d)) - 0.045*(xScale.bandwidth()))
-                    .attr("y", d => yScale(forecastTDAccessor(d)))
+                    .attr("y", d => yScale(compAccessor(d)))
                     .attr("width", xScale.bandwidth() + 0.09*(xScale.bandwidth()))
                     .attr("height", 3)
-                    .attr("fill", "lightgrey")
-                    .attr("stroke", "black")
-                    .attr("stroke-width", 1)
+                    .attr("fill", "black")
                     .on("mouseover", mouseover)
-                    .on("mousemove", d => mousemove({ data: d, label: "forecastrect" }))
+                    .on("mousemove", d => mousemove({ data: d, label: "compbar" }))
                     .on("mouseleave", mouseleave)
 
-            // draw monthly budget lines
-            if (config.budgetlines === "true" ) {
-                const budgetGoalLine = weekGroups 
-                    .append("rect")
-                        .attr("x", d => xScale(weekAccessor(d)) - 0.045*(xScale.bandwidth()))
-                        .attr("y", d => yScale(budgetTDAccessor(d)))
-                        .attr("width", xScale.bandwidth() + 0.09*(xScale.bandwidth()))
-                        .attr("height", 3)
-                        .attr("fill", "black")
-                        .on("mouseover", mouseover)
-                        .on("mousemove", d => mousemove({ data: d, label: "budgetline" }))
-                        .on("mouseleave", mouseleave)
-            }   
-
             // draw simple daily goal
-            if (config.dailylines === "true" ) {
+            if (config.dailylines == true ) {
                 const dayGoalLine = weekGroups
                     .append("line")
                         .attr("x1", d => xScale(weekAccessor(d)))
                         .attr("x2", d => xScale(weekAccessor(d)) + xScale.bandwidth())
-                        .attr("y1", d => yScale(budgetAccessor(d)/7))
-                        .attr("y2", d => yScale(budgetAccessor(d)/7))
+                        .attr("y1", d => yScale(compAccessor(d)/7))
+                        .attr("y2", d => yScale(compAccessor(d)/7))
                         .attr("stroke", "grey")
-                        .attr("stroke-width", 2)
+                        .attr("stroke-width", 1)
                         .attr("stroke-dasharray", ("5,3"))
                         .attr("class", "daily-average-goal")
                         .on("mouseover", mouseover)
@@ -621,7 +583,7 @@ export const object = {
                         .attr("y1", d => yScale(actualAccessor(d)))
                         .attr("y2", yScale(0))
                         .attr("stroke", "black")
-                        .attr("stroke-width", 2.5)
+                        .attr("stroke-width", 3)
                         .attr("class", "daily-lines")
                         .on("mouseover", mouseover)
                         .on("mousemove", d => mousemove({ data: d, label: "daycircle" }))
@@ -638,7 +600,7 @@ export const object = {
                             if (actualAccessor(d) === 0) {
                                 return 0
                             } else {
-                                return 4
+                                return 5
                             }
                         })
                         .attr("fill", "black")
@@ -654,80 +616,14 @@ export const object = {
 
             console.log("here2")
 
-
             // legend
             const legendContainer = group.append("g")
                 .attr("transform", "translate(0,0)")
                 .classed("legendContainer", true)
 
-            const legendSpot = legendContainer.append('g')
-                .classed("legend", true)
-                .attr("transform", `translate(6, -35)`)
-
-            legendSpot.append("text")
-                .attr("x", 20)
-                .attr("y", 0)
-                .style("text-anchor", "start")
-                .style("dominant-baseline", "middle")
-                .style("font-size", 11)
-                .text(`Spot`)
-            
-            legendSpot.append("rect")
-                .attr("x", 0)
-                .attr("y", -5.2)
-                .attr("width", 15)
-                .attr("height", 4)
-                .attr("fill", "#0072B5")
-                .attr("fill-opacity", 0.6)
-                .attr("stroke", "#0072b5")
-                .attr("stroke-width", 0.5)
-
-            legendSpot.append("rect")
-                .attr("x", 0)
-                .attr("y", -.5)
-                .attr("width", 15)
-                .attr("height", 4)
-                .attr("fill", "#D76106")
-                .attr("fill-opacity", 0.6)
-                .attr("stroke", "#D76106")
-                .attr("stroke-width", 0.5)
-
-            const legendContract = legendContainer.append('g')
-                .classed("legend", true)
-                .attr("transform", `translate(60, -35)`)
-
-            legendContract.append("text")
-                .attr("x", 20)
-                .attr("y", 0)
-                .style("text-anchor", "start")
-                .style("dominant-baseline", "middle")
-                .style("font-size", 11)
-                .text(`Contract`)
-            
-            legendContract.append("rect")
-                .attr("x", 0)
-                .attr("y", -5.4)
-                .attr("width", 15)
-                .attr("height", 4)
-                .attr("fill", "#0072B5")
-                .attr("fill-opacity", 0.3)
-                .attr("stroke", "#0072b5")
-                .attr("stroke-width", 0.5)
-
-            legendContract.append("rect")
-                .attr("x", 0)
-                .attr("y", -.5)
-                .attr("width", 15)
-                .attr("height", 4)
-                .attr("fill", "#D76106")
-                .attr("fill-opacity", 0.3)
-                .attr("stroke", "#D76106")
-                .attr("stroke-width", 0.5)
-
-
             const legendGoal = legendContainer.append('g')
                 .classed("legend", true)
-                .attr("transform", `translate(140, -35)`)
+                .attr("transform", `translate(6, -25)`)
 
             legendGoal.append("text")
                 .attr("x", 20)
@@ -735,55 +631,26 @@ export const object = {
                 .style("text-anchor", "start")
                 .style("dominant-baseline", "middle")
                 .style("font-size", 11)
-                .text(`Forecast`)
+                .text(() => {
+                    if (config.comparison) {
+                        return `Weekly ${config.comparison}`
+                    } else {
+                        return 'Weekly Goal'
+                    }
+                })
 
             legendGoal.append("rect")
                 .attr("x", 0)
-                .attr("y", -3)
+                .attr("y", -2)
                 .attr("width", 15)
                 .attr("height", 3)
-                .attr("fill", "lightgrey")
-                .attr("stroke", "black")
-                .attr("stroke-width", 1)
-
-            const legendXcoord = (() => {
-                if (config.dailylines == "true" && config.budgetlines == "true") {
-                    return 290
-                } else if (config.dailylines == "true" || config.budgetlines == "true") {
-                    return 220
-                } else {
-                    return 0
-                }
-            })();
-
-            console.log("legendXcoord", legendXcoord)
-
-            if (config.budgetlines == "true" ) {
-                const legendBudget = legendContainer.append('g')
-                    .classed("legend", true)
-                    .attr("transform", `translate(220, -35)`)
-
-                legendBudget.append("text")
-                    .attr("x", 20)
-                    .attr("y", 0)
-                    .style("text-anchor", "start")
-                    .style("dominant-baseline", "middle")
-                    .style("font-size", 11)
-                    .text(`Budget`)
-
-                legendBudget.append("rect")
-                    .attr("x", 0)
-                    .attr("y", -2)
-                    .attr("width", 15)
-                    .attr("height", 3)
-                    .attr("fill", "black")
-            }
+                .attr("fill", "black")
 
             
-            if (config.dailylines == "true" ) {
+            if (config.dailylines === true ) {
                 const legendDayGoal = legendContainer.append('g')
                     .classed("legend", true)
-                    .attr("transform", `translate(${legendXcoord}, -35)`)
+                    .attr("transform", `translate(130, -25)`)
 
                 legendDayGoal.append("text")
                     .attr("x", 20)
@@ -791,13 +658,19 @@ export const object = {
                     .style("text-anchor", "start")
                     .style("dominant-baseline", "middle")
                     .style("font-size", 11)
-                    .text('Daily Budget')
+                    .text(() => {
+                        if (config.comparison) {
+                            return `Daily ${config.comparison}`
+                        } else {
+                            return `Daily Goal`
+                        }
+                    })
 
                 legendDayGoal.append("line")
                     .attr("x1", 0)
                     .attr("x2", 15)
-                    .attr("y1", -1)
-                    .attr("y2", -1)
+                    .attr("y1", -2)
+                    .attr("y2", -2)
                     .attr("stroke", "grey")
                     .attr("stroke-width", 2)
                     .attr("stroke-dasharray", ("5,3"))
@@ -818,4 +691,4 @@ export const object = {
         done()
     }
 }
-};
+});
