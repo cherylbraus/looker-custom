@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
 
-export const object = {
+looker.plugins.visualizations.add({
 
     id: "week-day-bar",
     label: "ZDev Week & Day Bars",
@@ -31,14 +31,14 @@ export const object = {
           budgetlines: {
             type: "boolean",
             label: "Show Budget Goals",
-            default: "true",
+            default: true,
             section: "General",
             order: 2
         },
         show_yaxis_name: {
             type: "boolean",
             label: "Show Y-Axis Name",
-            default: "true",
+            default: true,
             section: "Y",
             order: 1
         },
@@ -53,7 +53,7 @@ export const object = {
         yticklabels_show: {
             type: "boolean",
             label: "Show Y Tick Labels",
-            default: "true",
+            default: true,
             section: "Y",
             order: 3
         },
@@ -69,7 +69,7 @@ export const object = {
         y_gridlines: {
             type: "boolean",
             label: "Show Y Gridlines",
-            default: "false",
+            default: false,
             section: "Y",
             order: 4
         },
@@ -199,6 +199,22 @@ export const object = {
                 min_measures: 0, max_measures: 11
             })) return
         }
+
+        const options = { ...this.options}
+
+        if (config.show_yaxis_name) {
+            options.yaxis_label.hidden = false
+        } else {
+            options.yaxis_label.hidden = true
+        }
+
+        if (config.yticklabels_show) {
+            options.ytick_format.hidden = false
+        } else {
+            options.ytick_format.hidden = true
+        }
+
+        this.trigger('registerOptions', options)
         
         try {
 
@@ -408,7 +424,7 @@ export const object = {
             const yScale = d3.scaleLinear()
                 .range([boundedHeight, 0])
 
-            if (config.budgetlines == "true") {
+            if (config.budgetlines ) {
                 yScale
                     .domain([0, Math.max(d3.max(data_ready, d => actualAccessor(d)), d3.max(data_ready, d => budgetAccessor(d)), d3.max(data_ready, d => forecastAccessor(d)))])
             } else {
@@ -421,7 +437,7 @@ export const object = {
                 .tickPadding(10)
                 .ticks(6)
             
-            if (config.yticklabels_show === "true") {
+            if (config.yticklabels_show ) {
                 yAxisGenerator
                     .tickFormat(d3.format(config.ytick_format))
             } else {
@@ -429,7 +445,7 @@ export const object = {
                     .tickFormat("")
             }
 
-            if (config.y_gridlines === "true") {
+            if (config.y_gridlines ) {
                 yAxisGenerator
                     .tickSize(-boundedWidth)
             } else {
@@ -442,7 +458,7 @@ export const object = {
                     .attr("class", "y-axis")
 
             // axis labels
-            if (config.show_yaxis_name == "true") {
+            if (config.show_yaxis_name ) {
                 const yAxisLabel = yAxis.append("text")
                     .attr("class", "axis-label")
                     .attr("x", (-boundedHeight/2))
@@ -589,7 +605,7 @@ export const object = {
                     .attr("stroke", "black")
                     .attr("stroke-width", 1)
 
-            if (config.budgetlines == "true") {
+            if (config.budgetlines ) {
                 const budgetGoalLine = monthGroups 
                     .append("rect")
                         .attr("x", d => xScale(monthAccessor(d)) - 0.04*(xScale.bandwidth()))
@@ -638,7 +654,7 @@ export const object = {
                 .attr("stroke", "black")
                 .attr("stroke-width", 1)
 
-            if (config.budgetlines == "true" ) {
+            if (config.budgetlines  ) {
                 const legendBudget = legendContainer.append('g')
                     .classed("legend", true)
                     .attr("transform", `translate(90, -30)`)
@@ -674,4 +690,4 @@ export const object = {
         done()
     }
 }
-};
+});
