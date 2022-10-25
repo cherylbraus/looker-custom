@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
 
-looker.plugins.visualizations.add({
+export const object = {
     // Id and Label are legacy properties that no longer have any function besides documenting
     // what the visualization used to have. The properties are now set via the manifest
     // form within the admin/visualizations page of Looker.
@@ -47,7 +47,7 @@ looker.plugins.visualizations.add({
         showlastmonth: {
             type: "boolean",
             label: "Show current month (forecast)",
-            default: true,
+            default: "true",
         }
       },
           // Set up the initial state of the visualization
@@ -149,7 +149,7 @@ looker.plugins.visualizations.add({
             console.log(data_ready)
 
             // filter out current month if choose to
-            if (config.showlastmonth == false) {
+            if (config.showlastmonth == "false") {
                 const currentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime()
                 const currentMonthFormatted = new Date(+currentMonth)
 
@@ -308,4 +308,4 @@ looker.plugins.visualizations.add({
         // Callback at the end of the rendering to let Looker know it's finished
         done()
     }
-}});
+}}

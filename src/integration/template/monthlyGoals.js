@@ -315,6 +315,10 @@ export const object = {
             console.log("measure", measures)
             console.log('data', data)
 
+            const pivotKeys = Object.keys(data[0][measures[0].name])
+            let pivotKey = pivotKeys[pivotKeys.length - 1]
+            console.log("pivotKeys, pivotKey", pivotKeys, pivotKey)
+
             // MANIPULATE DATA
             let data_ready = []
 

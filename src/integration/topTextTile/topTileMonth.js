@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
 
-export const object = {
+looker.plugins.visualizations.add({
     // Id and Label are legacy properties that no longer have any function besides documenting
     // what the visualization used to have. The properties are now set via the manifest
     // form within the admin/visualizations page of Looker.
@@ -33,28 +33,28 @@ export const object = {
         currency: {
             type: "boolean",
             label: "Metric is Currency",
-            default: "false",
+            default: false,
             section: "General",
             order: 3
         },
         colorTop: {
             type: "boolean",
             label: "Color Actuals",
-            default: "true",
+            default: true,
             section: "General",
             order: 4
         },
         colorBottom: {
             type: "boolean",
             label: "Color Percentages",
-            default: "true",
+            default: true,
             section: "General",
             order: 5
         },
         showmarginperc: {
             type: "boolean",
             label: "Show Margin %",
-            default: "false",
+            default: false,
             section: "General",
             order: 6
         }
@@ -256,7 +256,15 @@ export const object = {
             }
         
             const directionWording = function(d) {
-                if (data_ready[0].actual < data_ready[0][config.comparison]) {
+                if (data_current[0].actual < data_current[0][config.comparison]) {
+                    return "Below"
+                } else {
+                    return "Above"
+                }
+            }
+
+            const directionWordingPrior = function(d) {
+                if (data_prior[0].actual < data_prior[0][config.comparison]) {
                     return "Below"
                 } else {
                     return "Above"
@@ -285,7 +293,7 @@ export const object = {
                 .enter()
                 .append("text")
                     .text(function() {
-                        if (config.currency === "false") {
+                        if (config.currency == false) {
                             return rawFormat(data_current[0].actual)
                         } else {
                             return currFormat(data_current[0].actual)
@@ -299,7 +307,7 @@ export const object = {
                     .style("text-anchor", "middle")
                     .style("font-weight", "600")
                     .attr("fill", function() {
-                        if (config.colorTop == "true") {
+                        if (config.colorTop ) {
                             if (data_current[0].actual < data_current[0][config.comparison]) {
                                 return "#D76106"
                             } else {
@@ -311,7 +319,7 @@ export const object = {
                     })
 
 
-            if (config.showmarginperc == "true") {
+            if (config.showmarginperc ) {
                 const percMargin = group.append("g").selectAll("text")
                     .data(data_current)
                     .enter()
@@ -354,7 +362,7 @@ export const object = {
                     .style("text-anchor", "middle")
                     .style("font-weight", "550")
                     .attr("fill", function() {
-                        if (config.colorBottom == "true") {
+                        if (config.colorBottom ) {
                             if (data_current[0].actual < data_current[0][config.comparison]) {
                                 return "#D76106"
                             } else {
@@ -388,14 +396,14 @@ export const object = {
                     .attr("fill", "#323232")
                 .append("tspan")
                     .text(function() {
-                        if (config.currency === "false") {
+                        if (config.currency == false) {
                             return `\u00A0 ${rawFormat(data_prior[0].actual)}`
                         } else {
                             return `\u00A0 ${currFormat(data_prior[0].actual)}`
                         }
                     })
                     .attr("fill", function() {
-                        if (config.colorTop == "true") {
+                        if (config.colorTop ) {
                             if (data_prior[0].actual < data_prior[0][config.comparison]) {
                                 return "#D76106"
                             } else {
@@ -419,7 +427,7 @@ export const object = {
                         }
                     })
                     .attr("fill", function() {
-                        if (config.colorBottom == "true") {
+                        if (config.colorBottom ) {
                             if (data_prior[0].actual < data_prior[0][config.comparison]) {
                                 return "#D76106"
                             } else {
@@ -431,7 +439,7 @@ export const object = {
                     })
                     .style("font-weight", "550")
                 .append("tspan")
-                    .text(`\u00A0${directionWording()} ${bottomLabel}`)
+                    .text(`\u00A0${directionWordingPrior()} ${bottomLabel}`)
                     .attr("fill", "#323232")
                     .style("font-weight", "200")
                     .attr("class", "lastlabel")
@@ -451,4 +459,4 @@ export const object = {
         done()
     }
 }
-};
+});

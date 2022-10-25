@@ -15,8 +15,8 @@ export const object = {
           label: "Comparison Metric",
           display: "radio",
           values: [
-              {"Monthly Target": "monthly-budget"},
-              {"MTD Target": "mtd-budget"},
+              {"Monthly Budget": "monthly-budget"},
+              {"MTD Budget": "mtd-budget"},
               {"Monthly Forecast": "monthly-forecast"},
               {"MTD Forecast": "mtd-forecast"},
           ],
@@ -358,7 +358,7 @@ try {
             
 
     // Dummy data ---------------------------------------------
-    const monthlyTarget = rects
+    const monthlyBudget = rects
         .selectAll(".mpace")
         .data([budget_forecast_dps])
         .enter()
@@ -366,7 +366,7 @@ try {
             .attr("class", "mpace")
             .attr("transform", function(d, i) { return "translate(" + (xScale(d["monthly-budget"])) + "," + 26 + ")"; })
 
-    monthlyTarget
+    monthlyBudget
         .append("path")
         .attr("d", d3.symbol().size(30).type(d3.symbolTriangle))
         .attr("transform", "rotate(180)")
@@ -383,7 +383,7 @@ try {
             }
         })
 
-    const monthlyTargetText = monthlyTarget.append("text")
+    const monthlyBudgetText = monthlyBudget.append("text")
             .attr("x", 4)
             .attr("y", -10)
             .text((d) => 
@@ -414,11 +414,11 @@ try {
                 }
             })
 
-    const monthlyTargetHiddenText = monthlyTarget.append("text")
+    const monthlyBudgetHiddenText = monthlyBudget.append("text")
             .attr("x", 4)
             .attr("y", -10)
             .text(()=>{
-                const res = d3.timeFormat("%b")(new Date()) + " target";
+                const res = d3.timeFormat("%b")(new Date()) + " budget";
                 return res;
             })
             .attr("text-anchor", "end")
@@ -443,15 +443,15 @@ try {
 
     // --------------------------------------------
 
-    const mtdTarget = rects
-        .selectAll(".mtdtarget")
+    const mtdBudget = rects
+        .selectAll(".mtdbudget")
         .data([budget_forecast_dps])
         .enter()
             .append("g")
-            .attr("class", "mtdtarget")
+            .attr("class", "mtdbudget")
             .attr("transform", function(d, i) { return "translate(" + (xScale(d["mtd-budget"])) + "," + 26 + ")"; })
 
-    mtdTarget
+    mtdBudget
         .append("path")
         .attr("d", d3.symbol().size(30).type(d3.symbolTriangle))
         .attr("transform", "rotate(180)")
@@ -464,11 +464,11 @@ try {
                       return "#0072b5"
                     }
                 } else {
-                    return "#323232"
+                    return "#523130"
                 }
             })
 
-    const mtdTargetText = mtdTarget.append("text")
+    const mtdBudgetText = mtdBudget.append("text")
             .attr("x", -5) //4
             .attr("y", -24)
             .text((d) => 
@@ -495,14 +495,14 @@ try {
                       return "#0072b5"
                     }
                 } else {
-                    return "#323232"
+                    return "#523130"
                 }
             })
 
-    const mtdTargetHiddenText = mtdTarget.append("text")
+    const mtdBudgetHiddenText = mtdBudget.append("text")
             .attr("x", -5) //4
             .attr("y", -24)
-            .text("MTD target")
+            .text("MTD budget")
             .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
@@ -519,7 +519,7 @@ try {
                       return "#0072b5"
                     }
                 } else {
-                    return "#323232"
+                    return "#523130"
                 }
             })
 
@@ -630,7 +630,7 @@ try {
                   return "#0072b5"
                 }
             } else {
-                return "#323232"
+                return "#523130"
             }
         })
 
@@ -661,7 +661,7 @@ try {
                       return "#0072b5"
                     }
                 } else {
-                    return "#323232"
+                    return "#523130"
                 }
             })
 
@@ -685,7 +685,7 @@ try {
                       return "#0072b5"
                     }
                 } else {
-                    return "#323232"
+                    return "#523130"
                 }
             })
     
@@ -698,7 +698,7 @@ console.log("finished labels")
 
     const metricLabel = (function() {
         if (config.comparison.includes("budget")) {
-            return `${d3.timeFormat("%b")(new Date())} target`
+            return `${d3.timeFormat("%b")(new Date())} budget`
         } else {
             return `${d3.timeFormat("%b")(new Date())} forecast`
         }
@@ -762,7 +762,7 @@ console.log("finished labels")
             .text("Hover to see what each value represents.")
             .attr("text-anchor", "start")
             .attr("dominant-baseline", "middle")
-            .attr("font-size", "0.7em")
+            .attr("font-size", "0.95em")
             .attr("font-weight", 300)
             .attr("font-family", "sans-serif")
             .attr("fill", "#323232")
