@@ -397,7 +397,7 @@ looker.plugins.visualizations.add({
           }
   
         let margin = {
-            top: 25, 
+            top: 52, 
             right: 10, 
             bottom: bottom_margin, 
             left: left_margin
@@ -685,14 +685,29 @@ looker.plugins.visualizations.add({
             bucket_data = []
 
             data_ready.forEach(function(d) {
-                if (d.side.includes("Undefined") || bucket_data.includes(d.side)) {
-                    return 
+                if (d.side instanceof Date) {
+                    if (bucket_data.find(b => b.toDateString() === d.side.toDateString())) {
+                        return 
+                    } else {
+                        bucket_data.push(d.side)
+                    }
                 } else {
-                    bucket_data.push(d.side)
+                    if (d.side.includes("Undefined") || bucket_data.includes(d.side)) {
+                        return 
+                    } else {
+                        bucket_data.push(d.side)
+                    }
                 }
             })
 
             buckets['lower_pivot'] = bucket_data
+
+            if (pivotDate[1]) {
+                sides = [...new Set(data_ready.map(item =>item.side.toString()))]
+                // sides = sides.map(dateString => new Date(dateString))
+            } else {
+                sides = [...new Set(data_ready.map(item => item.side))]
+            }
 
             console.log("buckets", buckets)
 
@@ -773,6 +788,45 @@ looker.plugins.visualizations.add({
             })
 
             console.log("groupBins", groupBins)
+
+            groupBins.forEach((value, ind) => {
+                if (value.values.length != 2) {
+                    let existingSides = []
+                    value.values.forEach((item, index) => {
+                        existingSides.push(item.key)
+                    })
+
+                    console.log("existing", existingSides)
+
+                    if (existingSides[0] === sides[0]) { // ie the second side is missing
+                        let tempObject = {
+                            key: sides[1],
+                            lower: 0,
+                            mean: 0,
+                            median: 0,
+                            none: 0,
+                            upper: 0,
+                            value: []
+                        }
+
+                        value.values.push(tempObject)
+                    } else { // ie the first side is missing
+                        let tempObject = {
+                            key: sides[0],
+                            lower: 0,
+                            mean: 0,
+                            median: 0,
+                            none: 0,
+                            upper: 0,
+                            value: []
+                        }
+
+                        value.values.unshift(tempObject)
+                    }
+                }
+            })
+
+            console.log("groupBins gaps filled in", groupBins)
 
             // -------------------------------------------------------
             // SCALES AGAIN
@@ -1131,7 +1185,7 @@ looker.plugins.visualizations.add({
             // -------------------------------------------------------
             // DRAW LEGEND
             const legendContainer = group.append('g')
-                .attr("transform", "translate(0, 0)")
+                .attr("transform", "translate(0, -31)")
                 .classed("legendContainer", true)
 
             const legend = legendContainer.selectAll(".legend")

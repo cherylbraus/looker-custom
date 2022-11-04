@@ -384,7 +384,7 @@ try {
         })
 
     const monthlyBudgetText = monthlyBudget.append("text")
-            .attr("x", 4)
+            .attr("x", -5) //4
             .attr("y", -10)
             .text((d) => 
                 { 
@@ -395,7 +395,7 @@ try {
                     }
                     
                 })
-            .attr("text-anchor", "end")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("font-size", "0.8em")
@@ -415,13 +415,13 @@ try {
             })
 
     const monthlyBudgetHiddenText = monthlyBudget.append("text")
-            .attr("x", 4)
+            .attr("x", -5) // 4
             .attr("y", -10)
             .text(()=>{
                 const res = d3.timeFormat("%b")(new Date()) + " budget";
                 return res;
             })
-            .attr("text-anchor", "end")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("font-size", "0.8em")
@@ -550,7 +550,7 @@ try {
           })
 
     const monthlyForecastText = monthlyForecast.append("text")
-            .attr("x", 4)
+            .attr("x", -5) //4
             .attr("y", 12)
             .text((d) => 
                 { 
@@ -561,7 +561,7 @@ try {
                     }
                     
                 })
-            .attr("text-anchor", "end")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("font-size", "0.8em")
@@ -581,13 +581,13 @@ try {
             })
 
     const monthlyForecastHiddenText = monthlyForecast.append("text")
-            .attr("x", 4)
+            .attr("x", -5) // 4
             .attr("y", 12)
             .text(()=>{
                 const res = d3.timeFormat("%b")(new Date()) + " forecast";
                 return res;
             })
-            .attr("text-anchor", "end")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("font-size", "0.8em")
@@ -696,6 +696,14 @@ console.log("finished labels")
 
     const rightLabels = group.append("g")
 
+    const rightMetric = (function() {
+        if (config.comparison.includes("budget")) {
+            return `monthly-budget`
+        } else {
+            return `monthly-forecast`
+        }
+    })();
+
     const metricLabel = (function() {
         if (config.comparison.includes("budget")) {
             return `${d3.timeFormat("%b")(new Date())} budget`
@@ -704,6 +712,12 @@ console.log("finished labels")
         }
     })();
 
+    // const metricLabelDict = {
+    //     "mtd-budget": "MTD budget",
+    //     "monthly-budget": `${d3.timeFormat("%b")(new Date())} budget`,
+    //     "mtd-forecast": "MTD forecast",
+    //     "monthly-forecast": `${d3.timeFormat("%b")(new Date())} forecast`
+    // }
 
 
     const percPlanLabels = rightLabels
@@ -713,7 +727,8 @@ console.log("finished labels")
             .append("text")
             .attr("x", (d,i) => xScale(Math.max(d["monthly-budget"], d["monthly-forecast"])) + 53)
             .attr("y", d => yScale("metric") + yScale.bandwidth()/2 - 1)
-            .text(d => d3.format(".0%")(d["monthly-actual"]/d[`${config.comparison}`]))
+            // .text(d => d3.format(".0%")(d["monthly-actual"]/d[`${config.comparison}`]))
+            .text(d => d3.format(".0%")(d["monthly-actual"]/d[rightMetric]))
             .attr("text-anchor", "middle")
             .style("dominant-baseline", "middle")
             .attr("fill", function(d,i) {
@@ -735,6 +750,7 @@ console.log("finished labels")
             .attr("x", (d,i) => xScale(Math.max(d["monthly-budget"], d["monthly-forecast"])) + 53)
             .attr("y", d => yScale("metric") + yScale.bandwidth()/2 + 18)
             .text(`of ${metricLabel}`)
+            // .text(`of ${metricLabelDict[config.comparison]}`)
             .style("text-transform", "uppercase")
             .attr("text-anchor", "middle")
             .style("dominant-baseline", "middle")

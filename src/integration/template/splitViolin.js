@@ -363,7 +363,7 @@ export const object = {
           }
   
           let margin = {
-            top: 25, 
+            top: 52, 
             right: 10, 
             bottom: bottom_margin, 
             left: left_margin
@@ -642,6 +642,8 @@ export const object = {
 
             let bucket_data = []
             data_ready.forEach(function(d) {
+                console.log("d.group", d.group)
+                console.log("bucket_data", bucket_data)
                 if (bucket_data.includes(d.group)) {
                     return 
                 } else {
@@ -650,19 +652,43 @@ export const object = {
             })
 
             buckets['range'] = bucket_data
+            console.log("buckets.range", buckets['range'])
 
             bucket_data = []
 
+            console.log("bucket_data", bucket_data)
+            console.log("data_ready", data_ready)
+
+
             data_ready.forEach(function(d) {
-                if (d.side.includes("Undefined") || bucket_data.includes(d.side)) {
-                    return 
+                console.log("d.side", d.side)
+                if (d.side instanceof Date) {
+                    if (bucket_data.find(b => b.toDateString() === d.side.toDateString())) {
+                        return 
+                    } else {
+                        bucket_data.push(d.side)
+                    }
                 } else {
-                    bucket_data.push(d.side)
+                    if (d.side.includes("Undefined") || bucket_data.includes(d.side)) {
+                        return 
+                    } else {
+                        bucket_data.push(d.side)
+                    }
                 }
             })
 
             buckets['lower_pivot'] = bucket_data
+            let sides;
 
+            // if (data_ready[0].side instanceof Date) {
+            if (pivotDate[1]) {
+                sides = [...new Set(data_ready.map(item =>item.side.toString()))]
+                // sides = sides.map(dateString => new Date(dateString))
+            } else {
+                sides = [...new Set(data_ready.map(item => item.side))]
+            }
+
+            console.log("sides", sides)
             console.log("buckets", buckets)
 
             // -------------------------------------------------------
@@ -703,7 +729,7 @@ export const object = {
                 })
                 .entries(data_ready)
 
-            // console.log("groupBins", groupBins)
+            console.log("groupBins original", groupBins)
 
 
             // why do we have to loop through - aren't all the x0s the same?
@@ -742,6 +768,45 @@ export const object = {
             })
 
             console.log("groupBins", groupBins)
+
+            groupBins.forEach((value, ind) => {
+                if (value.values.length != 2) {
+                    let existingSides = []
+                    value.values.forEach((item, index) => {
+                        existingSides.push(item.key)
+                    })
+
+                    console.log("existing", existingSides)
+
+                    if (existingSides[0] === sides[0]) { // ie the second side is missing
+                        let tempObject = {
+                            key: sides[1],
+                            lower: 0,
+                            mean: 0,
+                            median: 0,
+                            none: 0,
+                            upper: 0,
+                            value: []
+                        }
+
+                        value.values.push(tempObject)
+                    } else { // ie the first side is missing
+                        let tempObject = {
+                            key: sides[0],
+                            lower: 0,
+                            mean: 0,
+                            median: 0,
+                            none: 0,
+                            upper: 0,
+                            value: []
+                        }
+
+                        value.values.unshift(tempObject)
+                    }
+                }
+            })
+
+            console.log("groupBins gaps filled in", groupBins)
 
             // -------------------------------------------------------
             // SCALES AGAIN
@@ -935,6 +1000,8 @@ export const object = {
                         .y(function(d) {return yScale(d.x0)})
                         .curve(d3.curveMonotoneY))
 
+            console.log("left violins done")
+
             const rightViolins = violins
                 .append("path")
                     .datum(function(d) {
@@ -948,6 +1015,8 @@ export const object = {
                         .x1(function(d) {return xNum(d.length)})
                         .y(function(d) {return yScale(d.x0)})
                         .curve(d3.curveMonotoneY))
+
+            console.log("right violins done")
 
             const leftStatsMarker = group.selectAll(".left-rect")
                 .data(groupBins)
@@ -1104,7 +1173,7 @@ export const object = {
             // -------------------------------------------------------
             // DRAW LEGEND
             const legendContainer = group.append('g')
-                .attr("transform", "translate(0, 0)")
+                .attr("transform", "translate(0, -31)")
                 .classed("legendContainer", true)
 
             const legend = legendContainer.selectAll(".legend")

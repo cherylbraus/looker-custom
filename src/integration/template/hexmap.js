@@ -110,6 +110,7 @@ export const object = {
 
     try {
 
+        // map chart setup ----------------------------------------------------------
         let margin = {
             top: 10,
             right: 10,
@@ -133,6 +134,32 @@ export const object = {
             .attr('height', (height + 'px'))
             .classed('group', true)
 
+        // line chart setup ----------------------------------------------------------
+        let margin2 = {
+            top: 10,
+            right: 10,
+            bottom: 30,
+            left: 30,
+        }
+
+        const width2 = element.clientWidth - margin2.left - margin2.right;
+        const height2 = element.clientHeight - margin2.top - margin2.bottom;
+
+        const svg2 = (
+            d3.select(element).select('svg#second')
+                .html('')
+                .attr('width', '100%')
+                .attr('height', '100%')
+        )
+
+        const group2 = svg2.append('g')
+            .attr('transform', `translate(${margin2.left},${margin2.top})`)
+            .attr('width', '100%')
+            .attr('height', (height + 'px'))
+            .classed('group', true)
+
+
+        // data setup ---------------------------------------------------------
         const dimensions = queryResponse.fields.dimension_like
         const measures = queryResponse.fields.measure_like
 
@@ -142,8 +169,6 @@ export const object = {
         let data_ready = []
 
         data.forEach((d) => {
-            // console.log(d[dimensions[0].name])
-            // console.log(d[dimensions[0].name].value)
             let entry = {}
 
             entry['month'] = new Date(d[dimensions[0].name].value + 'T00:00')
@@ -170,6 +195,140 @@ export const object = {
             console.log("data_ready", data_ready)
 
             // ---------------------------------------------------------------------
+            // LINE PLOT -----------------------------------------------------------
+
+            function group_by_month(arr) {
+                return Object.values(
+                    arr.reduce((a, {month: month,
+                                    rate: rate
+                                }) => {
+                        const key = month;
+        
+                        if (a[key] === undefined) {
+                            a[key] = {month: month, 
+                                rate: 0, 
+                                count: 0};
+                        }
+        
+                        a[key].rate += rate;
+                        a[key].count += 1;
+        
+                        return a;
+                    }, {})
+                )
+            }
+                
+            const data_month = group_by_month(data_ready)
+
+            data_month.forEach((d, i) => {
+                d['rateAvg'] = +d['rate'] / +d['count']
+            })
+
+            const monthAccessor = d => d.month;
+            const rateAvgAccessor = d => d.rateAvg;
+
+            console.log("data_month", data_month)
+
+            // axes
+            const xScale = d3.scaleTime()
+                .domain(d3.extent(data_month, d => d.month))
+                .range([0, width2])
+
+            const xAxisGenerator = d3.axisBottom()
+                .scale(xScale)
+                .tickFormat(d3.timeFormat("%b'%y"))
+
+            const xAxis = group2
+                .append('g')
+                .call(xAxisGenerator)
+                .style("transform", `translateY(${height2}px)`)
+
+            const yScale = d3.scaleLinear()
+                .domain(d3.extent(data_month, d => d.rateAvg))
+                .range([height2, 0])
+
+            const yAxisGenerator = d3.axisLeft()
+                .scale(yScale)
+                .tickFormat(d3.format("$.0s"))
+
+            const yAxis = group2
+                .append('g')
+                .call(yAxisGenerator)
+
+            const lineGenerator = d3.line()
+                .curve(d3.curveNatural)
+                .x(d => xScale(monthAccessor(d)))
+                .y(d => yScale(rateAvgAccessor(d)))
+
+            const timeline = group2
+                .append('path')
+                    .attr("fill", "none")
+                    .attr("stroke", "darkgrey")
+                    .attr("stroke-width", 1.5)
+                    .attr("d", lineGenerator(data_month))
+                    .attr("class", "timeline")
+
+            
+            // INTERACTIONS ------------------------------------------------------
+            group2
+                .call(d3.brushX()
+                    .extent([[0,0], [width2, height2]])
+                    .on("start brush end", brushed)    
+                )        
+
+            // placeholder dots
+            const dots = group2
+                .selectAll("circle")
+                .data(data_month)
+                .enter()
+                .append("circle")
+                    .attr("cx", d => xScale(monthAccessor(d)))
+                    .attr("cy", d => yScale(rateAvgAccessor(d)))
+                    .attr("r", 3)
+                    .attr("fill", "black")
+                    .attr("fill-opacity", 0.0)
+
+            let extent = null;
+            let data_map = data_ready;
+
+            console.log("extent", extent)
+
+            function brushed(extent) {
+                extent = d3.event.selection;
+                console.log("brush extent", extent)
+
+                if (extent) {
+                    dots
+                        .attr('fill-opacity', d => {
+                            const bool = xScale(monthAccessor(d)) >= extent[0] && xScale(monthAccessor(d)) <= extent[1];
+                            return bool ? 1.0 : 0.0;
+                        })
+
+                    let startDate = xScale.invert(extent[0])
+                    let endDate = xScale.invert(extent[1])
+
+                    console.log("brush start", startDate, startDate instanceof Date)
+                    console.log("brush end", endDate, endDate instanceof Date)
+                    console.log("ex month", data_ready[1].month, data_ready[1].month instanceof Date)
+                    data_map = data_ready.filter(function(d) {
+                        return d.month.getTime() >= startDate.getTime() && d.month.getTime() <= endDate.getTime()
+                    })
+
+                    console.log("data_map filtered", data_map)
+                } else {
+                    dots
+                        .attr('fill-opacity', 0.0)
+
+                    data_map = data_ready;
+                    console.log("data_map end", data_map)
+                }
+            }
+
+
+
+            
+
+            // ---------------------------------------------------------------------
             // HexGrid Map
 
             const projection = d3.geoAlbersUsa()
@@ -183,7 +342,7 @@ export const object = {
                 .append('g')
                 // .attr("stroke", "lightgrey")
                 // .attr("stroke-width", 0.5)
-                .attr("fill", "#fafafa")
+                .attr("fill", "#f9f9f9")
                 .selectAll("path")
                 .data(topojson.feature(mdata, mdata.objects.nation).features)
                 .enter()
@@ -205,7 +364,7 @@ export const object = {
                 .geography(topojson.feature(mdata, mdata.objects.nation))
                 .projection(projection)
                 .pathGenerator(path)
-                .hexRadius(9)
+                .hexRadius(10)
 
             console.log("data_ready", data_ready)
 
@@ -258,19 +417,19 @@ export const object = {
                     // .style('fill', d => !d.pointDensity ? '#fff' : colorScale(d.pointDensity))
                     .style("fill", "none")
                     // .style("stroke", "lightgrey")
-                    .style("stroke", d => !d.pointDensity ? "none" : "lightgrey")
+                    .style("stroke", d => !d.pointDensity ? "none" : "#b2b2b2")
 
             // create scale for inner hexagons
             const innerHexScale = d3.scaleQuantize()
-                .domain([Math.max(1, d3.min(totalVolumes)), d3.max(totalVolumes)])
-                .range([1,3,5,7,9])
+                .domain([Math.max(.001, d3.min(totalVolumes)), d3.max(totalVolumes)])
+                .range([2,4,6,8,10])
                 // .domain([0, d3.max(totalVolumes)])
                 // .range([0,1,2,3,4,5,6,7])
 
             // create color scale for rate *change*
             const colorRateScale = d3.scaleQuantize()
                 .domain(d3.extent(averageRates))
-                .range(["#f1cc56", "#8cbb61", "#007b82", "#27566b"])
+                .range(["#27566b", "#f1cc56", "#8cbb61"])
 
             // hexagon function
             const hexagonPoints = ( radius ) => {
@@ -302,8 +461,6 @@ export const object = {
                     })
                     .style("stroke", "none")
 
-            // ---------------------------------------------------------------------
-            
 
 
         })

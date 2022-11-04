@@ -124,8 +124,8 @@ try {
 
     let data_remix = []
 
-    const today = new Date("October 1, 2022")
-    // const today = new Date()
+    // const today = new Date("October 1, 2022")
+    const today = new Date()
     const todayYM = d3.timeFormat("%Y-%m")(today)
 
     console.log("todayYM", todayYM)
@@ -403,7 +403,7 @@ try {
         })
 
     const monthlyBudgetText = monthlyBudget.append("text")
-            .attr("x", 4)
+            .attr("x", -5)
             .attr("y", -10)
             .text((d) => 
                 { 
@@ -414,7 +414,7 @@ try {
                     }
                     
                 })
-            .attr("text-anchor", "end")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("font-size", "0.8em")
@@ -434,13 +434,13 @@ try {
             })
 
     const monthlyBudgetHiddenText = monthlyBudget.append("text")
-            .attr("x", 4)
+            .attr("x", -5)
             .attr("y", -10)
             .text(()=>{
                 const res = d3.timeFormat("%b")(new Date()) + " budget";
                 return res;
             })
-            .attr("text-anchor", "end")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("font-size", "0.8em")
@@ -569,7 +569,7 @@ try {
           })
 
     const monthlyForecastText = monthlyForecast.append("text")
-            .attr("x", 4)
+            .attr("x", -5)
             .attr("y", 12)
             .text((d) => 
                 { 
@@ -580,7 +580,7 @@ try {
                     }
                     
                 })
-            .attr("text-anchor", "end")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("font-size", "0.8em")
@@ -600,13 +600,13 @@ try {
             })
 
     const monthlyForecastHiddenText = monthlyForecast.append("text")
-            .attr("x", 4)
+            .attr("x", -5)
             .attr("y", 12)
             .text(()=>{
                 const res = d3.timeFormat("%b")(new Date()) + " forecast";
                 return res;
             })
-            .attr("text-anchor", "end")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("font-size", "0.8em")
@@ -722,8 +722,6 @@ try {
             return `${d3.timeFormat("%b")(new Date())} forecast`
         }
     })();
-
-
 
     const percPlanLabels = rightLabels
         .selectAll(".perc-label")
