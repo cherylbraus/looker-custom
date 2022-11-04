@@ -702,6 +702,7 @@ looker.plugins.visualizations.add({
 
             buckets['lower_pivot'] = bucket_data
 
+            let sides; 
             if (pivotDate[1]) {
                 sides = [...new Set(data_ready.map(item =>item.side.toString()))]
                 // sides = sides.map(dateString => new Date(dateString))
