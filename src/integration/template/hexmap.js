@@ -270,6 +270,8 @@ export const object = {
 
             
             // INTERACTIONS ------------------------------------------------------
+            createHexMap(data_ready)
+
             group2
                 .call(d3.brushX()
                     .extent([[0,0], [width2, height2]])
@@ -289,7 +291,6 @@ export const object = {
                     .attr("fill-opacity", 0.0)
 
             let extent = null;
-            let data_map = data_ready;
 
             console.log("extent", extent)
 
@@ -307,20 +308,17 @@ export const object = {
                     let startDate = xScale.invert(extent[0])
                     let endDate = xScale.invert(extent[1])
 
-                    console.log("brush start", startDate, startDate instanceof Date)
-                    console.log("brush end", endDate, endDate instanceof Date)
-                    console.log("ex month", data_ready[1].month, data_ready[1].month instanceof Date)
-                    data_map = data_ready.filter(function(d) {
+                    let data_map = data_ready.filter(function(d) {
                         return d.month.getTime() >= startDate.getTime() && d.month.getTime() <= endDate.getTime()
                     })
 
-                    console.log("data_map filtered", data_map)
+                    createHexMap(data_map)
+
                 } else {
                     dots
                         .attr('fill-opacity', 0.0)
 
-                    data_map = data_ready;
-                    console.log("data_map end", data_map)
+                    createHexMap(data_ready)
                 }
             }
 
@@ -331,135 +329,131 @@ export const object = {
             // ---------------------------------------------------------------------
             // HexGrid Map
 
-            const projection = d3.geoAlbersUsa()
-                .fitSize([width, height], topojson.feature(mdata, mdata.objects.nation))
+            function createHexMap(mapdata) {
+                const projection = d3.geoAlbersUsa()
+                    .fitSize([width, height], topojson.feature(mdata, mdata.objects.nation))
 
-            const path = d3.geoPath()
-                .projection(projection)
+                const path = d3.geoPath()
+                    .projection(projection)
 
-            // add outline for nation
-            const nation = group
-                .append('g')
-                // .attr("stroke", "lightgrey")
-                // .attr("stroke-width", 0.5)
-                .attr("fill", "#f9f9f9")
-                .selectAll("path")
-                .data(topojson.feature(mdata, mdata.objects.nation).features)
-                .enter()
-                .append("path")
-                .attr("d", path)
+                // add outline for nation
+                const nation = group
+                    .append('g')
+                    // .attr("stroke", "lightgrey")
+                    // .attr("stroke-width", 0.5)
+                    .attr("fill", "#f9f9f9")
+                    .selectAll("path")
+                    .data(topojson.feature(mdata, mdata.objects.nation).features)
+                    .enter()
+                    .append("path")
+                    .attr("d", path)
 
-            console.log("drew nation outline")
+                mapdata.forEach(d => {
+                    const coords = projection([d.lon, d.lat])
+                    d.x = coords[0]
+                    d.y = coords[1]
+                })
 
-            data_map.forEach(d => {
-                const coords = projection([d.lon, d.lat])
-                d.x = coords[0]
-                d.y = coords[1]
-            })
+                const hexgrid = d3.hexgrid()
+                    .extent([width, height])
+                    .geography(topojson.feature(mdata, mdata.objects.nation))
+                    .projection(projection)
+                    .pathGenerator(path)
+                    .hexRadius(10)
 
-            console.log("data_map with coords", data_map)
+                // console.log("mapdata", mapdata)
 
-            const hexgrid = d3.hexgrid()
-                .extent([width, height])
-                .geography(topojson.feature(mdata, mdata.objects.nation))
-                .projection(projection)
-                .pathGenerator(path)
-                .hexRadius(10)
+                const hex = hexgrid(mapdata, ["volume", "rate", "direction", "month"])
 
-            console.log("data_map", data_map)
+                // console.log("grid", hex.grid)
+                // console.log("pointdensity points", [...hex.grid.extentPointDensity].reverse())
+                    
+                const totalVolumes = []
+                const averageRates = []
+                    
+                hex.grid.layout.forEach((d, i) => {
+                    let vol = 0;
+                    if (+d.datapoints > 0) {
+                        let rateList = []
 
-            const hex = hexgrid(data_map, ["volume", "rate", "direction", "month"])
+                        d.forEach((sd, si) => {
+                            vol += +sd.volume
+                            rateList.push(+sd.rate)
+                        })
 
-            console.log("grid", hex.grid)
-            console.log("pointdensity points", [...hex.grid.extentPointDensity].reverse())
+                        const avg = rateList.reduce((a,b) => a + b) / rateList.length;
+                        averageRates.push(avg)
+                        d.rate = avg
+                    } else {
+                        d.rate = 0
+                    }
+                    d.volume = vol
+                    totalVolumes.push(vol)
+                })
 
-            const colorScale = d3.scaleSequential(d3.interpolateViridis)
-                .domain([...hex.grid.extentPointDensity].reverse())  
-                
-            const totalVolumes = []
-            const averageRates = []
-                
-            hex.grid.layout.forEach((d, i) => {
-                let vol = 0;
-                if (+d.datapoints > 0) {
-                    let rateList = []
+                // console.log("totvolume", hex.grid.layout)
+                // console.log("totalVolumes", totalVolumes)
+                // console.log("extent", d3.extent(totalVolumes))
+                // console.log("averageRates", averageRates)
+                // console.log("extent", d3.extent(averageRates))
 
-                    d.forEach((sd, si) => {
-                        vol += +sd.volume
-                        rateList.push(+sd.rate)
-                    })
+                // plot empty hexagons for only areas that have data
+                const grid = group.append('g')
+                    .selectAll('.hex')
+                    .data(hex.grid.layout)
+                    .enter()
+                    .append('path')
+                        .attr('class', 'hex')
+                        .attr('d', hex.hexagon())
+                        .attr('transform', d => `translate(${d.x}, ${d.y})`)
+                        // .style('fill', d => !d.pointDensity ? '#fff' : colorScale(d.pointDensity))
+                        .style("fill", "none")
+                        // .style("stroke", "lightgrey")
+                        .style("stroke", d => !d.pointDensity ? "none" : "#b2b2b2")
 
-                    const avg = rateList.reduce((a,b) => a + b) / rateList.length;
-                    averageRates.push(avg)
-                    d.rate = avg
-                } else {
-                    d.rate = 0
-                }
-                d.volume = vol
-                totalVolumes.push(vol)
-            })
+                // create scale for inner hexagons
+                const innerHexScale = d3.scaleQuantize()
+                    .domain([Math.max(.001, d3.min(totalVolumes)), d3.max(totalVolumes)])
+                    .range([2,4,6,8,10])
+                    // .domain([0, d3.max(totalVolumes)])
+                    // .range([0,1,2,3,4,5,6,7])
 
-            console.log("totvolume", hex.grid.layout)
-            console.log("totalVolumes", totalVolumes)
-            console.log("extent", d3.extent(totalVolumes))
-            console.log("averageRates", averageRates)
-            console.log("extent", d3.extent(averageRates))
+                // create color scale for rate *change*
+                const colorRateScale = d3.scaleQuantize()
+                    .domain(d3.extent(averageRates))
+                    .range(["#27566b", "#f1cc56", "#8cbb61"])
 
-            // plot empty hexagons for only areas that have data
-            const grid = group.append('g')
-                .selectAll('.hex')
-                .data(hex.grid.layout)
-                .enter()
-                .append('path')
-                    .attr('class', 'hex')
-                    .attr('d', hex.hexagon())
-                    .attr('transform', d => `translate(${d.x}, ${d.y})`)
-                    // .style('fill', d => !d.pointDensity ? '#fff' : colorScale(d.pointDensity))
-                    .style("fill", "none")
-                    // .style("stroke", "lightgrey")
-                    .style("stroke", d => !d.pointDensity ? "none" : "#b2b2b2")
+                // hexagon function
+                const hexagonPoints = ( radius ) => {
+                    const halfWidth = radius * Math.sqrt(3) / 2;
+                    return `
+                        0,${-radius}
+                        ${halfWidth},${-radius / 2}
+                        ${halfWidth},${radius / 2}
+                        0,${radius}
+                        ${-halfWidth},${radius / 2}
+                        ${-halfWidth},${-radius / 2}`;
+                };
 
-            // create scale for inner hexagons
-            const innerHexScale = d3.scaleQuantize()
-                .domain([Math.max(.001, d3.min(totalVolumes)), d3.max(totalVolumes)])
-                .range([2,4,6,8,10])
-                // .domain([0, d3.max(totalVolumes)])
-                // .range([0,1,2,3,4,5,6,7])
-
-            // create color scale for rate *change*
-            const colorRateScale = d3.scaleQuantize()
-                .domain(d3.extent(averageRates))
-                .range(["#27566b", "#f1cc56", "#8cbb61"])
-
-            // hexagon function
-            const hexagonPoints = ( radius ) => {
-                const halfWidth = radius * Math.sqrt(3) / 2;
-                return `
-                    0,${-radius}
-                    ${halfWidth},${-radius / 2}
-                    ${halfWidth},${radius / 2}
-                    0,${radius}
-                    ${-halfWidth},${radius / 2}
-                    ${-halfWidth},${-radius / 2}`;
-            };
-
-            const innerHexs = group
-                .append('g')
-                .selectAll('.innerhex')
-                .data(hex.grid.layout)
-                .enter()
-                .append("polygon")
-                    .attr("class", "innerhex")
-                    .attr("points", d => hexagonPoints(innerHexScale(d.volume)))
-                    .attr("transform", d => `translate(${d.x}, ${d.y})`)
-                    .style("fill", d => {
-                        if (+d.volume > 0) {
-                            return colorRateScale(d.rate)
-                        } else {
-                            return "none"
-                        }
-                    })
-                    .style("stroke", "none")
+                const innerHexs = group
+                    .append('g')
+                    .selectAll('.innerhex')
+                    .data(hex.grid.layout)
+                    .enter()
+                    .append("polygon")
+                        .attr("class", "innerhex")
+                        .attr("points", d => hexagonPoints(innerHexScale(d.volume)))
+                        .attr("transform", d => `translate(${d.x}, ${d.y})`)
+                        .style("fill", d => {
+                            if (+d.volume > 0) {
+                                return colorRateScale(d.rate)
+                            } else {
+                                return "none"
+                            }
+                        })
+                        .style("stroke", "none")
+            }
+            
 
 
 
