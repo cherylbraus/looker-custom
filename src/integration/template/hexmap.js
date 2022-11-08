@@ -351,13 +351,13 @@ export const object = {
 
             console.log("drew nation outline")
 
-            data_ready.forEach(d => {
+            data_map.forEach(d => {
                 const coords = projection([d.lon, d.lat])
                 d.x = coords[0]
                 d.y = coords[1]
             })
 
-            console.log("data_ready with coords", data_ready)
+            console.log("data_map with coords", data_map)
 
             const hexgrid = d3.hexgrid()
                 .extent([width, height])
@@ -366,9 +366,9 @@ export const object = {
                 .pathGenerator(path)
                 .hexRadius(10)
 
-            console.log("data_ready", data_ready)
+            console.log("data_map", data_map)
 
-            const hex = hexgrid(data_ready, ["volume", "rate", "direction", "month"])
+            const hex = hexgrid(data_map, ["volume", "rate", "direction", "month"])
 
             console.log("grid", hex.grid)
             console.log("pointdensity points", [...hex.grid.extentPointDensity].reverse())
