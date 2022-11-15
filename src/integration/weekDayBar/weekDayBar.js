@@ -527,9 +527,13 @@ looker.plugins.visualizations.add({
 
             const dayDomain = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']
 
-            const xDailyScale = d3.scalePoint()
+            // const xDailyScale = d3.scalePoint()
+            //     .domain(dayDomain)
+            //     .padding(0.5)
+            const xDailyScale = d3.scaleBand()
                 .domain(dayDomain)
                 .padding(0.5)
+
 
             const xDailyAxisGenerator = d3.axisBottom()
                 .scale(xDailyScale)
@@ -544,7 +548,7 @@ looker.plugins.visualizations.add({
                 .tickPadding(30)
                 .tickSizeOuter(0)
                 .tickSizeInner(0)
-                .tickFormat((d, i) => `Week: ${d3.timeFormat("%b %-d")(d)}`)
+                .tickFormat((d, i) => `Wk: ${d3.timeFormat("%b %-d")(d)}`)
 
             const yAxisGenerator = d3.axisLeft()
                 .scale(yScale)
@@ -712,39 +716,54 @@ looker.plugins.visualizations.add({
                     ])
 
                 d3.select(this)
-                    .selectAll("line .daily-lines")
+                    .selectAll("rect .daily-rects")
                     .data(data_group[i].days)
                     .enter()
-                    .append("line")
-                        .attr("x1", d => xDailyScale(dayofwkAccessor(d)))
-                        .attr("x2", d => xDailyScale(dayofwkAccessor(d)))
-                        .attr("y1", d => yScale(actualAccessor(d)))
-                        .attr("y2", yScale(0))
-                        .attr("stroke", "black")
-                        .attr("stroke-width", 2.5)
-                        .attr("class", "daily-lines")
+                    .append("rect")
+                        .attr("x", d => xDailyScale(dayofwkAccessor(d)))
+                        .attr("y", d => yScale(actualAccessor(d)))
+                        .attr("width", xDailyScale.bandwidth())
+                        .attr("height", d => yScale(0) - yScale(actualAccessor(d)))
+                        .attr("fill", "black")
+                        .attr("class", "daily-rects")
                         .on("mouseover", mouseover)
                         .on("mousemove", d => mousemove({ data: d, label: "daycircle" }))
                         .on("mouseleave", mouseleave)
 
-                d3.select(this)
-                    .selectAll("circle")
-                    .data(data_group[i].days)
-                    .enter()
-                    .append("circle")
-                        .attr("cx", d => xDailyScale(dayofwkAccessor(d)))
-                        .attr("cy", d => yScale(actualAccessor(d)))
-                        .attr("r", d => {
-                            if (actualAccessor(d) === 0) {
-                                return 0
-                            } else {
-                                return 4
-                            }
-                        })
-                        .attr("fill", "black")
-                        .on("mouseover", mouseover)
-                        .on("mousemove", d => mousemove({ data: d, label: "daycircle" }))
-                        .on("mouseleave", mouseleave)
+                // d3.select(this)
+                //     .selectAll("line .daily-lines")
+                //     .data(data_group[i].days)
+                //     .enter()
+                //     .append("line")
+                //         .attr("x1", d => xDailyScale(dayofwkAccessor(d)))
+                //         .attr("x2", d => xDailyScale(dayofwkAccessor(d)))
+                //         .attr("y1", d => yScale(actualAccessor(d)))
+                //         .attr("y2", yScale(0))
+                //         .attr("stroke", "black")
+                //         .attr("stroke-width", 2.5)
+                //         .attr("class", "daily-lines")
+                //         .on("mouseover", mouseover)
+                //         .on("mousemove", d => mousemove({ data: d, label: "daycircle" }))
+                //         .on("mouseleave", mouseleave)
+
+                // d3.select(this)
+                //     .selectAll("circle")
+                //     .data(data_group[i].days)
+                //     .enter()
+                //     .append("circle")
+                //         .attr("cx", d => xDailyScale(dayofwkAccessor(d)))
+                //         .attr("cy", d => yScale(actualAccessor(d)))
+                //         .attr("r", d => {
+                //             if (actualAccessor(d) === 0) {
+                //                 return 0
+                //             } else {
+                //                 return 4
+                //             }
+                //         })
+                //         .attr("fill", "black")
+                //         .on("mouseover", mouseover)
+                //         .on("mousemove", d => mousemove({ data: d, label: "daycircle" }))
+                //         .on("mouseleave", mouseleave)
 
                 d3.select(this).append("g")
                     .call(xDailyAxisGenerator)
