@@ -28,7 +28,7 @@ export const object = {
             section: "General",
             order: 1
           },
-          budgetlines: {
+        budgetlines: {
             type: "boolean",
             label: "Show Budget Goals",
             default: "true",
@@ -344,7 +344,8 @@ export const object = {
 
             // filter data - might want to check this?
             const uniqueMonths = [... new Set(data_ready.map(obj => +obj.month))].sort() 
-            const currentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime()
+            // const currentMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime()
+            const currentMonth = new Date('October 1, 2022').getTime()
             const indexOneMonthAgo = uniqueMonths.indexOf(+currentMonth) - 1
             const indexFourMonthsAgo = uniqueMonths.indexOf(+currentMonth) - 4
             const firstMonth = new Date(uniqueMonths[indexFourMonthsAgo])
@@ -511,7 +512,7 @@ export const object = {
                             if (d.subgroup === "actualSpot") {
                                 return 1.0
                             } else {
-                                return 0.75
+                                return 0.55
                             }
                         })
                         .attr("stroke", (d) => {
@@ -620,10 +621,76 @@ export const object = {
                 .attr("transform", "translate(0,0)")
                 .classed("legendContainer", true)
 
+            // new
+            const legendSpot = legendContainer.append('g')
+                .classed("legend", true)
+                .attr("transform", `translate(6, -30)`)
+
+            legendSpot.append("text")
+                .attr("x", 20)
+                .attr("y", 0)
+                .style("text-anchor", "start")
+                .style("dominant-baseline", "middle")
+                .style("font-size", 11)
+                .text(`Spot`)
+            
+            legendSpot.append("rect")
+                .attr("x", 0)
+                .attr("y", -5.2)
+                .attr("width", 15)
+                .attr("height", 4)
+                .attr("fill", "#0072B5")
+                .attr("fill-opacity", 1.0)
+                .attr("stroke", "#0072b5")
+                .attr("stroke-width", 0.5)
+
+            legendSpot.append("rect")
+                .attr("x", 0)
+                .attr("y", -.5)
+                .attr("width", 15)
+                .attr("height", 4)
+                .attr("fill", "#D76106")
+                .attr("fill-opacity", 1.0)
+                .attr("stroke", "#D76106")
+                .attr("stroke-width", 0.5)
+
+            const legendContract = legendContainer.append('g')
+                .classed("legend", true)
+                .attr("transform", `translate(60, -30)`)
+
+            legendContract.append("text")
+                .attr("x", 20)
+                .attr("y", 0)
+                .style("text-anchor", "start")
+                .style("dominant-baseline", "middle")
+                .style("font-size", 11)
+                .text(`Contract`)
+            
+            legendContract.append("rect")
+                .attr("x", 0)
+                .attr("y", -5.4)
+                .attr("width", 15)
+                .attr("height", 4)
+                .attr("fill", "#0072B5")
+                .attr("fill-opacity", 0.55)
+                .attr("stroke", "#0072b5")
+                .attr("stroke-width", 0.5)
+
+            legendContract.append("rect")
+                .attr("x", 0)
+                .attr("y", -.5)
+                .attr("width", 15)
+                .attr("height", 4)
+                .attr("fill", "#D76106")
+                .attr("fill-opacity", 0.55)
+                .attr("stroke", "#D76106")
+                .attr("stroke-width", 0.5)
+
+            // original
 
             const legendForecast = legendContainer.append('g')
                 .classed("legend", true)
-                .attr("transform", `translate(6, -30)`)
+                .attr("transform", `translate(140, -30)`)
 
             legendForecast.append("text")
                 .attr("x", 20)
@@ -645,7 +712,7 @@ export const object = {
             if (config.budgetlines == "true" ) {
                 const legendBudget = legendContainer.append('g')
                     .classed("legend", true)
-                    .attr("transform", `translate(90, -30)`)
+                    .attr("transform", `translate(220, -30)`)
 
                 legendBudget.append("text")
                     .attr("x", 20)
