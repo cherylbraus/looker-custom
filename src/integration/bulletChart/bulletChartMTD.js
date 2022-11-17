@@ -24,6 +24,18 @@ looker.plugins.visualizations.add({
           section: "General",
           order: 1
         },
+        splits: {
+            type: 'string',
+            label: "# of Groups",
+            display: "radio",
+            values: [
+                {"Two": "two"},
+                {"Three": "three"}
+            ],
+            default: "two",
+            section: "General",
+            order: 2
+        },
         currency_type: {
           type: 'string',
           label: 'Currency Prefix',
@@ -34,7 +46,7 @@ looker.plugins.visualizations.add({
           ],
           default: "dollar",
           section: "General",
-          order: 4
+          order: 5
         },
         bar_display: {
           type: 'string',
@@ -46,7 +58,7 @@ looker.plugins.visualizations.add({
           ],
           default: "yes",
           section: "General",
-          order: 2
+          order: 3
         },
         color: {
           type: 'string',
@@ -60,7 +72,7 @@ looker.plugins.visualizations.add({
           ],
           default: "rgba(0, 115, 181,",
           section: "General",
-          order: 3
+          order: 4
         },
       },
 
@@ -148,6 +160,14 @@ try {
     const mtd_budget = data_remix[0][bullet_measures[5]].value;
     const mtd_forecast = data_remix[0][bullet_measures[6]].value;
 
+    if (config.splits == "three") {
+        const contractTR_actual = data_remix[0][bullet_measures[8]].value;
+        const contractNTR_actual = data_remix[0][bullet_measures[7]].value;
+
+        budget_forecast_dps["monthly-actual-contractTR"] = contractTR_actual
+        budget_forecast_dps["monthly-actual-contractNTR"] = contractNTR_actual
+    } 
+
     budget_forecast_dps["monthly-budget"] = month_dp_bg
     budget_forecast_dps["monthly-forecast"] = month_dp_fc
     budget_forecast_dps["monthly-actual"] = month_actual
@@ -155,6 +175,7 @@ try {
     budget_forecast_dps["monthly-actual-contract"] = contract_actual
     budget_forecast_dps["mtd-budget"] = mtd_budget
     budget_forecast_dps["mtd-forecast"] = mtd_forecast
+    
 
     console.log("budget_forecast_dps", budget_forecast_dps)
 
@@ -210,17 +231,33 @@ try {
     // Since this is custom, we just pull off the two values. In another chart this should be done programmatically
 
     let stackedData = []
-    for (let n = 0; n < 2; n++) {
-        let dat = []
-        if (n == 0) {
-           dat.push(0)
-           dat.push(budget_forecast_dps["monthly-actual-spot"])
-        } else {
-            dat.push(budget_forecast_dps["monthly-actual-spot"])
-            dat.push(budget_forecast_dps["monthly-actual-spot"] + budget_forecast_dps["monthly-actual-contract"])
-
+    if (config.splits == "two") {
+        for (let n = 0; n < 2; n++) {
+            let dat = []
+            if (n == 0) {
+               dat.push(0)
+               dat.push(budget_forecast_dps["monthly-actual-spot"])
+            } else {
+                dat.push(budget_forecast_dps["monthly-actual-spot"])
+                dat.push(budget_forecast_dps["monthly-actual-spot"] + budget_forecast_dps["monthly-actual-contract"])
+            }
+            stackedData.push(dat)
         }
-        stackedData.push(dat)
+    } else {
+        for (let n = 0; n < 3; n++) {
+            let dat = []
+            if (n == 0) {
+               dat.push(0)
+               dat.push(budget_forecast_dps["monthly-actual-spot"])
+            } else if (n == 1) {
+                dat.push(budget_forecast_dps["monthly-actual-spot"])
+                dat.push(budget_forecast_dps["monthly-actual-spot"] + budget_forecast_dps["monthly-actual-contractNTR"])
+            } else {
+                dat.push(budget_forecast_dps["monthly-actual-spot"] + budget_forecast_dps["monthly-actual-contractNTR"])
+                dat.push(budget_forecast_dps["monthly-actual-spot"] + budget_forecast_dps["monthly-actual-contractNTR"] + budget_forecast_dps["monthly-actual-contractTR"])
+            }
+            stackedData.push(dat)
+        }
     }
 
     console.log("stackedData", stackedData)
@@ -289,57 +326,143 @@ try {
     console.log("stackedData", stackedData)
 
     // Handle positive/negative value signaling, or let user style bar fills
-    if (config.bar_display == "yes") {
+    if (config.bar_display == "yes" && config.splits == "three") {
         innerRects.attr("fill", function(d,i){
-                        if (+budget_forecast_dps["monthly-actual"] < +budget_forecast_dps[config.comparison]) {
-                            if (d[0] == 0) {
-                                return "#D76106"
-                            } else {
-                                return "rgba(215, 97, 6,0.75)"
-                            }
-                        } else {
-                            if (d[0] == 0) {
-                                return "#0072b5"
-                            } else {
-                                return "rgba(0, 115, 181,0.75)"
-                            }
-                        }
-                    })        
-    } else {
+            if (+budget_forecast_dps["monthly-actual"] < +budget_forecast_dps[config.comparison]) {
+                console.log("HERE")
+                if (d[0] == 0) {
+                    return "#D76106"
+                } else if (+d[1] == +budget_forecast_dps["monthly-actual"]) {
+                    return "rgba(215, 97, 6, 0.5)"
+                } else {
+                    return "rgba(215, 97, 6, 0.75)"
+                }
+            } else {
+                console.log("HERE2")
+                if (d[0] == 0) {
+                    return "#0072b5"
+                } else if (+d[1] == +budget_forecast_dps["monthly-actual"]) {
+                    return "rgba(0, 115, 181, 0.5)"
+                } else {
+                    return "rgba(0, 115, 181, 0.75)"
+                }
+            }
+        })      
+    } else if (config.splits == "three") {
+        innerRects.attr("fill", function(d,i){
+            if (d[0] == 0) {
+                return config.color + "1)"
+            } else if (+d[1] == +budget_forecast_dps["monthly-actual"]) {
+                return config.color + "0.5)"
+            } else {
+                return config.color + "0.7)"
+            }
+        })
+    }
+
+    if (config.bar_display == "yes" && config.splits == "two") {
+        innerRects.attr("fill", function(d,i){
+            if (+budget_forecast_dps["monthly-actual"] < +budget_forecast_dps[config.comparison]) {
+                console.log("HERE3")
+                if (d[0] == 0) {
+                    return "#D76106"
+                } else {
+                    console.log("HERE4")
+                    return "rgba(215, 97, 6, 0.75)"
+                }
+            } else {
+                if (d[0] == 0) {
+                    return "#0072b5"
+                } else {
+                    return "rgba(0, 115, 181, 0.75)"
+                }
+            }
+        })      
+    } else if (config.splits == "two") {
         innerRects.attr("fill", function(d,i){
             if (d[0] == 0) {
                 return config.color + "1)"
             } else {
-                return config.color + "0.65)"
+                return config.color + "0.7)"
             }
-    })
-}
+        })
+    }
 
-    const stackedLabels = rects
-        .selectAll(".stacked-label")
-        .data([stackedData])
-        .enter()
-        .append("g")
-            .attr("class", "stacked-label")
-            .selectAll("text .stacked")
-            .data(function(d) {return d})
+    function between(x, min, max) {
+        return x >= min && x <= max;
+    }
+
+    let stackedLabels;
+    if (config.splits == "two") {
+        stackedLabels = rects
+            .selectAll(".stacked-label")
+            .data([stackedData])
             .enter()
-            .append("text")
-                .attr("x", d => xScale(d[1]) - 9)
-                .attr("y", d => yScale("metric") + 8)
-                .text(d => {
-                    if (+d[1] == +budget_forecast_dps["monthly-actual-spot"]) {
-                        return "S"
-                    } else {
-                        return "C"
-                    }
-                })
-                .attr("text-anchor", "right")
-                .style("dominant-baseline", "hanging")
-                .attr("fill", "white")
-                .attr("font-size", "0.6em")
-                .attr("font-weight", "600")
-                .attr("font-family", "sans-serif")
+            .append("g")
+                .attr("class", "stacked-label")
+                .selectAll("text .stacked")
+                .data(function(d) {return d})
+                .enter()
+                .append("text")
+                    .attr("x", d => xScale(d[1]) - 9)
+                    .attr("y", d => yScale("metric") + 8)
+                    .text(d => {
+                        if (+d[1] == +budget_forecast_dps["monthly-actual-spot"]) {
+                            return "S"
+                        } else {
+                            return "C"
+                        }
+                    })
+                    .attr("text-anchor", "right")
+                    .style("dominant-baseline", "hanging")
+                    .attr("fill", "white")
+                    .attr("font-size", "0.6em")
+                    .attr("font-weight", "600")
+                    .attr("font-family", "sans-serif")
+                    .attr("class", "stack-label")
+    } else {
+        stackedLabels = rects
+            .selectAll(".stacked-label")
+            .data([stackedData])
+            .enter()
+            .append("g")
+                .attr("class", "stacked-label")
+                .selectAll("text .stacked")
+                .data(function(d) {return d})
+                .enter()
+                .append("text")
+                    .attr("x", d => xScale(d[1]) - 10)
+                    .attr("y", d => yScale("metric") + 8)
+                    .text(d => {
+                        if (+d[1] == +budget_forecast_dps["monthly-actual-spot"]) {
+                            return "S"
+                        } else if (between(+d[1] - +d[0], +budget_forecast_dps["monthly-actual-contractNTR"] - 1, +budget_forecast_dps["monthly-actual-contractNTR"] + 1)) {
+                            return "C"
+                        } else {
+                            return "TR"
+                        }
+                    })
+                    .attr("text-anchor", "right")
+                    .style("dominant-baseline", "hanging")
+                    .attr("fill", "white")
+                    .attr("font-size", "0.6em")
+                    .attr("font-weight", "600")
+                    .attr("font-family", "sans-serif")
+                    .attr("class", "stack-label")
+    }
+
+    const sections = d3.selectAll('.stack-label')
+    sections.each(function(d,i) {
+        let textLength = d3.select(this).node().getComputedTextLength()
+        d3.select(this)
+            .attr("opacity", () => {
+                if (textLength < xScale(parseInt(d[1] - parseInt(d[0])))) {
+                    return 1.0
+                } else {
+                    return 0.0
+                }
+            })
+    })
 
     console.log("budget_forecast_dps", budget_forecast_dps)
 

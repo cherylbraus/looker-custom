@@ -10,6 +10,16 @@ looker.plugins.visualizations.add({
     id: "bullet-chart",
     label: "ZDev Bullet Chart",
     options: {
+        splits: {
+            type: "string",
+            label: "# of Groups",
+            display: "radio",
+            values: [
+                {"Two":"two"},
+                {"Three":"three"}
+            ],
+            default: "two"
+        },
         currency_type: {
           type: 'string',
           label: 'Currency Prefix',
@@ -75,6 +85,12 @@ try {
           return d.getMonth() + 1;
         }
 
+    function getQuarter(d) {
+        d = d || new Date();
+        var m = Math.floor(d.getMonth()/3) + 1;
+        return m > 4? m - 4 : m;
+    }
+
     const parseTime = d3.timeParse("%Y-%m");
     const dimension = queryResponse.fields.dimension_like[0]
     const measures = queryResponse.fields.measure_like
@@ -88,8 +104,6 @@ try {
     let budget_forecast_dps = {}
 
     let data_remix = []
-
-    
 
     // Slice off only the current year into the chart and package into data_remix array
     data.forEach(function(d,i) {
@@ -117,33 +131,37 @@ try {
             // Monthly data
             for (let m = 0; m <= (getMonth(new Date()) - 1); m++) {
                 if (m === getMonth(new Date()) - 1) {
-                    console.log("last m", m)
                     month_dp_fc += data_remix[m][bullet_measures[1]].value // most recent month = forecast
+                    console.log("last m", m, data_remix[m][bullet_measures[1]].value, month_dp_fc)
                 } else {
-                    console.log("prior m", m)
                     month_dp_fc += data_remix[m][bullet_measures[2]].value // prior months = actuals
+                    console.log("prior m", m, data_remix[m][bullet_measures[2]].value, month_dp_fc)
                 }
-
                 month_dp_bg += data_remix[m][bullet_measures[0]].value
+                console.log("month budget", data_remix[m][bullet_measures[0]].value, month_dp_bg)
             }   
 
             // Quarterly data
             for (let j = 0; j <= ((getQuarter(new Date()) * 3) - 1); j++) {
                 if (j >= getMonth(new Date()) - 1) {
                     quarter_dp_fc += data_remix[j][bullet_measures[1]].value // current + future months = forecasts
+                    console.log("last q", j, data_remix[j][bullet_measures[1]].value, quarter_dp_fc)
                 } else {
                     quarter_dp_fc += data_remix[j][bullet_measures[2]].value // prior months = actuals
+                    console.log("prior q", j, data_remix[j][bullet_measures[2]].value, quarter_dp_fc)
                 }
-
                 quarter_dp_bg += data_remix[j][bullet_measures[0]].value
+                console.log("quarter budget", data_remix[j][bullet_measures[0]].value, quarter_dp_bg)
             }
 
             // Yearly data
             for (let k = 0; k <= 11; k++) {
                 if (k >= getMonth(new Date()) - 1) {
-                    year_dp_fc += data_remix[k][bullet_measures[1]].value // current + figure months = forecasts
+                    year_dp_fc += data_remix[k][bullet_measures[1]].value // current + future months = forecasts
+                    console.log("last y", k, data_remix[k][bullet_measures[1]].value, year_dp_fc)
                 } else {
                     year_dp_fc += data_remix[k][bullet_measures[2]].value // prior months = actuals
+                    console.log("prior y", data_remix[k][bullet_measures[2]].value, year_dp_fc)
                 }
 
                 year_dp_bg += data_remix[k][bullet_measures[0]].value
