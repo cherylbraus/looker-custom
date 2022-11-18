@@ -119,11 +119,12 @@ try {
 
     let data_remix = []
 
-    // Slice off only the current year into the chart and package into data_remix array
+    // Slice off only the current year into the chart and package into data_remix array - ASSUMES FILTER TO CURRENT YEAR IN RAW DATA
     data.forEach(function(d,i) {
-        if (parseTime(data[i][dimension.name].value) >= parseTime("2022-01") && parseTime(data[i][dimension.name].value) < parseTime("2023-01")) {
-            data_remix.push(d)
-        }
+        // if (parseTime(data[i][dimension.name].value) >= parseTime("2022-01") && parseTime(data[i][dimension.name].value) < parseTime("2023-01")) {
+        //     data_remix.push(d)
+        // }
+        data_remix.push(d)
     })
 
     // "Counters" in the for loops below allow you to roll up the data in the previous months 
@@ -258,6 +259,8 @@ try {
                  .domain([0, Math.max(budget_forecast_dps["yearly-budget"], budget_forecast_dps["yearly-forecast"])])
                  .range([0, dimensions.boundedWidth])
 
+    console.log("x domain", budget_forecast_dps["yearly-budget"], budget_forecast_dps["yearly-forecast"], xScale.domain())
+
     const yScale = d3.scaleBand()
         .domain(xMetrics.map(d => d))
         .range([0, dimensions.boundedHeight])
@@ -326,7 +329,7 @@ try {
             .attr("x", (d,i) => xScale(0))
             .attr("y", d => yScale(xMetrics[0]))
             .attr("width", (d,i) => {
-                return xScale(d["yearly-budget"])
+                return xScale(Math.max(budget_forecast_dps["yearly-budget"], budget_forecast_dps["yearly-forecast"]))
             })
             .attr("height", yScale.bandwidth())
             .attr("fill", "#fbfbfb")

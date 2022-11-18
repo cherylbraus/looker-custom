@@ -15,8 +15,8 @@ looker.plugins.visualizations.add({
             label: "# of Groups",
             display: "radio",
             values: [
-                {"Two":"two"},
-                {"Three":"three"}
+                {"Two": "two"},
+                {"Three": "three"}
             ],
             default: "two"
         },
@@ -105,11 +105,12 @@ try {
 
     let data_remix = []
 
-    // Slice off only the current year into the chart and package into data_remix array
+    // Slice off only the current year into the chart and package into data_remix array - ASSUMES FILTER TO CURRENT YEAR IN RAW DATA
     data.forEach(function(d,i) {
-        if (parseTime(data[i][dimension.name].value) >= parseTime("2022-01") && parseTime(data[i][dimension.name].value) < parseTime("2023-01")) {
-            data_remix.push(d)
-        }
+        // if (parseTime(data[i][dimension.name].value) >= parseTime("2022-01") && parseTime(data[i][dimension.name].value) < parseTime("2023-01")) {
+        //     data_remix.push(d)
+        // }
+        data_remix.push(d)
     })
 
     // "Counters" in the for loops below allow you to roll up the data in the previous months 
@@ -123,6 +124,8 @@ try {
     let year_actual = 0;
     let spot_actual = 0;
     let contract_actual = 0;
+    let contractNTR_actual = 0;
+    let contractTR_actual = 0;
 
     data_remix.sort(function(a,b) {
         return parseTime(a[dimension.name].value) - parseTime(b[dimension.name].value)
@@ -168,6 +171,11 @@ try {
                 year_actual += data_remix[k][bullet_measures[2]].value
                 spot_actual += data_remix[k][bullet_measures[3]].value
                 contract_actual += data_remix[k][bullet_measures[4]].value
+
+                if (config.splits == "three") {
+                    contractNTR_actual += data_remix[k][bullet_measures[5]].value
+                    contractTR_actual += data_remix[k][bullet_measures[6]].value
+                }
             }
 
             budget_forecast_dps["monthly-budget"] = month_dp_bg
@@ -179,6 +187,11 @@ try {
             budget_forecast_dps["yearly-actual"] = year_actual
             budget_forecast_dps["yearly-actual-spot"] = spot_actual
             budget_forecast_dps["yearly-actual-contract"] = contract_actual
+
+            if (config.splits == "three") {
+                budget_forecast_dps["yearly-actual-contractNTR"] = contractNTR_actual
+                budget_forecast_dps["yearly-actual-contractTR"] = contractTR_actual
+            }
 
     // const pivots = queryResponse.fields.pivots
 
@@ -217,7 +230,7 @@ try {
     const xMetrics = ["metric"]
 
     const xScale = d3.scaleLinear()
-                 .domain([0, budget_forecast_dps["yearly-budget"]])
+                 .domain([0, Math.max(budget_forecast_dps["yearly-budget"], budget_forecast_dps["yearly-forecast"])])
                  .range([0, dimensions.boundedWidth])
 
     const yScale = d3.scaleBand()
@@ -228,18 +241,36 @@ try {
     // Since this is custom, we just pull off the two values. In another chart this should be done programmatically
 
     let stackedData = []
-    for (let n = 0; n < 2; n++) {
-        let dat = []
-        if (n == 0) {
-           dat.push(0)
-           dat.push(budget_forecast_dps["yearly-actual-spot"])
-        } else {
-            dat.push(budget_forecast_dps["yearly-actual-spot"])
-            dat.push(budget_forecast_dps["yearly-actual-spot"] + budget_forecast_dps["yearly-actual-contract"])
-
+    if (config.splits == "two") {
+        for (let n = 0; n < 2; n++) {
+            let dat = []
+            if (n == 0) {
+               dat.push(0)
+               dat.push(budget_forecast_dps["yearly-actual-spot"])
+            } else {
+                dat.push(budget_forecast_dps["yearly-actual-spot"])
+                dat.push(budget_forecast_dps["yearly-actual-spot"] + budget_forecast_dps["yearly-actual-contract"])
+            }
+            stackedData.push(dat)
         }
-        stackedData.push(dat)
+    } else {
+        for (let n = 0; n < 3; n++) {
+            let dat = []
+            if (n == 0) {
+               dat.push(0)
+               dat.push(budget_forecast_dps["yearly-actual-spot"])
+            } else if (n==1) {
+                dat.push(budget_forecast_dps["yearly-actual-spot"])
+                dat.push(budget_forecast_dps["yearly-actual-spot"] + budget_forecast_dps["yearly-actual-contractNTR"])
+            } else {
+                dat.push(budget_forecast_dps["yearly-actual-spot"] + budget_forecast_dps["yearly-actual-contractNTR"])
+                dat.push(budget_forecast_dps["yearly-actual-spot"] + budget_forecast_dps["yearly-actual-contractNTR"] + budget_forecast_dps["yearly-actual-contractTR"])
+            }
+            stackedData.push(dat)
+        }
     }
+
+    console.log("stackedData", stackedData)
 
     const rects = group.append("g")
 
@@ -269,7 +300,7 @@ try {
             .attr("x", (d,i) => xScale(0))
             .attr("y", d => yScale(xMetrics[0]))
             .attr("width", (d,i) => {
-                return xScale(d["yearly-budget"])
+                return xScale(Math.max(budget_forecast_dps["yearly-budget"], budget_forecast_dps["yearly-forecast"]))
             })
             .attr("height", yScale.bandwidth())
             .attr("fill", "#fbfbfb")
@@ -301,57 +332,139 @@ try {
                 .attr("stroke-width", 1)
 
     // Handle positive/negative value signaling, or let user style bar fills
-    if (config.bar_display == "yes") {
+    if (config.bar_display == "yes" && config.splits == "three") {
         innerRects.attr("fill", function(d,i){
-                        if (+d["yearly-actual"] < +d["yearly-budget"]) {
-                            if (d[0] == 0) {
-                                return "#D76106"
-                            } else {
-                                return "rgba(215, 97, 6,0.75)"
-                            }
-                        } else {
-                            if (d[0] == 0) {
-                                return "#0072b5"
-                            } else {
-                                return "rgba(0, 115, 181,0.75)"
-                            }
-                        }
-                    })        
+            if (+d["yearly-actual"] < +d["yearly-budget"]) {
+                if (d[0] == 0) {
+                    return "#D76106"
+                } else if (+d[1] == +d["yearly-actual"]) {
+                    return "rgba(215, 97, 6, 0.5)"
                 } else {
-                    innerRects.attr("fill", function(d,i){
-                        if (d[0] == 0) {
-                            return config.color + "1)"
-                        } else {
-                            return config.color + "0.65)"
-                        }
-                })
+                    return "rgba(215, 97, 6, 0.75)"
+                }
+            } else {
+                if (d[0] == 0) {
+                    return "#0072b5"
+                } else if (+d[1] == +d["yearly-actual"]) {
+                    return "rgba(0, 115, 181, 0.5)"
+                } else {
+                    return "rgba(0, 115, 181, 0.75)"
+                }
             }
+        })
+    } else if (config.splits == "three") {
+        innerRects.attr("fill", function(d,i){
+            if (d[0] == 0) {
+                return config.color + "1)"
+            } else if (+d[1] == +d["yearly-actual"]) {
+                return config.color + "0.5)"
+            } else {
+                return config.color + "0.7)"
+            }
+        })
+    }
 
-    const stackedLabels = rects
-        .selectAll(".stacked-label")
-        .data([stackedData])
-        .enter()
-        .append("g")
-            .attr("class", "stacked-label")
-            .selectAll("text .stacked")
-            .data(function(d) {return d})
+    if (config.bar_display == "yes" && config.splits == "two") {
+        innerRects.attr("fill", function(d,i){
+            if (+d["yearly-actual"] < +d["yearly-budget"]) {
+                if (d[0] == 0) {
+                    return "#D76106"
+                } else {
+                    return "rgba(215, 97, 6,0.75)"
+                }
+            } else {
+                if (d[0] == 0) {
+                    return "#0072b5"
+                } else {
+                    return "rgba(0, 115, 181,0.75)"
+                }
+            }
+        })        
+    } else if (config.splits == "two") {
+        innerRects.attr("fill", function(d,i){
+            if (d[0] == 0) {
+                return config.color + "1)"
+            } else {
+                return config.color + "0.65)"
+            }
+        })
+    }
+
+    function between(x, min, max) {
+        return x >= min && x <= max;
+    }
+
+    let stackedLabels;
+    if (config.splits == "two") {
+        stackedLabels = rects
+            .selectAll(".stacked-label")
+            .data([stackedData])
             .enter()
-            .append("text")
-                .attr("x", d => xScale(d[1]) - 9)
-                .attr("y", d => yScale("metric") + 8)
-                .text(d => {
-                    if (+d[1] == +budget_forecast_dps["yearly-actual-spot"]) {
-                        return "S"
-                    } else {
-                        return "C"
-                    }
-                })
-                .attr("text-anchor", "right")
-                .style("dominant-baseline", "hanging")
-                .attr("fill", "white")
-                .attr("font-size", "0.6em")
-                .attr("font-weight", "600")
-                .attr("font-family", "sans-serif")
+            .append("g")
+                .attr("class", "stacked-label")
+                .selectAll("text .stacked")
+                .data(function(d) {return d})
+                .enter()
+                .append("text")
+                    .attr("x", d => xScale(d[1]) - 9)
+                    .attr("y", d => yScale("metric") + 8)
+                    .text(d => {
+                        if (+d[1] == +budget_forecast_dps["yearly-actual-spot"]) {
+                            return "S"
+                        } else {
+                            return "C"
+                        }
+                    })
+                    .attr("text-anchor", "right")
+                    .style("dominant-baseline", "hanging")
+                    .attr("fill", "white")
+                    .attr("font-size", "0.6em")
+                    .attr("font-weight", "600")
+                    .attr("font-family", "sans-serif")
+                    .attr("class", "stack-label")
+    } else {
+        stackedLabels = rects
+            .selectAll(".stacked-label")
+            .data([stackedData])
+            .enter()
+            .append("g")
+                .attr("class", "stacked-label")
+                .selectAll("text .stacked")
+                .data(function(d) {return d})
+                .enter()
+                .append("text")
+                    .attr("x", d => xScale(d[1]) - 9)
+                    .attr("y", d => yScale("metric") + 8)
+                    .text(d => {
+                        if (+d[1] == +budget_forecast_dps["yearly-actual-spot"]) {
+                            return "S"
+                        } else if (between(+d[1] - +d[0], +budget_forecast_dps["yearly-actual-contractNTR"] - 1, +budget_forecast_dps["yearly-actual-contractNTR"] + 1)) {
+                            return "C"
+                        } else {
+                            return "TR"
+                        }
+                    })
+                    .attr("text-anchor", "right")
+                    .style("dominant-baseline", "hanging")
+                    .attr("fill", "white")
+                    .attr("font-size", "0.6em")
+                    .attr("font-weight", "600")
+                    .attr("font-family", "sans-serif")
+                    .attr("class", "stack-label")
+    }
+
+    const sections = d3.selectAll(".stack-label")
+    sections.each(function(d,i) {
+        let textLength = d3.select(this).node().getComputedTextLength()
+        d3.select(this)
+            .attr("opacity", () => {
+                if (textLength < xScale(parseInt(d[1]) - parseInt(d[0]))) {
+                    return 1.0
+                } else {
+                    return 0.0
+                }
+            })
+    })
 
     const innerBarText = rects
         .selectAll(".inner-text")
@@ -396,21 +509,21 @@ try {
           .style("fill", "black")
 
     const yearTargetText = yearTarget.append("text")
-            .attr("x", 0)
-            .attr("y", -8)
+            .attr("x", -5)
+            .attr("y", -10)
             .text("Budget Target")
-            .attr("text-anchor", "middle")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#323232")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.8em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "visible")
 
     const yearTargetHiddenText = yearTarget.append("text")
-            .attr("x", 0)
-            .attr("y", -8)
+            .attr("x", -5)
+            .attr("y", -10)
             .text((d) => 
                 { 
                     if (config.currency_type == "dollar") {
@@ -420,11 +533,11 @@ try {
                     }
                     
                 })
-            .attr("text-anchor", "middle")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#323232")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.8em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "hidden")
@@ -446,24 +559,24 @@ try {
           .style("fill", "#007b82")
 
     const quarterlyTargetText = quarterlyTarget.append("text")
-            .attr("x", -4)
-            .attr("y", -20)
+            .attr("x", -5)
+            .attr("y", -24)
             .text(()=>{
                 const res = "Q" + getQuarter(new Date()) + " target";
                 return res;
             })
-            .attr("text-anchor", "middle")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#007b82")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.8em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "visible")
 
         const quarterlyTargetHiddenText = quarterlyTarget.append("text")
-            .attr("x", -4)
-            .attr("y", -20)
+            .attr("x", -5)
+            .attr("y", -24)
             .text((d) => 
                 { 
                     if (config.currency_type == "dollar") {
@@ -473,11 +586,11 @@ try {
                     }
                     
                 })
-            .attr("text-anchor", "middle")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#007b82")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.8em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "hidden")
@@ -501,7 +614,7 @@ try {
 
     const monthlyTargetText = monthlyTarget.append("text")
             .attr("x", 4)
-            .attr("y", -8)
+            .attr("y", -10)
             .text(()=>{
                 const res = d3.timeFormat("%b")(new Date()) + " target";
                 return res;
@@ -510,14 +623,14 @@ try {
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#523130")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.8em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "visible")
 
     const monthlyTargetHiddenText = monthlyTarget.append("text")
             .attr("x", 4)
-            .attr("y", -8)
+            .attr("y", -10)
             .text((d) => 
                 { 
                     if (config.currency_type == "dollar") {
@@ -531,11 +644,13 @@ try {
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#523130")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.8em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "hidden")
             .attr("opacity", 0)
+
+    // ------forecast labels (bottom)----------------
 
     const yearForecast = rects
         .selectAll(".forecast")
@@ -552,21 +667,21 @@ try {
           .style("fill", "#989898")
 
     const yearForecastText = yearForecast.append("text")
-            .attr("x", 0)
-            .attr("y", 10)
+            .attr("x", -5)
+            .attr("y", 12)
             .text("Forecast")
-            .attr("text-anchor", "middle")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#989898")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.8em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "visible")
 
     const yearForecastHiddenText = yearForecast.append("text")
-            .attr("x", 0)
-            .attr("y", 10)
+            .attr("x", -5)
+            .attr("y", 12)
             .text((d) => 
                 { 
                     if (config.currency_type == "dollar") {
@@ -576,11 +691,11 @@ try {
                     }
                     
                 })
-            .attr("text-anchor", "middle")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#989898")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.8em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "hidden")
@@ -602,24 +717,24 @@ try {
           .style("fill", "#6ea6aa")
 
     const quarterlyForecastText = quarterlyForecast.append("text")
-            .attr("x", -4)
-            .attr("y", 22)
+            .attr("x", -5)
+            .attr("y", 26)
             .text(()=>{
                 const res = "Q" + getQuarter(new Date()) + " forecast";
                 return res;
             })
-            .attr("text-anchor", "middle")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#6ea6aa")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.8em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "visible")
 
     const quarterlyForecastHiddenText = quarterlyForecast.append("text")
-            .attr("x", -4)
-            .attr("y", 22)
+            .attr("x", -5)
+            .attr("y", 26)
             .text((d) => 
                 { 
                     if (config.currency_type == "dollar") {
@@ -629,11 +744,11 @@ try {
                     }
                     
                 })
-            .attr("text-anchor", "middle")
+            .attr("text-anchor", "start")
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#6ea6aa")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.8em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "hidden")
@@ -655,7 +770,7 @@ try {
 
     const monthlyForecastText = monthlyForecast.append("text")
             .attr("x", 4)
-            .attr("y", 10)
+            .attr("y", 12)
             .text(()=>{
                 const res = d3.timeFormat("%b")(new Date()) + " forecast";
                 return res;
@@ -664,14 +779,14 @@ try {
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#856b69")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.8em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "visible")
 
         const monthlyForecastHiddenText = monthlyForecast.append("text")
             .attr("x", 4)
-            .attr("y", 10)
+            .attr("y", 12)
             .text((d) => 
                 { 
                     if (config.currency_type == "dollar") {
@@ -685,7 +800,7 @@ try {
             .style("text-transform", "uppercase")
             .style("dominant-baseline", "middle")
             .attr("fill", "#856b69")
-            .attr("font-size", "0.6em")
+            .attr("font-size", "0.8em")
             .attr("font-weight", "700")
             .attr("font-family", "sans-serif")
             .attr("class", "hidden")
@@ -704,7 +819,7 @@ try {
         .data([budget_forecast_dps])
         .enter()
             .append("text")
-            .attr("x", (d,i) => xScale(d["yearly-budget"]) + 40)
+            .attr("x", (d,i) => xScale(Math.max(d["yearly-budget"], d["yearly-forecast"])) + 40)
             .attr("y", d => yScale("metric") + yScale.bandwidth()/2 - 3)
             .text(d => d3.format(".0%")(d["yearly-actual"]/d["yearly-budget"]))
             .attr("text-anchor", "middle")
@@ -725,7 +840,7 @@ try {
             .attr("font-family", "sans-serif")
             .attr("class", "perc-label")
         .append("tspan")
-            .attr("x", (d,i) => xScale(d["yearly-budget"]) + 40)
+            .attr("x", (d,i) => xScale(Math.max(d["yearly-budget"], d["yearly-forecast"])) + 40)
             .attr("y", d => yScale("metric") + yScale.bandwidth()/2 + 16)
             .text("of target")
             .style("text-transform", "uppercase")
@@ -751,7 +866,7 @@ try {
         .data([budget_forecast_dps])
         .enter()
         .append("text")
-            .attr("x", (d,i) => xScale(d["yearly-budget"]) + 110)
+            .attr("x", (d,i) => xScale(Math.max(d["yearly-budget"], d["yearly-forecast"])) + 110)
             .attr("y", d => yScale("metric") + yScale.bandwidth()/2 - 2)
             .text((d) => 
                 { 
@@ -771,7 +886,7 @@ try {
             .attr("font-family", "sans-serif")
             .attr("class", "plan-label")
         .append("tspan")
-            .attr("x", (d,i) => xScale(d["yearly-budget"]) + 110)
+            .attr("x", (d,i) => xScale(Math.max(d["yearly-budget"], d["yearly-forecast"])) + 110)
             .attr("y", d => yScale("metric") + yScale.bandwidth()/2 + 12)
             .text("Target")
             .attr("text-anchor", "middle")
