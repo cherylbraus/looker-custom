@@ -24,7 +24,7 @@ var webpackConfig = {
     // violin: './src/integration/violin/violin.js',
     // test: './src/integration/test/test.js',
     // splitViolin: './src/integration/splitViolin/splitViolin.js',
-    bulletChart: './src/integration/bulletChart/bulletChart.js',
+    // bulletChart: './src/integration/bulletChart/bulletChart.js',
     // bulletChartMTD: './src/integration/bulletChart/bulletChartMTD.js',
     // topTextTile: './src/integration/topTextTile/topTextTile.js',
     // topTileMonth: './src/integration/topTextTile/topTileMonth.js',
@@ -35,6 +35,7 @@ var webpackConfig = {
     // weekDayBar: './src/integration/weekDayBar/weekDayBar.js',
     // weekCumulative: './src/integration/weekCumulative/weekCumulative.js',
     // monthlyGoals: './src/integration/monthlyGoals/monthlyGoals.js',
+    linedropdown: './src/integration/line/linedropdown.js',
     template: './src/integration/template/template.js',
   },
   output: {
