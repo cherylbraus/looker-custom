@@ -64,8 +64,8 @@ looker.plugins.visualizations.add({
                     background-color: none;
                     border: 1px solid #d3d3d3;
                     text-align: center;
-                    width: 600px;
-                    height: 360px;
+                    // width: 600px;
+                    // height: 360px;
                 }
                 #dimension-header {
                     font-size: 12px;
@@ -82,8 +82,8 @@ looker.plugins.visualizations.add({
                     z-index: 10;
                     background-color: none;
                     color: #fff;
-                    height: 100%;
-                    width: 100%;
+                    // height: 100%;
+                    // width: 100%;
                     fill: black;
                     color: black;
                 }
@@ -203,14 +203,6 @@ looker.plugins.visualizations.add({
                 .change-figure {
                     line-height: 36px;
                 }
-                .first-svg {
-                    height: 50px!important;
-                    width: 120px!important;
-                }
-                .second-svg {
-                    height: 50px!important;
-                    width: 120px!important;
-                }
                 #menu-options p {
                     font-weight: 500;
                 }
@@ -235,8 +227,7 @@ looker.plugins.visualizations.add({
                 user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
             </style>
             <div id="vis-options-container"><p>Compare current month to: </p>
-                <select name="vis-options" id="vis-options">
-                </select>
+                <select name="vis-options" id="vis-options"></select>
             </div>
             <svg>
             </svg>`;
@@ -257,13 +248,21 @@ looker.plugins.visualizations.add({
         // set dimensions
         let margin = {
                 top: 10,
-                right: 10,
+                right: 20,
                 bottom: 20,
                 left: 10
         }
 
-        const width = element.clientWidth;
-        const height = element.clientHeight;
+        const getNode = d3.select("#vis");
+
+        // Update this once we have a better idea how Looker integration will look
+        const new_node_width = getNode.select(function() { return this.parentNode; })
+        const new_node_height = getNode.select(function() { return this.parentNode; })
+        const width = new_node_width.node().getBoundingClientRect().width;
+        const height = new_node_height.node().getBoundingClientRect().height;
+
+        // const width = element.clientWidth;
+        // const height = element.clientHeight;
 
         const boundedWidth = width - margin.left - margin.right;
         const boundedHeight = height - margin.top - margin.bottom;
@@ -377,15 +376,15 @@ looker.plugins.visualizations.add({
             console.log("COMP PERIOD", compperiod)
 
             const svg = (
-                d3.select(element).select("svg")
+                d3.select("#vis").select("svg")
                     .html("")
-                    .attr("width", "100%")
-                    .attr("height", "100%")
+                    .attr("width", '100%')
+                    .attr("height", '100%')
             )
     
             const group = svg.append("g")
                 .attr("transform", `translate(${margin.left}, ${margin.top})`)
-                .attr("width", "100%")
+                .attr("width", ((boundedWidth) + "px"))
                 .attr("height", ((boundedHeight) + "px"))
                 .classed("group", true)
 
@@ -477,7 +476,7 @@ looker.plugins.visualizations.add({
             console.log("change", change)
 
             const changeContainer = group.append('g')
-                .attr("transform", `translate(70, 30)`)
+                .attr("transform", `translate(55, 20)`)
                 .classed("changeContainer", true)
 
             const changeNumber = changeContainer.append("g")
@@ -489,7 +488,7 @@ looker.plugins.visualizations.add({
                 .attr("y", 0)
                 .style("text-anchor", "middle")
                 .style("dominant-baseline", "middle")
-                .style("font-size", 28)
+                .style("font-size", 24)
                 .attr("fill", () => {
                     console.log("test", current_total, prior_total)
                     if (+current_total >= +prior_total) {
@@ -511,7 +510,7 @@ looker.plugins.visualizations.add({
                 .attr("y", 0)
                 .style("text-anchor", "middle")
                 .style("dominant-baseline", "middle")
-                .style("font-size", 12)
+                .style("font-size", 11)
                 .attr("fill", () => {
                     if (+current_total >= +prior_total) {
                         return "#0072b5"

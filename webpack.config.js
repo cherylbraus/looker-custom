@@ -35,7 +35,7 @@ var webpackConfig = {
     // weekDayBar: './src/integration/weekDayBar/weekDayBar.js',
     // weekCumulative: './src/integration/weekCumulative/weekCumulative.js',
     // monthlyGoals: './src/integration/monthlyGoals/monthlyGoals.js',
-    linedropdown: './src/integration/line/linedropdown.js',
+    // linedropdown: './src/integration/line/linedropdown.js',
     template: './src/integration/template/template.js',
   },
   output: {
@@ -47,12 +47,12 @@ var webpackConfig = {
   resolve: {
     extensions: [".ts", ".js"]
   },
-  // optimization: {
-  //   minimize: false
-  // },
-  plugins: [
-    new UglifyJSPlugin()
-  ],
+  optimization: {
+    minimize: false
+  },
+  // plugins: [
+  //   new UglifyJSPlugin()
+  // ],
   module: {
     rules: [
       { test: /\.js$/, loader: "babel-loader" },
