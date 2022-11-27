@@ -1,3 +1,4 @@
+import { text } from "d3";
 import { createIntersectionTypeNode, isWhiteSpaceLike } from "typescript";
 
 export const object = {
@@ -114,7 +115,7 @@ export const object = {
         let margin = {
             top: 10,
             right: 10,
-            bottom: 10,
+            bottom: 90,
             left: 10,
         }
 
@@ -136,10 +137,10 @@ export const object = {
 
         // line chart setup ----------------------------------------------------------
         let margin2 = {
-            top: 10,
-            right: 10,
-            bottom: 30,
-            left: 30,
+            top: 40,
+            right: 40,
+            bottom: 40,
+            left: 40,
         }
 
         const width2 = element.clientWidth - margin2.left - margin2.right;
@@ -237,6 +238,7 @@ export const object = {
             const xAxisGenerator = d3.axisBottom()
                 .scale(xScale)
                 .tickFormat(d3.timeFormat("%b'%y"))
+                .tickSize(0)
 
             const xAxis = group2
                 .append('g')
@@ -244,7 +246,8 @@ export const object = {
                 .style("transform", `translateY(${height2}px)`)
 
             const yScale = d3.scaleLinear()
-                .domain(d3.extent(data_month, d => d.rateAvg))
+                // .domain(d3.extent(data_month, d => d.rateAvg))
+                .domain([d3.min(data_month, d => d.rateAvg) - 0.5, d3.max(data_month, d => d.rateAvg) + 0.5])
                 .range([height2, 0])
 
             const yAxisGenerator = d3.axisLeft()
@@ -275,7 +278,8 @@ export const object = {
             group2
                 .call(d3.brushX()
                     .extent([[0,0], [width2, height2]])
-                    .on("start brush end", brushed)    
+                    .on("end", brushed)    
+                    .on("brush", brushing)
                 )        
 
             // placeholder dots
@@ -294,9 +298,9 @@ export const object = {
 
             console.log("extent", extent)
 
-            function brushed(extent) {
+            function brushing(extent) {
                 extent = d3.event.selection;
-                console.log("brush extent", extent)
+                console.log("brushing extent", extent)
 
                 if (extent) {
                     dots
@@ -304,26 +308,198 @@ export const object = {
                             const bool = xScale(monthAccessor(d)) >= extent[0] && xScale(monthAccessor(d)) <= extent[1];
                             return bool ? 1.0 : 0.0;
                         })
+                } 
+            }
+
+            function brushed(extent) {
+                extent = d3.event.selection;
+                console.log("brush extent", extent)
+
+                const selectedDirection = d3.select(`text[fill="white"]`).attr("class")
+
+                // d3.selectAll(".map-background").remove()
+                // d3.selectAll(".innerhex").remove()
+                // d3.selectAll(".hex").remove()
+
+                if (extent) {
+                    // dots
+                    //     .attr('fill-opacity', d => {
+                    //         const bool = xScale(monthAccessor(d)) >= extent[0] && xScale(monthAccessor(d)) <= extent[1];
+                    //         return bool ? 1.0 : 0.0;
+                    //     })
 
                     let startDate = xScale.invert(extent[0])
                     let endDate = xScale.invert(extent[1])
 
-                    let data_map = data_ready.filter(function(d) {
-                        return d.month.getTime() >= startDate.getTime() && d.month.getTime() <= endDate.getTime()
-                    })
+                    let data_map;
+                    if (selectedDirection != "All") {
+                        data_map = data_ready.filter(function(d) {
+                            return d.month.getTime() >= startDate.getTime() && d.month.getTime() <= endDate.getTime()
+                        })
+                    } else {
+                        data_map = data_ready.filter(function(d) {
+                            return d.month.getTime() >= startDate.getTime() && d.month.getTime() <= endDate.getTime() && d.direction === selectedDirection
+                        })
+                    }
+                    
 
+                    const legendTexts = d3.selectAll(".legend")
+                    legendTexts.remove()
+
+                    console.log("data_map", data_map)
                     createHexMap(data_map)
 
                 } else {
                     dots
                         .attr('fill-opacity', 0.0)
 
-                    createHexMap(data_ready)
+                    const legendTexts = d3.selectAll(".legend")
+                    legendTexts.remove()
+
+                    let data_map;
+                    if (selectedDirection != "All") {
+                        data_map = data_ready.filter(function(d) {
+                            return d.direction === selectedDirection
+                        })
+                        console.log("data_map", data_map)
+                        createHexMap(data_map)
+                    } else {
+                        console.log("data_map = data_ready", data_ready)
+                        createHexMap(data_ready)
+                    }
                 }
             }
 
+            function rectClick(clickedElement) {
+                console.log("clickedElement", clickedElement)
+                console.log("clickedElement class", clickedElement.attr("class"))
+
+                const thisClass = clickedElement.attr("class")
+
+                const classes = ['All', 'Inbound', 'Outbound']
+
+                classes.forEach((d, i) => {
+                    if (d === thisClass) {
+                        let thisRect = d3.select(`rect.${d}`)
+                        thisRect
+                            .attr("fill", "#323232")
+
+                        let thisText = d3.select(`text.${d}`)
+                        thisText
+                            .attr("fill", "white")
+                    } else {
+                        let thisRect = d3.select(`rect.${d}`)
+                        thisRect
+                            .attr("fill", "#f9f9f9")
+
+                        let thisText = d3.select(`text.${d}`)
+                        thisText
+                            .attr("fill", "#323232")
+                    }
+                })
+
+                brushed()
+
+            }
+
+            // BUTTONS
+            const buttonContainer = group.append("g")
+                .attr("transform", `translate(${width / 1.33},${height + 15})`)
+                .classed("buttonContainer", true)
+
+            buttonContainer.append("text")
+                .attr("x", 0)
+                .attr("y", 2)
+                .style("text-anchor", "middle")
+                .style("dominant-baseline", "middle")
+                .style("font-size", 11)
+                .attr("fill", "#323232")
+                .text("Freight Direction")
+
+            buttonContainer.append("rect")
+                .attr("x", -90)
+                .attr("y", 15)
+                .attr("width", 60)
+                .attr("height", 28)
+                .attr("stroke", "#323232")
+                .attr("fill", "#323232") 
+                .classed("All", true)
+                // .on("click", rectClick(d3.select(this)))
+                .on("click", function() {
+                    const d3This = d3.select(this)
+                    rectClick(d3This)
+                })
+
+            buttonContainer.append("text")
+                .attr("x", -60)
+                .attr("y", 29)
+                .style("text-anchor", "middle")
+                .style("dominant-baseline", "middle")
+                .style("font-size", 11)
+                .attr("fill", "white")
+                .text("All")
+                .classed("All", true)
+                .on("click", function() {
+                    const d3This = d3.select(this)
+                    rectClick(d3This)
+                })
+
+            buttonContainer.append("rect")
+                .attr("x", -30)
+                .attr("y", 15)
+                .attr("width", 60)
+                .attr("height", 28)
+                .attr("stroke", "#323232")
+                .attr("fill", "#f9f9f9")
+                .classed("Inbound", true)
+                .on("click", function() {
+                    const d3This = d3.select(this)
+                    rectClick(d3This)
+                })
+
+            buttonContainer.append("text")
+                .attr("x", 0)
+                .attr("y", 29)
+                .style("text-anchor", "middle")
+                .style("dominant-baseline", "middle")
+                .style("font-size", 11)
+                .attr("fill", "#323232")
+                .text("Inbound")
+                .classed("Inbound", true)
+                .on("click", function() {
+                    const d3This = d3.select(this)
+                    rectClick(d3This)
+                })
+
+            buttonContainer.append("rect")
+                .attr("x", 30)
+                .attr("y", 15)
+                .attr("width", 60)
+                .attr("height", 28)
+                .attr("stroke", "#323232")
+                .attr("fill", "#f9f9f9")
+                .classed("Outbound", true)
+                .on("click", function() {
+                    const d3This = d3.select(this)
+                    rectClick(d3This)
+                })
+
+            buttonContainer.append("text")
+                .attr("x", 60)
+                .attr("y", 29)
+                .style("text-anchor", "middle")
+                .style("dominant-baseline", "middle")
+                .style("font-size", 11)
+                .attr("fill", "#323232")
+                .text("Outbound")
+                .classed("Outbound", true)
+                .on("click", function() {
+                    const d3This = d3.select(this)
+                    rectClick(d3This)
+                })
 
 
+            console.log("select chosen one", d3.select(`text[fill="white"]`).attr("class"))
             
 
             // ---------------------------------------------------------------------
@@ -347,6 +523,7 @@ export const object = {
                     .enter()
                     .append("path")
                     .attr("d", path)
+                    .classed("map-background", true)
 
                 mapdata.forEach(d => {
                     const coords = projection([d.lon, d.lat])
@@ -414,7 +591,7 @@ export const object = {
                 // create scale for inner hexagons
                 const innerHexScale = d3.scaleQuantize()
                     .domain([Math.max(.001, d3.min(totalVolumes)), d3.max(totalVolumes)])
-                    .range([2,4,6,8,10])
+                    .range([2,6,10]) // [2,4,6,8,10]
                     // .domain([0, d3.max(totalVolumes)])
                     // .range([0,1,2,3,4,5,6,7])
 
@@ -452,11 +629,158 @@ export const object = {
                             }
                         })
                         .style("stroke", "none")
+
+                // HEXMAP LEGEND
+                innerHexScale.invert = (function() {
+                    let domain = innerHexScale.domain()
+                    let range = innerHexScale.range()
+                    let scale = d3.scaleQuantize().domain(range).range(domain)
+                    return function(x) {
+                        return scale(x)
+                    }
+                })()
+
+                const legendContainer = group.append("g")
+                    .attr("transform", `translate(${width / 4},${height + 10})`)
+                    .classed("legendContainer", true)
+
+                const legendSize = legendContainer.append("g")
+                    .classed("legend", true)
+                    .attr("transform", "translate(0,0)")
+
+                legendSize.append("text")
+                    .attr("x", 0)
+                    .attr("y", 2)
+                    .style("text-anchor", "middle")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 11)
+                    .attr("fill", "#323232")
+                    .text("Volume")
+
+                // const legendSizeEntries = legendSize.append("g")
+                //     .attr("transform", "translate(-30, 20)")
+
+                // const legendS = d3.legendSize()
+                //     .labelFormat(d3.format("~s"))
+                //     .orient("horizontal")
+                //     .useClass("true")
+                //     .labelAlign("start")
+                //     .title("Volume")
+                //     .titleWidth(100)
+                //     .scale(innerHexScale)
+                //     .shape("circle")
+
+                // legendSizeEntries.call(legendS)
+                
+                legendSize.append("polygon")
+                    .attr("points", d => hexagonPoints(2))
+                    .attr("transform", "translate(-100, 17)")
+                    .style("fill", "#27566b")
+
+                legendSize.append("text")
+                    .attr("x", -94)
+                    .attr("y", 18)
+                    .style("text-anchor", "start")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 9)
+                    .attr("fill", "#323232")
+                    .text(`${d3.format(".2s")(innerHexScale.invertExtent(2)[0])} to ${d3.format(".2s")(innerHexScale.invertExtent(2)[1])}`)
+                    .classed("legend-text", true)
+
+                legendSize.append("polygon")
+                    .attr("points", d => hexagonPoints(6))
+                    .attr("transform", "translate(-30, 17)")
+                    .style("fill", "#27566b")
+
+                legendSize.append("text")
+                    .attr("x", -20)
+                    .attr("y", 18)
+                    .style("text-anchor", "start")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 9)
+                    .attr("fill", "#323232")
+                    .text(`${d3.format(".2s")(innerHexScale.invertExtent(6)[0])} to ${d3.format(".2s")(innerHexScale.invertExtent(6)[1])}`)
+                    .classed("legend-text", true)
+
+                legendSize.append("polygon")
+                    .attr("points", d => hexagonPoints(10))
+                    .attr("transform", "translate(45, 17)")
+                    .style("fill", "#27566b")
+
+                legendSize.append("text")
+                    .attr("x", 59)
+                    .attr("y", 18)
+                    .style("text-anchor", "start")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 9)
+                    .attr("fill", "#323232")
+                    .text(`${d3.format(".2s")(innerHexScale.invertExtent(10)[0])} to ${d3.format(".2s")(innerHexScale.invertExtent(10)[1])}`)
+                    .classed("legend-text", true)
+
+
+                const legendColor = legendContainer.append("g")
+                    .classed("legend", true)
+                    .attr("transform", "translate(0, 40)")
+
+                legendColor.append("text")
+                    .attr("x", 0)
+                    .attr("y", 2)
+                    .style("text-anchor", "middle")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 11)
+                    .attr("fill", "#323232")
+                    .text("% Change in RPM")
+
+                legendColor.append("polygon")
+                    .attr("points", d => hexagonPoints(6))
+                    .attr("transform", "translate(-100, 17)")
+                    .style("fill", "#27566b")
+
+                legendColor.append("text")
+                    .attr("x", -90)
+                    .attr("y", 18)
+                    .style("text-anchor", "start")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 9)
+                    .attr("fill", "#323232")
+                    .text(`${d3.format(".2s")(colorRateScale.invertExtent("#27566b")[0])} to ${d3.format(".2s")(colorRateScale.invertExtent("#27566b")[1])}`)
+                    .classed("legend-text", true)
+
+                legendColor.append("polygon")
+                    .attr("points", d => hexagonPoints(6))
+                    .attr("transform", "translate(-30, 17)")
+                    .style("fill", "#f1cc56")
+
+                legendColor.append("text")
+                    .attr("x", -20)
+                    .attr("y", 18)
+                    .style("text-anchor", "start")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 9)
+                    .attr("fill", "#323232")
+                    .text(`${d3.format(".2s")(colorRateScale.invertExtent("#f1cc56")[0])} to ${d3.format(".2s")(colorRateScale.invertExtent("#f1cc56")[1])}`)
+                    .classed("legend-text", true)
+
+                legendColor.append("polygon")
+                    .attr("points", d => hexagonPoints(6))
+                    .attr("transform", "translate(45, 17)")
+                    .style("fill", "#8cbb61")
+
+                legendColor.append("text")
+                    .attr("x", 55)
+                    .attr("y", 18)
+                    .style("text-anchor", "start")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 9)
+                    .attr("fill", "#323232")
+                    .text(`${d3.format(".2s")(colorRateScale.invertExtent("#8cbb61")[0])} to ${d3.format(".2s")(colorRateScale.invertExtent("#8cbb61")[1])}`)
+                    .classed("legend-text", true)
+
+                console.log('colorscale', colorRateScale.domain())
+
+                
+
             }
-            
-
-
-
         })
 
     } catch(error) {
