@@ -341,7 +341,11 @@ export const object = {
                             return d.month.getTime() >= startDate.getTime() && d.month.getTime() <= endDate.getTime() && d.direction === selectedDirection
                         })
                     }
-                    
+
+                    console.log("remove nation-group")
+                    const nationGroup = d3.selectAll(".nation-group")
+                    nationGroup.remove()   
+                    console.log("any nation-group elements", d3.selectAll(".nation-group"))                 
 
                     const legendTexts = d3.selectAll(".legend")
                     legendTexts.remove()
@@ -352,6 +356,14 @@ export const object = {
                 } else {
                     dots
                         .attr('fill-opacity', 0.0)
+
+                    console.log("remove nation-group")
+                    const nationGroup = d3.selectAll(".nation-group")
+                    nationGroup.remove()  
+                    console.log("any nation-group elements", d3.selectAll(".nation-group"))  
+
+    //                 d3.select(".chart").select("svg");
+    // svg.selectAll(".x.axis").remove()
 
                     const legendTexts = d3.selectAll(".legend")
                     legendTexts.remove()
@@ -515,15 +527,18 @@ export const object = {
                 // add outline for nation
                 const nation = group
                     .append('g')
+                    .attr("class", "nation-group")
                     // .attr("stroke", "lightgrey")
                     // .attr("stroke-width", 0.5)
-                    .attr("fill", "#f9f9f9")
+                    .attr("fill", "black")
+                    .attr("opacity", .20)
+                    // .attr("fill", "#f9f9f9")
                     .selectAll("path")
                     .data(topojson.feature(mdata, mdata.objects.nation).features)
                     .enter()
                     .append("path")
                     .attr("d", path)
-                    .classed("map-background", true)
+                    .attr("class", "map-background")
 
                 mapdata.forEach(d => {
                     const coords = projection([d.lon, d.lat])
