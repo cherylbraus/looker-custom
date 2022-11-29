@@ -160,32 +160,87 @@
 
                         /* design */
             table {
+                border-collapse:collapse;
+                border:none;
                overflow-y:scroll;
                height:100%;
-               font-size: 14px;
-               display:block;}
+               font-size: 12px;
+               display:block;
+               text-align:left;
+           }
+            table td, table th {
+                border: 1px solid #bec4c7;
+            }
             th {
-                background: #a9a9a9;
-                padding: 4px 0;
-            }
-            tr:nth-child(even) { 
-              background: #EEE; 
-            }
-            .value-down {
-              color: #D76106;
+              padding: 8px 8px;
+              background-color:#c2d3e0;
+              font-family:Roboto;
+              font-size:12px!important;
               font-weight:500;
-              display:flex;
-              justify-content: center;
             }
-            .value-up {
-              color: #0072b5;
-              font-weight:500;
-               display:flex;
-              justify-content: center;
+            th.stuck {
+              position: sticky!important;
+              top:0;
             }
-            .change-figure {
-              line-height: 36px;
+            td {
+              font-family:Roboto;
+              font-size:12px!important;
+              font-weight:400!important;
             }
+            .table-index {
+              text-align: right;
+            }
+            .chart_column {
+                min-width: 120px!important;
+                min-height: 70px!important;
+                text-align:center;
+            }
+            .second_chart_column {
+                min-width: 120px!important;
+                min-height: 70px!important;
+                text-align:center;
+            }
+            tr:first-child {
+              font-weight:500
+            }
+            tr:nth-child(even) { background: #f0f1f0; }
+              .value-down {
+                color: #D76106;
+                font-weight:500;
+                display:flex;
+                justify-content: center;
+              }
+              td:not(.no-padding) {
+                padding: 0 8px;
+              }
+              .value-even {
+                text-align:center;
+              }
+              .value-up {
+                color: #0072b5;
+                font-weight:500;
+                display:flex;
+                justify-content: center;
+              }
+              .value-up {
+                color: #0072b5;
+                font-weight:500;
+                display:flex;
+                justify-content: center;
+              }
+              .value-up.color-off {
+                color: black;
+              }
+              .value-down.color-off {
+                color: black;
+              }
+              .change-figure {
+                line-height: 36px;
+              }
+            .insert-column {
+              background-color:#9facb7;
+            } 
+            
             .first-svg {
                 height: 50px!important;
                 width: 120px!important;

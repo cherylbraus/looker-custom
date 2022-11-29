@@ -8,7 +8,7 @@ export const object = {
     // form within the admin/visualizations page of Looker.
 
     id: "sparkline-table",
-    label: "ZDev Sparkline Table",
+    label: "Sparkline Table",
     options: {
 
         first_chart_type: {
@@ -60,7 +60,7 @@ export const object = {
           order:5,
           type: "boolean",
           label: "Disable last period display",
-          default:false
+          default:"false"
         },
         y_axis_lower_first: {
           section: "Y",
@@ -100,23 +100,23 @@ export const object = {
         },
         directionality: {
           section: 'Formatting',
-          order:4,
+          order:5,
           type: 'boolean',
           label: 'Color negative trends',
-          default: true
+          default: "false"
         },
         display_values: {
           section: 'Formatting',
-          order:3,
+          order:4,
           type: 'boolean',
           label: 'Display max/min values',
-          default: true
+          default: "false"
         },
         change_label_second: {
           section: 'Labels',
           order:4,
           type: 'string',
-          label: 'Change column 2 label',
+          label: 'Last period (column 2) label',
           display: "text",
           default: ""
         },
@@ -124,7 +124,7 @@ export const object = {
           section: 'Labels',
           order:2,
           type: 'string',
-          label: 'Change column 1 label',
+          label: 'Last period (column 1) label',
           display: "text",
           default: ""
         },
@@ -132,7 +132,7 @@ export const object = {
           section: 'Labels',
           order:1,
           type: 'string',
-          label: 'Chart column 1 label',
+          label: 'Chart (column 1) label',
           display: "text",
           default: ""
         },
@@ -140,7 +140,15 @@ export const object = {
           section: 'Labels',
           order:3,
           type: 'string',
-          label: 'Chart column 2 label',
+          label: 'Chart (column 2) label',
+          display: "text",
+          default: ""
+        },
+        label_total_row: {
+          section: 'Labels',
+          order:5,
+          type: 'string',
+          label: 'Total row descriptor',
           display: "text",
           default: ""
         },
@@ -149,12 +157,20 @@ export const object = {
           order:1,
           type: 'boolean',
           label: 'Freeze header row',
-          default: true
+          default: "false"
+        },
+        size_to_fit: {
+          section: 'Formatting',
+          order:2,
+          type: 'boolean',
+          label: 'Size-to-fit table width',
+          default: "false"
         }
       },
 
     // Set up the initial state of the visualization
     create: function(element, config) {
+      this.trigger("updateConfig", [{directionality: "true", display_values:"true",freeze_header:"true"}])
         // Insert a <style> tag with some styles we'll use later
         element.innerHTML = `
             <style>
@@ -260,6 +276,9 @@ export const object = {
                 min-height: 70px!important;
                 text-align:center;
             }
+            tr:first-child {
+              font-weight:500
+            }
             tr:nth-child(even) { background: #f0f1f0; }
               .value-down {
                 color: #D76106;
@@ -311,25 +330,27 @@ export const object = {
             })) return
         }
 
-    if (queryResponse.has_row_totals == false) {
-      $('#viz').contents(':not(style)').remove();
+    // Custom error handling
+    if (typeof config.where_values == 'undefined' || typeof config.where_chart == 'undefined') {
+      $('#vis').contents(':not(style)').remove();
+      const error = '<div class="error-container"><div class="error-header">Loading</div><div class="error">Wait until chart type is fully loaded.</div></div>'
+      $('#vis').append(error);
+    } else if (queryResponse.has_row_totals == false) {
+      $('#vis').contents(':not(style)').remove();
       const error = '<div class="error-container"><div class="error-header">Row totals required</div><div class="error">Sparklines requires row totals. Check row totals box and re-run.</div></div>'
-      $('#viz').append(error);
-    } else if (config.where_values.split(",") && config.where_values.split(",").length > 2) {
-      $('#viz').contents(':not(style)').remove();
-      const error = '<div class="error-container"><div class="error-header">Too many charted measures</div><div class="error">Sparklines cannot currently handle more than two chart columns.</div></div>'
-      $('#viz').append(error);
-    } else if ((config.where_chart == "" && config.where_values != "") || (config.where_values == "" && config.where_chart != "") || ((config.where_values.split(",") || config.where_chart.split(",")) && config.where_chart.split(",").length != config.where_values.split(",").length)) {
-      $('#viz').contents(':not(style)').remove();
+      $('#vis').append(error);
+    } else if ((config.where_chart == "" && config.where_values != "") || (config.where_values == "" && config.where_chart != "") || ((config.where_values || config.where_chart) && config.where_chart.split(",").length != config.where_values.split(",").length)) {
+      $('#vis').contents(':not(style)').remove();
       const error = '<div class="error-container"><div class="error-header">Options mismatch</div><div class="error">Number of measures charted and chart columns must be equal.</div></div>'
-      $('#viz').append(error);
-    } else if (config.where_values.split(",") && parseInt(config.where_values.split(",")[0]) > queryResponse.fields.measure_like.length - 1 || parseInt(config.where_values.split(",")[1]) > queryResponse.fields.measure_like.length - 1 || parseInt(config.where_values.split(",")[2]) > queryResponse.fields.measure_like.length - 1 ) {
-      $('#viz').contents(':not(style)').remove();
+      $('#vis').append(error);
+    } else if (config.where_values && config.where_values.split(",") && parseInt(config.where_values.split(",")[0]) > queryResponse.fields.measure_like.length - 1 || parseInt(config.where_values.split(",")[1]) > queryResponse.fields.measure_like.length - 1 || parseInt(config.where_values.split(",")[2]) > queryResponse.fields.measure_like.length - 1 ) {
+      $('#vis').contents(':not(style)').remove();
       const error = '<div class="error-container"><div class="error-header">Index out of range</div><div class="error">That value is out of the range of possible measures.</div></div>'
-      $('#viz').append(error);
+      $('#vis').append(error);
     } else {
 
     try {
+
       // d3.select(element).html('')
       var parseTimeDay = d3.timeParse("%Y-%m-%d");
       var parseTimeMonth = d3.timeParse("%Y-%m");
@@ -341,8 +362,15 @@ export const object = {
       const dimensions = queryResponse.fields.dimension_like;
       const measures = queryResponse.fields.measure_like;
       const pivots = queryResponse.fields.pivots;
-      console.log(pivots[0].time_interval.name)
-      if (pivots[0].time_interval.name == "day" || pivots[0].time_interval.name == "week") {
+
+      console.log("queryResponse", queryResponse)
+      console.log("dimensions", dimensions)
+      console.log("measures", measures)
+      console.log("pivots", pivots)
+      console.log("data", data)
+      console.log("object keys", Object.keys(data[0][measures[0].name]))
+
+      if (pivots[0].time_interval.name == "day") {
         parseTime = parseTimeDay;
       } else if (pivots[0].time_interval.name == "month") {
         parseTime = parseTimeMonth;
@@ -387,59 +415,58 @@ export const object = {
       
       let row_totals = [];
 
-      let final_dimensions = [];
+      let column_headers = [];
       let final_measures = [];
 
-      let measures_start = dimensions.length - 1; 
-
+      // Get the header names for the dimensions
       dimensions.forEach(function(entry,i){
-        final_dimensions.push(entry.name)
+        column_headers.push(entry.name)
       })
-      console.log(where_values)
+
+      // If there are leftover measures, push them into the dimensions 
       if (where_values.length < measures.length) {
         measures.forEach(function(entry,i) {
           if (where_values.includes(i)) {
             return
           } else {
             row_totals.push(entry.name)
-            final_dimensions.push(("row_total_heading-" + i));
+            column_headers.push(("row_total_heading-" + i));
           }
         })
       }
 
       if (where_chart.length > 1) {
-        if (config.ignore_last_week == false) {
-          final_dimensions.splice(where_chart[1],0,"second_last_week_column")
+        if (config.ignore_last_week == "false") {
+          column_headers.splice(where_chart[1],0,"second_last_week_column")
         }
-        final_dimensions.splice(where_chart[1],0,"second_chart_column")
+        column_headers.splice(where_chart[1],0,"second_chart_column")
       }
       if (where_chart.length > 0) {
-        if (config.ignore_last_week == false) {
-          final_dimensions.splice(where_chart[0],0,"last_week_column")
+        if (config.ignore_last_week == "false") {
+          column_headers.splice(where_chart[0],0,"last_week_column")
         }
-        final_dimensions.splice(where_chart[0],0,"chart_column")
+        column_headers.splice(where_chart[0],0,"chart_column")
       }
 
       measures.forEach(function(entry){
         final_measures.push(entry.name)
       })
 
-  // TODO error reporting
-  // TODO responsive widths
-  const w = 120
-  const h = 70
+      console.log("here")
+      console.log("row_totals", row_totals)
+      console.log("column_headers", column_headers)
+      console.log("final_measures", final_measures)
 
   const margin = {
-    top:16,
-    bottom:16,
+    top:12,
+    bottom:12,
     left:2,
     right:2
   }
-  const width = w - margin.left - margin.right
-  const height = (h - margin.top - margin.bottom) / 2
-  const x = d3.scaleTime().range([0, width]);
-  const y = d3.scaleLinear().range([height, 0]);
-  const y2 = d3.scaleLinear().range([height, 0]);
+
+  const x = d3.scaleTime().range([0, 116]);
+  const y = d3.scaleLinear().range([46, 0]);
+  const y2 = d3.scaleLinear().range([46, 0]);
 
   const line = d3.line()
       .defined(function(d) {
@@ -461,17 +488,23 @@ export const object = {
           return y(d.value);
         })
 
+  console.log("here1")
+
   function createTable(data_insert,element) {
       // Clear out the previous charts/code if not removed to see the table
-      $('#viz').contents(':not(style)').remove();
-      var headings_dim = data_insert;
+      $('#vis').contents(':not(style)').remove();
+      const headings_dim = data_insert;
 
-      var html = '<table>';
+      console.log("headings_dim", headings_dim)
+
+      let html = '<table>';
 
       html += '<thead><tr><th class="table-index"></th>';
       $.each(headings_dim, function () {
         let found = false
         const lookup_this = this
+        console.log("lookup_this", this)
+        
         // this is the current heading
         dimensions.forEach(function(entry) {
           if (lookup_this == entry.name) {
@@ -513,31 +546,93 @@ export const object = {
 
       // build table body
       html += '<tbody>';
+
+    console.log("createTable 1")
+
+     if (queryResponse.has_totals == true) {
+        let descriptor = ""
+        if (config.label_total_row.length>0) {
+          descriptor = " " + config.label_total_row + "s"
+        }
+
+        console.log("insert row prep", data[0][Object.keys(data[0])[0]].value.split(" ")[0])
+        console.log("data_insert", data_insert)
+
+        if (data[0][Object.keys(data[0])[0]].value.split(" ")[0] != "All") {
+            let insertRow = {}
+
+            insertRow[data_insert[0]] = {}
+
+            insertRow[data_insert[0]]['value'] = "All" + descriptor
+
+            const insertArray = Object.keys(queryResponse.totals_data)
+
+            console.log("insertRow pre", insertRow)
+            console.log("insertArray", insertArray)
+            
+            insertArray.forEach((entry) => {
+              let fillemup = {}
+              for (const [key, value] of Object.entries(queryResponse.totals_data[entry])) {
+                fillemup[key] = {}
+                fillemup[key]['value'] = value['value']
+                fillemup[key]['rendered'] = value['html']
+              }
+              insertRow[entry] = fillemup
+            })
+
+            console.log("insertRow", insertRow)
+
+            data.splice(0,0,insertRow)
+        }
+      }
+
+      console.log("createTable 2")
+
       // use the length of first array to determine how many rows
       for (let i = 0, len = data.length; i < len; i++) {
         html += '<tr><td class="table-index">' + (i + 1) + '</td>';
         // build each cell using the heading's ith element
         $.each(headings_dim, function () {
+
+          console.log("THIS", this)
+
+          console.log("createTable 3")
+
+          // Add the chart columns
           if (this == "chart_column") {
+            console.log("CHART COLUMN - 4")
+
             const chart_id = "chart_column-" + i
             
             html += '<td class="no-padding"><div class="chart_column" id=' + chart_id + '></div></td>';
 
           } else if (this == "second_chart_column") {
+            console.log("SECOND CHART COLUN - 5")
+
             const chart_id = "second_chart_column-" + i
             
             html += '<td class="no-padding"><div class="second_chart_column" id=' + chart_id + '></div></td>';
 
           } else if (this == "last_week_column") {
+            console.log("LAST WEEK COLUMN - 6")
+
+            // Add section for triangle up/down trends
+
             const last_week_id = "last_week_column-" + i
             let last_week_class;
             let direction_icon;
 
             let date_keys = Object.keys(data[i][measures[where_values[0]].name])
+            console.log("date_keys pre", date_keys)
+
             date_keys = date_keys.filter((entry)=>{
               return entry[0] != "$"
             })
+            console.log("date_keys", date_keys)
+
             let last_week_data;
+
+            console.log("test", data[i][measures[where_values[0]].name])
 
             if (data[i][measures[where_values[0]].name][date_keys[date_keys.length-1]]["value"] != null) {
               if (data[i][measures[where_values[0]].name][date_keys[date_keys.length-1]]["rendered"]) {
@@ -549,8 +644,6 @@ export const object = {
             } else {
               last_week_data = "<span class='null-val'>∅</span>"
             }
-
-            // Can change this but for now, check if it's up or down from prev week
 
             if (data[i][measures[where_values[0]].name][date_keys[date_keys.length-1]]["value"] != null && data[i][measures[where_values[0]].name][date_keys[date_keys.length-2]]["value"] != null && data[i][measures[where_values[0]].name][date_keys[date_keys.length-1]]["value"] < data[i][measures[where_values[0]].name][date_keys[date_keys.length-2]]["value"]) {
               last_week_class = "value-down"
@@ -566,6 +659,8 @@ export const object = {
             html += '<td class="triangle-flex"><div class=' + last_week_class + ' id=' + last_week_id + '><div class="change-figure">' + last_week_data + '</div>' + direction_icon + '</div></td>';
 
           } else if (this == "second_last_week_column") {
+            console.log("SECOND LAST WEEK COLUMN - 7")
+
             const last_week_id = "second_last_week_column-" + i
             let last_week_class;
             let direction_icon;
@@ -588,7 +683,6 @@ export const object = {
               last_week_data = "<span class='null-val'>∅</span>"
             }
 
-            // Can change this but for now, check if it's up or down from prev week
             if (data[i][measures[where_values[1]].name][date_keys[date_keys.length-1]]["value"] != null && data[i][measures[where_values[1]].name][date_keys[date_keys.length-2]]["value"] != null && data[i][measures[where_values[1]].name][date_keys[date_keys.length-1]]["value"] < data[i][measures[where_values[1]].name][date_keys[date_keys.length-2]]["value"]) {
               last_week_class = "value-down"
               direction_icon = '<div id="second-chart-triangle-' + i + '"></div>'
@@ -603,17 +697,30 @@ export const object = {
             html += '<td class="triangle-flex"><div class=' + last_week_class + ' id=' + last_week_id + '><div class="change-figure">' + last_week_data + '</div>' + direction_icon + '</div></td>';
 
           } else if (this.split("-")[0] == "row_total_heading") {
+            console.log("ROW TOTAL HEADING - 8")
+            console.log("data", this.split("-"))
+            console.log("data", data[i])
+            console.log("data", data[i][measures[this.split("-")[1]]["name"]])
+
             if (data[i][measures[this.split("-")[1]]["name"]]["$$$_row_total_$$$"]["value"]) {
+              console.log("ROW TOTAL HEADING - 8a - VALUE")
               if (data[i][measures[this.split("-")[1]]["name"]]["$$$_row_total_$$$"]["rendered"]) {
+                console.log("ROW TOTAL HEADING - 8b - RENDERED")
                 html += '<td class="value-even">' + data[i][measures[this.split("-")[1]]["name"]]["$$$_row_total_$$$"]["rendered"] + '</td>';
               } else {
+                console.log("ROW TOTAL HEADING - 8c - NO RENDERED, SO USE VALUE")
                 html += '<td class="value-even">' + data[i][measures[this.split("-")[1]]["name"]]["$$$_row_total_$$$"]["value"] + '</td>';
               }
             } else {
+              console.log("ROW TOTAL HEADING - 8d - NO VALUE/RENDERED")
               console.log(this, " has no values to display")
             }
+
+            console.log("ROW TOTAL HEADING - 8 - DONE")
             
           } else {
+            console.log("SOMETHING ELSE - 9")
+
             if (data[i][this]["rendered"]) {
               html += '<td>' + data[i][this]["rendered"] + '</td>';
             } else if (data[i][this]["value"] == null) {
@@ -628,14 +735,16 @@ export const object = {
       }
       html += '</tbody>';
       html += '</table>';
-      $('#viz').append(html);
+      $('#vis').append(html);
 
-      if (config.freeze_header == true) {
+      console.log("createTable DONE")
+
+      if (config.freeze_header == "true") {
         $('th').addClass('stuck')
       } else {
         $('th').removeClass('stuck')
       }
-      if (config.directionality == false) {
+      if (config.directionality == "false") {
         $('.value-down').addClass('color-off')
         $('.value-up').addClass('color-off')
       } else {
@@ -645,19 +754,27 @@ export const object = {
     }
 
     function drawOnTable(data_insert,element) {
-      // Find extent for all charted values
+      if (config.size_to_fit == "true") {
+        console.log("true")
+        $("table").addClass("size-to-fit")
+      } else {
+        $("table").removeClass("size-to-fit")
+      }
+      // Check on element height and width to test responsiveness using getBoundingClientRect
       let width_first;
       let height_first;
       if (config.where_chart.length > 0){ 
         const node_get_width = d3.select("#chart_column-0")
         const new_node_width = node_get_width.select(function() { return this.parentNode; })
         width_first = new_node_width.node().getBoundingClientRect().width
+        console.log("check width of 1st", node_get_width, new_node_width, width_first)
       } 
 
       if (config.where_chart.length > 0){ 
         const node_get_height = d3.select("#chart_column-0")
         const new_node_height = node_get_height.select(function() { return this.parentNode; })
         height_first = new_node_height.node().getBoundingClientRect().height
+        console.log("check height of 1st", node_get_height, new_node_height, height_first)
       } 
 
       let width_second;
@@ -674,6 +791,7 @@ export const object = {
         height_second = new_node_height_2.node().getBoundingClientRect().height
       } 
 
+      // Get max and min for both the first and second chart columns
       let col_one_max
       let col_one_min
       let col_two_max
@@ -685,18 +803,24 @@ export const object = {
         let dataset_one = []
 
         let dataset_one_keys = Object.keys(data[j][measures[where_values[0]].name])
+        console.log("dataset_one_keys", dataset_one_keys)
+
         dataset_one_keys.forEach((entry)=>{
           if (entry[0] != "$") {
             dataset_one.push({date:entry,value:data[j][measures[where_values[0]].name][entry]["value"]})
           }
-          
         })
+        console.log("dataset_one_keys done", dataset_one_keys)
+
         col_one_max = d3.max([col_one_max,d3.max(dataset_one,(ent)=>{
           return ent.value
         })])
+
         col_one_min = d3.min([col_one_min,d3.min(dataset_one,(ent)=>{
           return ent.value
         })])
+
+        console.log("col_one min/max", col_one_min, col_one_max)
 
         if (where_values.length > 1) {
           let dataset_two = []
@@ -706,8 +830,8 @@ export const object = {
             if (entry[0] != "$") {
               dataset_two.push({date:entry,value:data[j][measures[where_values[1]].name][entry]["value"]})
             }
-            
           })
+
           col_two_max = d3.max([col_two_max,d3.max(dataset_two,(ent)=>{
             return ent.value
           })])
@@ -766,12 +890,18 @@ export const object = {
           .append('path')
           .attr("d", d3.symbol().type(d3.symbolTriangle).size(30))
 
-        if (dataset_one[dataset_one.length-1].value < dataset_one[dataset_one.length-2].value) {
-          tri.attr("transform",  "rotate(180)")
-          .style("fill", "#D76106");
+        if (config.directionality == "true") {
+          if (dataset_one[dataset_one.length-1].value < dataset_one[dataset_one.length-2].value) {
+            tri.attr("transform",  "rotate(180)")
+            .style("fill", "#D76106");
+          } else if (dataset_one[dataset_one.length-1].value > dataset_one[dataset_one.length-2].value) {
+            tri
+              .style("fill", "#0072b5");
+          }
         } else {
-          tri
-            .style("fill", "#0072b5");
+          if (dataset_one[dataset_one.length-1].value < dataset_one[dataset_one.length-2].value) {
+            tri.attr("transform",  "rotate(180)");
+          }
         }
 
 
@@ -781,11 +911,13 @@ export const object = {
               .attr("class", "line")
               .attr("d", line)
               .attr("stroke", (d)=>{
-                if (config.directionality == true) {
+                if (config.directionality == "true") {
                   if (dataset_one[dataset_one.length-1].value != null && dataset_one[0].value > dataset_one[dataset_one.length-1].value) {
                     return "#D76106"
-                  } else {
+                  } else if (dataset_one[dataset_one.length-1].value != null && dataset_one[0].value < dataset_one[dataset_one.length-1].value) {
                     return "#0072b5"
+                  } else {
+                    return "#c2c2c2"
                   }
                 } else {
                   return ["#27566b","#007b82"][i%2]
@@ -802,11 +934,13 @@ export const object = {
               .attr("cy", line.y())
               .attr("r", 1)
               .attr("fill", (d)=>{
-                if (config.directionality == true) {
+                if (config.directionality == "true") {
                   if (dataset_one[dataset_one.length-1].value != null && dataset_one[0].value > dataset_one[dataset_one.length-1].value) {
                     return "#D76106"
-                  } else {
+                  } else if (dataset_one[dataset_one.length-1].value != null && dataset_one[0].value < dataset_one[dataset_one.length-1].value) {
                     return "#0072b5"
+                  } else {
+                    return "#c2c2c2"
                   }
                 } else {
                   return ["#27566b","#007b82"][i%2]
@@ -819,22 +953,26 @@ export const object = {
               .attr("class", "area")
               .attr("d", area)
               .attr("stroke", (d)=>{
-                if (config.directionality == true) {
+                if (config.directionality == "true") {
                   if (dataset_one[dataset_one.length-1].value != null && dataset_one[0].value > dataset_one[dataset_one.length-1].value) {
                     return "#D76106"
-                  } else {
+                  } else if (dataset_one[dataset_one.length-1].value != null && dataset_one[0].value < dataset_one[dataset_one.length-1].value) {
                     return "#0072b5"
+                  } else {
+                    return "#c2c2c2"
                   }
                 } else {
                   return ["#27566b","#007b82"][i%2]
                 }
               })
               .attr("fill", (d)=>{
-                if (config.directionality == true) {
+                if (config.directionality == "true") {
                   if (dataset_one[dataset_one.length-1].value != null && dataset_one[0].value > dataset_one[dataset_one.length-1].value) {
                     return "#D76106"
-                  } else {
+                  } else if (dataset_one[dataset_one.length-1].value != null && dataset_one[0].value < dataset_one[dataset_one.length-1].value) {
                     return "#0072b5"
+                  } else {
+                    return "#c2c2c2"
                   }
                 } else {
                   return ["#27566b","#007b82"][i%2]
@@ -855,18 +993,20 @@ export const object = {
                   return xBar(d.date)
                 })
                 .attr("y", (d)=>{
-                  console.log(y(0), y(d.value), y(height_first), height_first)
-                  return y(d.value)
+                    return y(Math.max(0, d.value));                  
                 })
                 .attr("width", xBar.bandwidth())
                 .attr("height", (d)=>{ 
-                  return height_first - y(d.value) - margin.top - margin.bottom })
+                    return Math.abs(y(d.value) - y(0));
+                })
                 .attr("fill", (d)=>{
-                  if (config.directionality == true) {
+                  if (config.directionality == "true") {
                     if (dataset_one[dataset_one.length-1].value != null && dataset_one[0].value > dataset_one[dataset_one.length-1].value) {
                       return "#D76106"
-                    } else {
+                    } else if (dataset_one[dataset_one.length-1].value != null && dataset_one[0].value < dataset_one[dataset_one.length-1].value) {
                       return "#0072b5"
+                    } else {
+                      return "#c2c2c2"
                     }
                   } else {
                     return ["#27566b","#007b82"][i%2]
@@ -894,12 +1034,12 @@ export const object = {
          }
        })
        if (isNaN(+val_extent[0])) {
-        console.log("No max/min")
+        return
        } else {
         arr_text.push({"value":val_extent[1],"date":maxValValues["date"],"rendered":maxValValues["rendered"]})
         arr_text.push({"value":val_extent[0],"date":minValValues["date"],"rendered":minValValues["rendered"]})
 
-       if (config.display_values == true) {
+       if (config.display_values == "true") {
          var filter = group.append("defs")
             .append("filter")
             .attr("id", "blur")
@@ -988,7 +1128,7 @@ export const object = {
           }
        
        }
-
+        
         if (where_values.length > 1 ) {
 
 
@@ -1012,7 +1152,7 @@ export const object = {
               y2.domain([col_two_min,config.y_axis_upper_second])
             }
         x.domain([parseTime(dataset_two[0].date), parseTime(dataset_two[dataset_two.length-1].date)]).range([0,width_first - margin.left - margin.right])
-        y2.range([height_first - margin.top - margin.bottom,0])
+        y2.range([height_second - margin.top - margin.bottom,0])
       const line2 = d3.line()
           .defined(function(d) {
             return d.value != null
@@ -1057,12 +1197,18 @@ export const object = {
           .append('path')
           .attr("d", d3.symbol().type(d3.symbolTriangle).size(30))
 
-        if (dataset_two[dataset_two.length-1].value < dataset_two[dataset_two.length-2].value) {
-          tri_two.attr("transform",  "rotate(180)")
-          .style("fill", "#D76106");
-        } else {
-          tri_two
-            .style("fill", "#0072b5");
+        if (config.directionality == "true") {  
+            if (dataset_two[dataset_two.length-1].value < dataset_two[dataset_two.length-2].value) {
+              tri_two.attr("transform",  "rotate(180)")
+              .style("fill", "#D76106");
+            } else if (dataset_two[dataset_two.length-1].value > dataset_two[dataset_two.length-2].value) {
+              tri_two
+                .style("fill", "#0072b5");
+            }
+          } else {
+          if (dataset_two[dataset_two.length-1].value < dataset_two[dataset_two.length-2].value) {
+            tri_two.attr("transform",  "rotate(180)");
+          }
         }
 
 
@@ -1072,32 +1218,36 @@ export const object = {
               .attr("class", "line")
               .attr("d", line2)
               .attr("stroke", (d)=>{
-                if (config.directionality == true) {
+                if (config.directionality == "true") {
                   if (dataset_two[dataset_two.length-1].value != null && dataset_two[0].value > dataset_two[dataset_two.length-1].value) {
                     return "#D76106"
-                  } else {
+                  } else if (dataset_two[dataset_two.length-1].value != null && dataset_two[0].value < dataset_two[dataset_two.length-1].value) {
                     return "#0072b5"
+                  } else {
+                    return "#c2c2c2"
                   }
                 } else {
                   return ["#27566b","#007b82"][i%2]
                 }
               });
 
-          group.selectAll(".dot")
+          group_two.selectAll(".dot-two")
               .data(dataset_two.filter(function(d, i) {
                   return d.value !== null
               }))
             .enter().append("circle")
-              .attr("class", "dot")
+              .attr("class", "dot-two")
               .attr("cx", line2.x())
               .attr("cy", line2.y())
               .attr("r", 1)
               .attr("fill", (d)=>{
-                if (config.directionality == true) {
+                if (config.directionality == "true") {
                   if (dataset_two[dataset_two.length-1].value != null && dataset_two[0].value > dataset_two[dataset_two.length-1].value) {
                     return "#D76106"
-                  } else {
+                  } else if (dataset_two[dataset_two.length-1].value != null && dataset_two[0].value < dataset_two[dataset_two.length-1].value) {
                     return "#0072b5"
+                  } else {
+                    return "#c2c2c2"
                   }
                 } else {
                   return ["#27566b","#007b82"][i%2]
@@ -1110,22 +1260,26 @@ export const object = {
               .attr("class", "area")
               .attr("d", area2)
               .attr("stroke", (d)=>{
-                if (config.directionality == true) {
+                if (config.directionality == "true") {
                   if (dataset_two[dataset_two.length-1].value != null && dataset_two[0].value > dataset_two[dataset_two.length-1].value) {
                     return "#D76106"
-                  } else {
+                  } else if (dataset_two[dataset_two.length-1].value != null && dataset_two[0].value < dataset_two[dataset_two.length-1].value) {
                     return "#0072b5"
+                  } else {
+                    return "#c2c2c2"
                   }
                 } else {
                   return ["#27566b","#007b82"][i%2]
                 }
               })
               .attr("fill", (d)=>{
-                if (config.directionality == true) {
+                if (config.directionality == "true") {
                   if (dataset_two[dataset_two.length-1].value != null && dataset_two[0].value > dataset_two[dataset_two.length-1].value) {
                     return "#D76106"
-                  } else {
+                  } else if (dataset_two[dataset_two.length-1].value != null && dataset_two[0].value < dataset_two[dataset_two.length-1].value) {
                     return "#0072b5"
+                  } else {
+                    return "#c2c2c2"
                   }
                 } else {
                   return ["#27566b","#007b82"][i%2]
@@ -1153,11 +1307,13 @@ export const object = {
                     return Math.abs(y2(d.value) - y2(0));
                 })
                 .attr("fill", (d)=>{
-                  if (config.directionality == true) {
+                  if (config.directionality == "true") {
                     if (dataset_two[dataset_two.length-1].value != null && dataset_two[0].value > dataset_two[dataset_two.length-1].value) {
                       return "#D76106"
-                    } else {
+                    } else if (dataset_two[dataset_two.length-1].value != null && dataset_two[0].value < dataset_two[dataset_two.length-1].value) {
                       return "#0072b5"
+                    } else {
+                      return "#c2c2c2"
                     }
                   } else {
                     return ["#27566b","#007b82"][i%2]
@@ -1185,12 +1341,12 @@ export const object = {
          }
        })
        if (isNaN(+val_extent_two[0])) {
-        console.log("")
+        return
        } else {
         arr_text_two.push({"value":val_extent_two[1],"date":maxValValues_two["date"],"rendered":maxValValues_two["rendered"]})
         arr_text_two.push({"value":val_extent_two[0],"date":minValValues_two["date"],"rendered":minValValues_two["rendered"]})
 
-       if (config.display_values == true) {
+       if (config.display_values == "true") {
          var filter_two = group_two.append("defs")
             .append("filter")
             .attr("id", "blur_two")
@@ -1284,17 +1440,14 @@ export const object = {
 
       }
     }
-      createTable(final_dimensions)
+      createTable(column_headers)
+      console.log("finished createTable")
 
-      drawOnTable(final_dimensions)
+      drawOnTable(column_headers)
+      console.log("finished drawOnTable")
  
         } catch(error) {
-            if (environment == "prod") {
-              console.log(error)
-            } else {
                 console.log(error)
-            }
-            
         }
       }
 

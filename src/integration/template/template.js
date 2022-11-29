@@ -100,7 +100,7 @@ keys.forEach(function(entry, i) {
 })
 
 
-d3.json("http://localhost:3001/dataMCSmap2").then(function(data) {
+d3.json("http://localhost:3001/dataMCSmap2").then(function(data) { //dataMCSmap2 dataSparklineWorks
 	let todays_options = {}
 
 	$('input:radio:checked').each(function() {
