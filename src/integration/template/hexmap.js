@@ -112,6 +112,8 @@ export const object = {
     try {
 
         // map chart setup ----------------------------------------------------------
+        let SELECTED_RANGE;
+
         let margin = {
             top: 10,
             right: 10,
@@ -296,11 +298,11 @@ export const object = {
 
             let extent = null;
 
-            console.log("extent", extent)
+            // console.log("extent", extent)
 
             function brushing(extent) {
                 extent = d3.event.selection;
-                console.log("brushing extent", extent)
+                // console.log("brushing extent", extent)
 
                 if (extent) {
                     dots
@@ -311,62 +313,60 @@ export const object = {
                 } 
             }
 
-            function brushed(extent) {
-                extent = d3.event.selection;
-                console.log("brush extent", extent)
+            function brushed(extentArg) {
+                const extent = d3.event.selection;
 
+                // if there is an extent, use it, otherwise use the extentArg, which is from the rect button function
+                let extentActual = extent !== undefined ? extent : extentArg;
+                console.log("extentActual", extentActual)             
+
+                // let brushRect = d3.select(`rect.selection[style="display: none;"]`)
+                // console.log("brushRect", brushRect)
+
+                // determine which button is currently pressed by text color
                 const selectedDirection = d3.select(`text[fill="white"]`).attr("class")
+                console.log("selectedDirection", selectedDirection)
 
-                // d3.selectAll(".map-background").remove()
-                // d3.selectAll(".innerhex").remove()
-                // d3.selectAll(".hex").remove()
+                if (extentActual) {
+                    SELECTED_RANGE = extentActual
+                    console.log("SELECTED_RANGE", SELECTED_RANGE)
 
-                if (extent) {
-                    // dots
-                    //     .attr('fill-opacity', d => {
-                    //         const bool = xScale(monthAccessor(d)) >= extent[0] && xScale(monthAccessor(d)) <= extent[1];
-                    //         return bool ? 1.0 : 0.0;
-                    //     })
+                    // let monthsSelected = d3.select("#second").select(".group").selectAll(`circle[fill-opacity="1"]`)
 
-                    let startDate = xScale.invert(extent[0])
-                    let endDate = xScale.invert(extent[1])
+                    // let endDate2 = monthsSelected["_groups"][0][0]["__data__"]['month']
+
+                    // const circleCount = monthsSelected["_groups"][0]["length"]
+                    // let startDate2 = monthsSelected["_groups"][0][circleCount - 1]["__data__"]["month"]
+
+                    // console.log("HTML DATES", startDate2, circleCount, endDate2)
+
+                    let startDateExact = xScale.invert(SELECTED_RANGE[0])
+                    let endDateExact = xScale.invert(SELECTED_RANGE[1])
+                    let startDate = new Date(startDateExact.getFullYear(), startDateExact.getMonth() + 1, 1)
+                    let endDate = new Date(endDateExact.getFullYear(), endDateExact.getMonth() + 1, 0)
+
+                    console.log("CALC DATES", startDate, endDate, startDate.getTime(), endDate.getTime())
 
                     let data_map;
                     if (selectedDirection != "All") {
-                        data_map = data_ready.filter(function(d) {
-                            return d.month.getTime() >= startDate.getTime() && d.month.getTime() <= endDate.getTime()
-                        })
-                    } else {
+                        console.log("NOT ALL")
                         data_map = data_ready.filter(function(d) {
                             return d.month.getTime() >= startDate.getTime() && d.month.getTime() <= endDate.getTime() && d.direction === selectedDirection
                         })
+                    } else {
+                        console.log("ALL")
+                        data_map = data_ready.filter(function(d) {
+                            return d.month.getTime() >= startDate.getTime() && d.month.getTime() <= endDate.getTime() 
+                        })
                     }
-
-                    console.log("remove nation-group")
-                    const nationGroup = d3.selectAll(".nation-group")
-                    nationGroup.remove()   
-                    console.log("any nation-group elements", d3.selectAll(".nation-group"))                 
-
-                    const legendTexts = d3.selectAll(".legend")
-                    legendTexts.remove()
 
                     console.log("data_map", data_map)
                     createHexMap(data_map)
 
                 } else {
+                    SELECTED_RANGE = undefined;
                     dots
                         .attr('fill-opacity', 0.0)
-
-                    console.log("remove nation-group")
-                    const nationGroup = d3.selectAll(".nation-group")
-                    nationGroup.remove()  
-                    console.log("any nation-group elements", d3.selectAll(".nation-group"))  
-
-    //                 d3.select(".chart").select("svg");
-    // svg.selectAll(".x.axis").remove()
-
-                    const legendTexts = d3.selectAll(".legend")
-                    legendTexts.remove()
 
                     let data_map;
                     if (selectedDirection != "All") {
@@ -383,8 +383,8 @@ export const object = {
             }
 
             function rectClick(clickedElement) {
-                console.log("clickedElement", clickedElement)
-                console.log("clickedElement class", clickedElement.attr("class"))
+                // console.log("clickedElement", clickedElement)
+                // console.log("clickedElement class", clickedElement.attr("class"))
 
                 const thisClass = clickedElement.attr("class")
 
@@ -410,7 +410,9 @@ export const object = {
                     }
                 })
 
-                brushed()
+                console.log("RECTCLICK SELECTED_RANGE", SELECTED_RANGE)
+
+                brushed(SELECTED_RANGE)
 
             }
 
@@ -511,13 +513,19 @@ export const object = {
                 })
 
 
-            console.log("select chosen one", d3.select(`text[fill="white"]`).attr("class"))
+            // console.log("select chosen one", d3.select(`text[fill="white"]`).attr("class"))
             
 
             // ---------------------------------------------------------------------
             // HexGrid Map
 
             function createHexMap(mapdata) {
+                // remove DOM elements
+                d3.select(".legendContainer").remove()
+                d3.select(".nation-group").remove()
+                d3.select(".outer-hexs").remove()
+                d3.select(".inner-hexs").remove()
+
                 const projection = d3.geoAlbersUsa()
                     .fitSize([width, height], topojson.feature(mdata, mdata.objects.nation))
 
@@ -528,11 +536,7 @@ export const object = {
                 const nation = group
                     .append('g')
                     .attr("class", "nation-group")
-                    // .attr("stroke", "lightgrey")
-                    // .attr("stroke-width", 0.5)
-                    .attr("fill", "black")
-                    .attr("opacity", .20)
-                    // .attr("fill", "#f9f9f9")
+                    .attr("fill", "#f9f9f9")
                     .selectAll("path")
                     .data(topojson.feature(mdata, mdata.objects.nation).features)
                     .enter()
@@ -546,6 +550,7 @@ export const object = {
                     d.y = coords[1]
                 })
 
+                // define hexgrid
                 const hexgrid = d3.hexgrid()
                     .extent([width, height])
                     .geography(topojson.feature(mdata, mdata.objects.nation))
@@ -557,7 +562,7 @@ export const object = {
 
                 const hex = hexgrid(mapdata, ["volume", "rate", "direction", "month"])
 
-                // console.log("grid", hex.grid)
+                console.log("grid", hex.grid)
                 // console.log("pointdensity points", [...hex.grid.extentPointDensity].reverse())
                     
                 const totalVolumes = []
@@ -574,6 +579,7 @@ export const object = {
                         })
 
                         const avg = rateList.reduce((a,b) => a + b) / rateList.length;
+
                         averageRates.push(avg)
                         d.rate = avg
                     } else {
@@ -583,14 +589,12 @@ export const object = {
                     totalVolumes.push(vol)
                 })
 
-                // console.log("totvolume", hex.grid.layout)
-                // console.log("totalVolumes", totalVolumes)
-                // console.log("extent", d3.extent(totalVolumes))
-                // console.log("averageRates", averageRates)
-                // console.log("extent", d3.extent(averageRates))
+                // console.log("AVERAGE RATES MIN/MAX", Math.min(...averageRates), Math.max(...averageRates))
+
 
                 // plot empty hexagons for only areas that have data
                 const grid = group.append('g')
+                    .attr("class", "outer-hexs")
                     .selectAll('.hex')
                     .data(hex.grid.layout)
                     .enter()
@@ -629,6 +633,7 @@ export const object = {
 
                 const innerHexs = group
                     .append('g')
+                    .attr("class", "inner-hexs")
                     .selectAll('.innerhex')
                     .data(hex.grid.layout)
                     .enter()
@@ -654,6 +659,8 @@ export const object = {
                         return scale(x)
                     }
                 })()
+
+                console.log("INNERHEXSCALE ORIGINAL DOMAIN", innerHexScale.domain())
 
                 const legendContainer = group.append("g")
                     .attr("transform", `translate(${width / 4},${height + 10})`)

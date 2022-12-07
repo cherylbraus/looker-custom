@@ -62,16 +62,9 @@ export const object = {
           label: "Disable last period display",
           default:"false"
         },
-        y_axis_scale_fixed: {
-          section: "Y",
-          order: 1,
-          type: "boolean",
-          label: "Use Same Y-Scale",
-          default: "false",
-        },
         y_axis_lower_first: {
           section: "Y",
-          order:2,
+          order:1,
           type: "string",
           display: "text",
           label: "Lower Y-Axis Bound",
@@ -80,7 +73,7 @@ export const object = {
         },
         y_axis_upper_first: {
           section: "Y",
-          order:3,
+          order:2,
           type: "string",
           display: "text",
           label: "Upper Y-Axis Bound",
@@ -89,7 +82,7 @@ export const object = {
         },
         y_axis_lower_second: {
           section: "Y",
-          order:4,
+          order:3,
           type: "string",
           display: "text",
           label: "Lower Y-Axis Bound (Second Chart)",
@@ -98,7 +91,7 @@ export const object = {
         },
         y_axis_upper_second: {
           section: "Y",
-          order:5,
+          order:4,
           type: "string",
           display: "text",
           label: "Upper Y-Axis Bound (Second Chart)",
@@ -495,14 +488,14 @@ export const object = {
           return y(d.value);
         })
 
-  // console.log("here1")
+  console.log("here1")
 
   function createTable(data_insert,element) {
       // Clear out the previous charts/code if not removed to see the table
       $('#vis').contents(':not(style)').remove();
       const headings_dim = data_insert;
 
-      // console.log("headings_dim", headings_dim)
+      console.log("headings_dim", headings_dim)
 
       let html = '<table>';
 
@@ -549,12 +542,12 @@ export const object = {
           {html += '<th>' + this + '</th>';}
         }
       });
-      html += '</tr></thead>'; 
+      html += '</tr></thead>';
 
       // build table body
       html += '<tbody>';
 
-    // console.log("createTable 1")
+    console.log("createTable 1")
 
      if (queryResponse.has_totals == true) {
         let descriptor = ""
@@ -593,37 +586,37 @@ export const object = {
         }
       }
 
-      // console.log("createTable 2")
-      // console.log('DATA LINE 590', data)
+      console.log("createTable 2")
+      console.log('DATA LINE 590', data)
 
       // use the length of first array to determine how many rows
       for (let i = 0, len = data.length; i < len; i++) {
-        // console.log("i 594", i)
+        console.log("i 594", i)
         html += '<tr><td class="table-index">' + (i + 1) + '</td>';
         // build each cell using the heading's ith element
         $.each(headings_dim, function () {
 
-          // console.log("THIS", this)
+          console.log("THIS", this)
 
-          // console.log("createTable 3")
+          console.log("createTable 3")
 
           // Add the chart columns
           if (this == "chart_column") {
-            // console.log("CHART COLUMN - 4")
+            console.log("CHART COLUMN - 4")
 
             const chart_id = "chart_column-" + i
             
             html += '<td class="no-padding"><div class="chart_column" id=' + chart_id + '></div></td>';
 
           } else if (this == "second_chart_column") {
-            // console.log("SECOND CHART COLUN - 5")
+            console.log("SECOND CHART COLUN - 5")
 
             const chart_id = "second_chart_column-" + i
             
             html += '<td class="no-padding"><div class="second_chart_column" id=' + chart_id + '></div></td>';
 
           } else if (this == "last_week_column") {
-            // console.log("LAST WEEK COLUMN - 6")
+            console.log("LAST WEEK COLUMN - 6")
 
             // Add section for triangle up/down trends
 
@@ -632,16 +625,16 @@ export const object = {
             let direction_icon;
 
             let date_keys = Object.keys(data[i][measures[where_values[0]].name])
-            // console.log("date_keys pre", date_keys)
+            console.log("date_keys pre", date_keys)
 
             date_keys = date_keys.filter((entry)=>{
               return entry[0] != "$"
             })
-            // console.log("date_keys", date_keys)
+            console.log("date_keys", date_keys)
 
             let last_week_data;
 
-            // console.log("test", data[i][measures[where_values[0]].name])
+            console.log("test", data[i][measures[where_values[0]].name])
 
             if (data[i][measures[where_values[0]].name][date_keys[date_keys.length-1]]["value"] != null) {
               if (data[i][measures[where_values[0]].name][date_keys[date_keys.length-1]]["rendered"]) {
@@ -668,7 +661,7 @@ export const object = {
             html += '<td class="triangle-flex"><div class=' + last_week_class + ' id=' + last_week_id + '><div class="change-figure">' + last_week_data + '</div>' + direction_icon + '</div></td>';
 
           } else if (this == "second_last_week_column") {
-            // console.log("SECOND LAST WEEK COLUMN - 7")
+            console.log("SECOND LAST WEEK COLUMN - 7")
 
             const last_week_id = "second_last_week_column-" + i
             let last_week_class;
@@ -706,29 +699,29 @@ export const object = {
             html += '<td class="triangle-flex"><div class=' + last_week_class + ' id=' + last_week_id + '><div class="change-figure">' + last_week_data + '</div>' + direction_icon + '</div></td>';
 
           } else if (this.split("-")[0] == "row_total_heading") {
-            // console.log("ROW TOTAL HEADING - 8")
-            // console.log("data", this.split("-"))
-            // console.log("data", data[i])
-            // console.log("data", data[i][measures[this.split("-")[1]]["name"]])
+            console.log("ROW TOTAL HEADING - 8")
+            console.log("data", this.split("-"))
+            console.log("data", data[i])
+            console.log("data", data[i][measures[this.split("-")[1]]["name"]])
 
             if (data[i][measures[this.split("-")[1]]["name"]]["$$$_row_total_$$$"]["value"]) {
-              // console.log("ROW TOTAL HEADING - 8a - VALUE")
+              console.log("ROW TOTAL HEADING - 8a - VALUE")
               if (data[i][measures[this.split("-")[1]]["name"]]["$$$_row_total_$$$"]["rendered"]) {
-                // console.log("ROW TOTAL HEADING - 8b - RENDERED")
+                console.log("ROW TOTAL HEADING - 8b - RENDERED")
                 html += '<td class="value-even">' + data[i][measures[this.split("-")[1]]["name"]]["$$$_row_total_$$$"]["rendered"] + '</td>';
               } else {
-                // console.log("ROW TOTAL HEADING - 8c - NO RENDERED, SO USE VALUE")
+                console.log("ROW TOTAL HEADING - 8c - NO RENDERED, SO USE VALUE")
                 html += '<td class="value-even">' + data[i][measures[this.split("-")[1]]["name"]]["$$$_row_total_$$$"]["value"] + '</td>';
               }
             } else {
-              // console.log("ROW TOTAL HEADING - 8d - NO VALUE/RENDERED")
-              // console.log(this, " has no values to display")
+              console.log("ROW TOTAL HEADING - 8d - NO VALUE/RENDERED")
+              console.log(this, " has no values to display")
             }
 
-            // console.log("ROW TOTAL HEADING - 8 - DONE")
+            console.log("ROW TOTAL HEADING - 8 - DONE")
             
           } else {
-            // console.log("SOMETHING ELSE - 9")
+            console.log("SOMETHING ELSE - 9")
 
             if (data[i][this]["rendered"]) {
               html += '<td>' + data[i][this]["rendered"] + '</td>';
@@ -765,99 +758,93 @@ export const object = {
     function drawOnTable(data_insert,element) {
       console.log('STARTING DRAWONTABLE')
       if (config.size_to_fit == "true") {
-        // console.log("true")
+        console.log("true")
         $("table").addClass("size-to-fit")
       } else {
         $("table").removeClass("size-to-fit")
       }
-
+      // Check on element height and width to test responsiveness using getBoundingClientRect
       let width_first;
       let height_first;
+      if (config.where_chart.length > 0){ 
+        const node_get_width = d3.select("#chart_column-0")
+        const new_node_width = node_get_width.select(function() { return this.parentNode; })
+        width_first = new_node_width.node().getBoundingClientRect().width
+        console.log("check width of 1st", node_get_width, new_node_width, width_first)
+      } 
+
+      if (config.where_chart.length > 0){ 
+        const node_get_height = d3.select("#chart_column-0")
+        const new_node_height = node_get_height.select(function() { return this.parentNode; })
+        height_first = new_node_height.node().getBoundingClientRect().height
+        console.log("check height of 1st", node_get_height, new_node_height, height_first)
+      } 
+
       let width_second;
       let height_second;
+      if (config.where_chart.length > 1){ 
+        const node_get_width_2 = d3.select("#second_chart_column-0")
+        const new_node_width_2 = node_get_width_2.select(function() { return this.parentNode; })
+        width_second = new_node_width_2.node().getBoundingClientRect().width
 
-      // DETERMINE HEIGHT OF EACH SVG IS BASED ON FIRST ROW HEIGHT IF SINGLE Y-SCALE
-      if (config.y_axis_scale_fixed == "true") {   
-        if (config.where_chart.length > 0){ 
-          const node_get_width = d3.select("#chart_column-0")
-          const new_node_width = node_get_width.select(function() { return this.parentNode; })
-          width_first = new_node_width.node().getBoundingClientRect().width
-          // console.log("check width of 1st", node_get_width, new_node_width, width_first)
-        } 
+      } 
+      if (config.where_chart.length > 1){ 
+        const node_get_height_2 = d3.select("#second_chart_column-0")
+        const new_node_height_2 = node_get_height_2.select(function() { return this.parentNode; })
+        height_second = new_node_height_2.node().getBoundingClientRect().height
+      } 
 
-        if (config.where_chart.length > 0){ 
-          const node_get_height = d3.select("#chart_column-0")
-          const new_node_height = node_get_height.select(function() { return this.parentNode; })
-          height_first = new_node_height.node().getBoundingClientRect().height
-          // console.log("check height of 1st", node_get_height, new_node_height, height_first)
-        } 
-        
-        if (config.where_chart.length > 1){ 
-          const node_get_width_2 = d3.select("#second_chart_column-0")
-          const new_node_width_2 = node_get_width_2.select(function() { return this.parentNode; })
-          width_second = new_node_width_2.node().getBoundingClientRect().width
-
-        } 
-        if (config.where_chart.length > 1){ 
-          const node_get_height_2 = d3.select("#second_chart_column-0")
-          const new_node_height_2 = node_get_height_2.select(function() { return this.parentNode; })
-          height_second = new_node_height_2.node().getBoundingClientRect().height
-        }
-        console.log("WIDTHS/HEIGHTS SINGLE", width_first, height_first, width_second, height_second) 
-      }
+      console.log("WIDTHS/HEIGHTS", width_first, height_first, width_second, height_second)
 
       // Get max and min for both the first and second chart columns
       let col_one_max
       let col_one_min
       let col_two_max
       let col_two_min
-
       if (where_values.length < 1) {
         return
       } else {
-        // FIND Y AXIS MIN AND MAX ACROSS ALL DATA TO CREATE SINGLE Y-SCALE
-        if (config.y_axis_scale_fixed == "true") {
-          for (let j = 0, len = data.length; j < len; j++) {
-            let dataset_one = []
-  
-            let dataset_one_keys = Object.keys(data[j][measures[where_values[0]].name])
-            // console.log("dataset_one_keys", dataset_one_keys)
-  
-            dataset_one_keys.forEach((entry)=>{
-              if (entry[0] != "$") {
-                dataset_one.push({date:entry,value:data[j][measures[where_values[0]].name][entry]["value"]})
-              }
-            })
-            // console.log("dataset_one_keys done", dataset_one_keys)
-  
-            col_one_max = d3.max([col_one_max,d3.max(dataset_one,(ent)=>{
-              return ent.value
-            })])
-  
-            col_one_min = d3.min([col_one_min,d3.min(dataset_one,(ent)=>{
-              return ent.value
-            })])
-  
-            if (where_values.length > 1) {
-              let dataset_two = []
-  
-              let dataset_two_keys = Object.keys(data[j][measures[where_values[1]].name])
-              dataset_two_keys.forEach((entry)=>{
-                if (entry[0] != "$") {
-                  dataset_two.push({date:entry,value:data[j][measures[where_values[1]].name][entry]["value"]})
-                }
-              })
-  
-              col_two_max = d3.max([col_two_max,d3.max(dataset_two,(ent)=>{
-                return ent.value
-              })])
-              col_two_min = d3.min([col_two_min,d3.min(dataset_two,(ent)=>{
-                return ent.value
-              })])
+      for (let j = 0, len = data.length; j < len; j++) {
+        let dataset_one = []
+
+        let dataset_one_keys = Object.keys(data[j][measures[where_values[0]].name])
+        // console.log("dataset_one_keys", dataset_one_keys)
+
+        dataset_one_keys.forEach((entry)=>{
+          if (entry[0] != "$") {
+            dataset_one.push({date:entry,value:data[j][measures[where_values[0]].name][entry]["value"]})
+          }
+        })
+        // console.log("dataset_one_keys done", dataset_one_keys)
+
+        col_one_max = d3.max([col_one_max,d3.max(dataset_one,(ent)=>{
+          return ent.value
+        })])
+
+        col_one_min = d3.min([col_one_min,d3.min(dataset_one,(ent)=>{
+          return ent.value
+        })])
+
+        if (where_values.length > 1) {
+          let dataset_two = []
+
+          let dataset_two_keys = Object.keys(data[j][measures[where_values[1]].name])
+          dataset_two_keys.forEach((entry)=>{
+            if (entry[0] != "$") {
+              dataset_two.push({date:entry,value:data[j][measures[where_values[1]].name][entry]["value"]})
             }
-          } 
+          })
+
+          col_two_max = d3.max([col_two_max,d3.max(dataset_two,(ent)=>{
+            return ent.value
+          })])
+          col_two_min = d3.min([col_two_min,d3.min(dataset_two,(ent)=>{
+            return ent.value
+          })])
         }
-        
+      }
+
+
       for (let i = 0, len = data.length; i < len; i++) {
         let dataset_one = []
 
@@ -870,49 +857,7 @@ export const object = {
           
         })
 
-        // FIND ROW'S SVG HEIGHT BASED ON ROW FOR VARIABLE Y-SCALES
-        if (config.y_axis_scale_fixed == "false") {
-          if (config.where_chart.length > 0){ 
-            const node_get_width = d3.select(`#chart_column-${i}`)
-            const new_node_width = node_get_width.select(function() { return this.parentNode; })
-            width_first = new_node_width.node().getBoundingClientRect().width
-            // console.log("check width of 1st", node_get_width, new_node_width, width_first)
-          } 
-  
-          if (config.where_chart.length > 0){ 
-            const node_get_height = d3.select(`#chart_column-${i}`)
-            const new_node_height = node_get_height.select(function() { return this.parentNode; })
-            height_first = new_node_height.node().getBoundingClientRect().height
-            // console.log("check height of 1st", node_get_height, new_node_height, height_first)
-          } 
-          
-          if (config.where_chart.length > 1){ 
-            const node_get_width_2 = d3.select(`#second_chart_column-${i}`)
-            const new_node_width_2 = node_get_width_2.select(function() { return this.parentNode; })
-            width_second = new_node_width_2.node().getBoundingClientRect().width
-  
-          } 
-          if (config.where_chart.length > 1){ 
-            const node_get_height_2 = d3.select(`#second_chart_column-${i}`)
-            const new_node_height_2 = node_get_height_2.select(function() { return this.parentNode; })
-            height_second = new_node_height_2.node().getBoundingClientRect().height
-          }
-          console.log("WIDTHS/HEIGHTS VARIABLE", width_first, height_first, width_second, height_second)
-        }
-
-        // FIND SINGLE ROW'S Y MIN AND MAX FOR VARIABLE Y-SCALES
-        if (config.y_axis_scale_fixed == "false") {
-          col_one_max = d3.max(dataset_one,(ent)=>{
-            return ent.value
-          })
-  
-          col_one_min = d3.min(dataset_one,(ent)=>{
-            return ent.value
-          })
-        }
-
-        // console.log("dataset_one 2nd time", i, dataset_one)
-        // console.log("min/max", col_one_min, col_one_max)
+        console.log("dataset_one 2nd time", dataset_one)
 
         // HERE IS WHERE TO SET THE INDIVIDUAL Y AXIS DOMAINS
 
@@ -935,10 +880,10 @@ export const object = {
         const svg = d3.select(chart_id_grabber).append('svg')
                 .html('')
                 .attr('width', width_first)
-                .attr('height', height_first) 
+                .attr('height', height_first)
                 .classed('first-svg', true)
 
-        const group = svg.append('g') 
+        const group = svg.append('g')
               .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
               .attr("width", width_first - margin.left - margin.right)
               .attr("height", height_first - margin.top - margin.bottom)
