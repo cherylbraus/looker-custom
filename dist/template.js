@@ -21035,7 +21035,7 @@ var handleErrors = function (vis, res, options) {
         && check('mes-req', 'Measure', measures.length, options.min_measures, options.max_measures));
 };
 
-// CONCATENATED MODULE: ./src/integration/template/sparklines.js
+// CONCATENATED MODULE: ./src/integration/template/sparklines_mid.js
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -21053,7 +21053,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 
 
-var sparklines_object = {
+var sparklines_mid_object = {
   // Id and Label are legacy properties that no longer have any function besides documenting
   // what the visualization used to have. The properties are now set via the manifest
   // form within the admin/visualizations page of Looker.
@@ -22294,24 +22294,24 @@ var template_done = function done() {
 
 var menuOptions = "<div id='menu'><h1><strong>Menu</strong></h1><div id='menu-options'></div></div></div>";
 jquery("body").append(menuOptions);
-var template_keys = Object.keys(sparklines_object.options);
-console.log("object.options", sparklines_object.options);
-console.log("Object", Object.keys(sparklines_object.options));
+var template_keys = Object.keys(sparklines_mid_object.options);
+console.log("object.options", sparklines_mid_object.options);
+console.log("Object", Object.keys(sparklines_mid_object.options));
 console.log("keys", template_keys);
 template_keys.forEach(function (entry, i) {
-  var array_name = sparklines_object.options[entry].label;
+  var array_name = sparklines_mid_object.options[entry].label;
   jquery("#menu-options").append("<p>" + array_name + "</p>");
   var form = jquery('<form>', {
     id: 'id-1',
     "class": 'menu-options-entry'
   }).appendTo('#menu-options'); // console.log("display", object.options[entry].display, ["radio","select"].includes(object.options[entry].display))
 
-  if (["radio", "select"].includes(sparklines_object.options[entry].display)) {
-    var array_values = sparklines_object.options[entry].values;
+  if (["radio", "select"].includes(sparklines_mid_object.options[entry].display)) {
+    var array_values = sparklines_mid_object.options[entry].values;
     array_values.forEach(function (ent) {
       var str;
 
-      if (ent[Object.keys(ent)[0]] == sparklines_object.options[entry]["default"]) {
+      if (ent[Object.keys(ent)[0]] == sparklines_mid_object.options[entry]["default"]) {
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent[Object.keys(ent)] + "' id='" + Object.keys(ent)[0] + "' name='" + array_name + "' value='" + Object.keys(ent)[0] + "' checked></input><label class='form-label' for='" + Object.keys(ent)[0] + "'>" + Object.keys(ent)[0] + "</label>";
       } else {
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent[Object.keys(ent)] + "' id='" + Object.keys(ent)[0] + "' name='" + array_name + "' value='" + Object.keys(ent)[0] + "'></input><label class='form-label' for='" + Object.keys(ent)[0] + "'>" + Object.keys(ent)[0] + "</label>";
@@ -22319,22 +22319,22 @@ template_keys.forEach(function (entry, i) {
 
       form.append(str);
     });
-  } else if (sparklines_object.options[entry].display == "number") {
+  } else if (sparklines_mid_object.options[entry].display == "number") {
     var str;
-    str = "<input type='number' internal_cat='" + template_keys[i] + "' internal_value='" + sparklines_object.options[entry]["default"] + "' id='" + template_keys[i] + "' min='0' name='" + sparklines_object.options[entry]["label"] + "' value='" + sparklines_object.options[entry]["default"] + "'></input><label class='form-label' for='" + sparklines_object.options[entry]["label"] + "'>" + sparklines_object.options[entry]["label"] + "</label>";
+    str = "<input type='number' internal_cat='" + template_keys[i] + "' internal_value='" + sparklines_mid_object.options[entry]["default"] + "' id='" + template_keys[i] + "' min='0' name='" + sparklines_mid_object.options[entry]["label"] + "' value='" + sparklines_mid_object.options[entry]["default"] + "'></input><label class='form-label' for='" + sparklines_mid_object.options[entry]["label"] + "'>" + sparklines_mid_object.options[entry]["label"] + "</label>";
     form.append(str);
-  } else if (sparklines_object.options[entry].display == "text") {
+  } else if (sparklines_mid_object.options[entry].display == "text") {
     var _str;
 
-    _str = "<input type='text' internal_cat='" + template_keys[i] + "' internal_value='" + sparklines_object.options[entry]["default"] + "' id='" + template_keys[i] + "' name='" + sparklines_object.options[entry]["label"] + "' value='" + sparklines_object.options[entry]["default"] + "'></input><label class='form-label' for='" + sparklines_object.options[entry]["label"] + "'>" + sparklines_object.options[entry]["label"] + "</label>";
+    _str = "<input type='text' internal_cat='" + template_keys[i] + "' internal_value='" + sparklines_mid_object.options[entry]["default"] + "' id='" + template_keys[i] + "' name='" + sparklines_mid_object.options[entry]["label"] + "' value='" + sparklines_mid_object.options[entry]["default"] + "'></input><label class='form-label' for='" + sparklines_mid_object.options[entry]["label"] + "'>" + sparklines_mid_object.options[entry]["label"] + "</label>";
     form.append(_str);
-  } else if (sparklines_object.options[entry].type == "boolean") {
+  } else if (sparklines_mid_object.options[entry].type == "boolean") {
     var _array_values = ["true", "false"];
 
     _array_values.forEach(function (ent) {
       var str;
 
-      if (ent == sparklines_object.options[entry]["default"]) {
+      if (ent == sparklines_mid_object.options[entry]["default"]) {
         // console.log("adding default")
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent + "' id='" + template_keys[i] + "' name='" + array_name + "' value='" + ent + "' checked></input><label class='form-label' for ='" + ent + "'>" + ent + "</label>";
       } else {
@@ -22344,8 +22344,8 @@ template_keys.forEach(function (entry, i) {
 
       form.append(str);
     });
-  } else if (sparklines_object.options[entry].type == "array") {
-    var _array_values2 = sparklines_object.options[entry]["default"]; // console.log("array_values", array_values)
+  } else if (sparklines_mid_object.options[entry].type == "array") {
+    var _array_values2 = sparklines_mid_object.options[entry]["default"]; // console.log("array_values", array_values)
 
     _array_values2.forEach(function (ent) {
       var str; // console.log("ent", ent)
@@ -22380,26 +22380,26 @@ json("http://localhost:3001/dataSparklineWorks").then(function (data) {
 
   var details = ""; // Fire first instance of chart
 
-  sparklines_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment); // On change to options, loop through selections and then redraw chart
+  sparklines_mid_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment); // On change to options, loop through selections and then redraw chart
 
   jquery('input:radio').on("click", function () {
     jquery('input:radio:checked').each(function () {
       todays_options[this.attributes.internal_cat.value] = this.attributes.internal_value.value;
     });
-    sparklines_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    sparklines_mid_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
   });
   jquery('input[type=number]').on("input", function () {
     // const id = $('input[type=number]').attr("id")
     var id = this.attributes.id.value;
     var num = jquery("#" + id).val();
     todays_options[this.attributes.internal_cat.value] = num;
-    sparklines_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    sparklines_mid_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
   });
   jquery('input[type=text]').on("input", function () {
     var id = this.attributes.id.value;
     var str = jquery("#" + id).val();
     todays_options[this.attributes.internal_cat.value] = str;
-    sparklines_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    sparklines_mid_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
   }); // Handle the mousedown event
   // that's triggered when user drags the resizer
 
@@ -22429,7 +22429,7 @@ json("http://localhost:3001/dataSparklineWorks").then(function (data) {
     // Remove the handlers of `mousemove` and `mouseup`
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
-    sparklines_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    sparklines_mid_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
   }; // Query all resizers
 
 
