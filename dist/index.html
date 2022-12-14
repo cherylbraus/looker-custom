@@ -263,6 +263,141 @@
             .backdrop {
               opacity: .5;
             }
+            
+            /* SPARKLINE STUFF */
+
+            .error-container {
+                    margin: 0;
+                    position: absolute;
+                    top: 50%;
+                    -ms-transform: translateY(-50%);
+                    transform: translateY(-50%);
+                    text-align:center;
+                    width:100%;
+                }
+                .error {
+                    font-family:Roboto;
+                    font-size:16px
+                }
+                .error-header {
+                    font-family:Roboto;
+                    font-weight:700;
+                    font-size:16px
+                }
+                .min-max-text-background {
+                    font-weight:700!important;
+                    font-family:Roboto;
+                }
+                .min-max-text-background_two {
+                    font-weight:700!important;
+                    font-family:Roboto;
+                }
+                .min-max-text {
+                    font-weight:700!important;
+                    font-family:Roboto;
+                }
+                .min-max-text_two {
+                    font-weight:700!important;
+                    font-family:Roboto;
+                }
+                .line {
+                    fill: none;
+                    stroke-width: 2px;
+                }
+                .null-val {
+                    color:#c2c2c2;
+                }
+                            /* design */
+                table {
+                    border-collapse:collapse;
+                    border:none;
+                    overflow-y:scroll;
+                    height:100%;
+                    font-size: 12px;
+                    display:block;
+                    text-align:left;
+                }
+                table td, table th {
+                    border: 1px solid #bec4c7;
+                }
+                th {
+                    padding: 8px 8px;
+                    background-color:#c2d3e0;
+                    font-family:Roboto;
+                    font-size:12px!important;
+                    font-weight:500;
+                }
+                th.stuck {
+                    position: sticky!important;
+                    top:0;
+                }
+                td {
+                    font-family:Roboto;
+                    font-size:12px!important;
+                    font-weight:400!important;
+                }
+                .table-index {
+                 text-align: right;
+                }
+
+                div[class^='chart_column'] {
+                  min-width: 120px!important;
+                  min-height: 70px!important;
+                  text-align:center;
+                }
+
+                /* .chart_column {
+                    min-width: 120px!important;
+                    min-height: 70px!important;
+                    text-align:center;
+                }
+                .second_chart_column {
+                    min-width: 120px!important;
+                    min-height: 70px!important;
+                    text-align:center;
+                } */
+                tr:first-child {
+                 font-weight:500
+                }
+                tr:nth-child(even) { 
+                    background: #f0f1f0; 
+                }
+                .value-down {
+                    color: #D76106;
+                    font-weight:500;
+                    display:flex;
+                    justify-content: center;
+                }
+                td:not(.no-padding) {
+                    padding: 0 8px;
+                }
+                .value-even {
+                    text-align:center;
+                }
+                .value-up {
+                    color: #0072b5;
+                    font-weight:500;
+                    display:flex;
+                    justify-content: center;
+                }
+                .value-up {
+                    color: #0072b5;
+                    font-weight:500;
+                    display:flex;
+                    justify-content: center;
+                }
+                .value-up.color-off {
+                    color: black;
+                }
+                .value-down.color-off {
+                    color: black;
+                }
+                .change-figure {
+                    line-height: 36px;
+                }
+                .insert-column {
+                    background-color:#9facb7;
+                }
 
             #vis {
   -webkit-touch-callout: none; /* iOS Safari */
@@ -309,7 +444,7 @@
         <body>
             <script src="https://unpkg.com/d3-hexgrid"></script>
             <script src="https://d3js.org/d3.v5.min.js"></script>
-            <script src="//d3js.org/topojson.v1.min.js"></script>
+            <script src="https://d3js.org/topojson.v1.min.js"></script>
             <script src="https://d3js.org/d3-hexbin.v0.2.min.js"></script>
             <!-- <script src="lodash.js"></script> -->
 

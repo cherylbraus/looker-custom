@@ -97,6 +97,8 @@ looker.plugins.visualizations.add({
             /* ---AXIS OPTIONS: END--- */
 
             </style>
+            <script src="https://d3js.org/topojson.v1.min.js"></script>
+            <script src="https://d3js.org/d3-hexbin.v0.2.min.js"></script>
 
             <svg id="first"></svg>
             <svg id="second"></svg>`;
