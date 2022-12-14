@@ -117,18 +117,18 @@ export const object = {
         let margin = {
             top: 10,
             right: 10,
-            bottom: 90,
+            bottom: 100,
             left: 10,
         }
 
         const width = element.clientWidth - margin.left - margin.right;
-        const height = element.clientHeight - margin.top - margin.bottom;
+        const height = (element.clientHeight * .7) - margin.top - margin.bottom;
 
         const svg = (
             d3.select(element).select('svg#first')
                 .html('')
                 .attr('width', '100%')
-                .attr('height', '100%')
+                .attr('height', '70%')
         )
 
         const group = svg.append('g')
@@ -139,20 +139,20 @@ export const object = {
 
         // line chart setup ----------------------------------------------------------
         let margin2 = {
-            top: 40,
+            top: 20,
             right: 40,
-            bottom: 40,
+            bottom: 20,
             left: 40,
         }
 
         const width2 = element.clientWidth - margin2.left - margin2.right;
-        const height2 = element.clientHeight - margin2.top - margin2.bottom;
+        const height2 = (element.clientHeight * .3) - margin2.top - margin2.bottom;
 
         const svg2 = (
             d3.select(element).select('svg#second')
                 .html('')
                 .attr('width', '100%')
-                .attr('height', '100%')
+                .attr('height', '30%')
         )
 
         const group2 = svg2.append('g')

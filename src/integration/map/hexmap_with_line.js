@@ -1,6 +1,7 @@
 import { text } from "d3";
 import { createIntersectionTypeNode, isWhiteSpaceLike } from "typescript";
 import * as d3 from 'd3'
+import * as d3hex from 'd3-hexgrid'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
 
@@ -97,8 +98,6 @@ looker.plugins.visualizations.add({
             /* ---AXIS OPTIONS: END--- */
 
             </style>
-            <script src="https://d3js.org/topojson.v1.min.js"></script>
-            <script src="https://d3js.org/d3-hexbin.v0.2.min.js"></script>
 
             <svg id="first"></svg>
             <svg id="second"></svg>`;
@@ -562,7 +561,7 @@ looker.plugins.visualizations.add({
                 console.log("made coordinates")
 
                 // define hexgrid
-                const hexgrid = d3.hexgrid()
+                const hexgrid = d3hex.hexgrid()
                     .extent([width, height])
                     .geography(topojson.feature(mdata, mdata.objects.nation))
                     .projection(projection)
