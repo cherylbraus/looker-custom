@@ -1,6 +1,8 @@
 import * as d3 from 'd3'
+import * as d3sank from 'd3-sankey'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
+import { selectAll } from 'd3'
 
 export const object = {
     id: "sankey-new",
@@ -13,7 +15,7 @@ export const object = {
             display: "text",
             label: "Flow Mapping",
             placeholder: "see docs",
-            default: "{}"
+            default: ["0:[1]", "1:[6 2]", "6:[3 4]"]
         }
     },
 
@@ -92,7 +94,7 @@ export const object = {
             const height = element.clientHeight - margin.top - margin.bottom;
 
             const svg = (
-                d3.select(element).select('svg#first')
+                d3.select(element).select('svg')
                     .html('')
                     .attr('width', '100%')
                     .attr('height', '100%')
@@ -103,6 +105,107 @@ export const object = {
                 .attr('width', '100%')
                 .attr('height', (height + 'px'))
                 .classed('group', true)
+
+            // -----------------------------------------------------------------------------------
+            // ONLY LOOK AT ONE ROW FOR DEVELOPMENT PURPOSES
+            const data_sank = data[0]
+
+            // -----------------------------------------------------------------------------------
+            // RECONFIGURE DATA FOR SANKEY
+            let sank_map = {"nodes":[], "links":[]}
+
+            // make sure any measures not used in sankey are hidden before importing data
+            measures.forEach((d, i) => {
+                if (d.label_short) {
+                    sank_map["nodes"].push({"id": i, "name": d.label_short})
+                } else {
+                    sank_map["nodes"].push({"id": i, "name": d.label})
+                }
+            })
+
+            console.log("flowmap", config.flowmap.split(","))
+            config.flowmap.split(",").forEach((d, i) => {
+                let source = parseInt(d.split(":")[0])
+
+                d.split("[")[1].split("]")[0].split(" ").forEach((d, i) => {
+                    sank_map["links"].push({"source": source, "target": parseInt(d), "value": data_sank[measures[parseInt(d)].name].value})
+                })
+            })
+
+
+            console.log("data_sank", data_sank)
+            console.log("sank_map", sank_map)
+
+            // -----------------------------------------------------------------------------------
+            // SETUP SANKEY
+            const sankey = d3sank.sankey()
+                .nodeId(d => d.id)
+                .nodeWidth(20)
+                .nodePadding(200)
+                .size([width, height])
+                .nodeAlign(d3sank.sankeyCenter)
+
+            let graph = sankey(sank_map)
+
+            console.log("defined sankey")
+            console.log("graph.links", graph.links)
+            console.log("graph.nodes", graph.nodes)
+
+            // -----------------------------------------------------------------------------------
+            // DRAW SANKEY
+            let links = group.append('g')
+                .attr("class", "links")
+                .selectAll("path")
+                .data(graph.links)
+                .enter()
+                .append("path")
+                    .attr("class", "link")
+                    .attr("d", d3sank.sankeyLinkHorizontal())
+                    .attr("fill", "none")
+                    .attr("stroke", "#afafaf")
+                    .attr("stroke-width", d => d.width)
+                    .attr("stroke-opacity", 0.4)
+                    .on("mouseover", function() {
+                        d3.select(this)
+                            .attr("stroke-opacity", 0.9)
+                            .attr("stroke", "#f1cc56")
+                    })
+                    .on("mouseout", function() {
+                        d3.select(this)
+                            .attr("stroke-opacity", 0.4)
+                            .attr("stroke", "#afafaf")
+                    })
+
+            let nodes = group.append('g')
+                .attr("class", "nodes")
+                .selectAll("rect")
+                .data(graph.nodes)
+                .enter()
+                .append("rect")
+                    .attr("class", "node")
+                    .attr("x", d => d.x0)
+                    .attr("y", d => d.y0)
+                    .attr("width", d => d.x1 - d.x0)
+                    .attr("height", d => d.y1 - d.y0)
+                    .attr("fill", "#007b82")
+                    .attr("opacity", 0.7)
+
+            let labels = group.append('g')
+                .attr("class", "node-labels")
+                .selectAll("text")
+                .data(graph.nodes)
+                .enter()
+                .append("text")
+                    .attr("class", "node-label")
+                    .attr("x", d => { return d.x0 - 2 })
+                    .attr("y", d => d.y0 + ((d.y1 - d.y0) / 2))
+                    .attr("font-size", "10px")
+                    .attr("text-anchor", "end")
+                    .attr("transform", null)
+                    .text(d => d.name)
+                    .filter(d => d.x0 < width / 2)
+                        .attr("x", d => d.x1 + 2)
+                        .attr("text-anchor", "start")
 
         } catch(error) {
             console.log(error)
