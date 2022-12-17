@@ -21130,7 +21130,11 @@ function horizontalTarget(d) {
 
 
 
+// EXTERNAL MODULE: ./node_modules/tslint/lib/utils.js
+var utils = __webpack_require__(28);
+
 // CONCATENATED MODULE: ./src/integration/template/sankey.js
+
 
 
 
@@ -21175,6 +21179,39 @@ var sankey_object = {
     }
 
     try {
+      // -----------------------------------------------------------------------------------
+      // Interactions
+      var nodeHighlightLinks = function nodeHighlightLinks(d) {
+        console.log("d", d);
+        var linkIndices = [];
+        d.sourceLinks.forEach(function (e, ind) {
+          linkIndices.push(e["index"]);
+        });
+        d.targetLinks.forEach(function (e, ind) {
+          linkIndices.push(e["index"]);
+        });
+        linkIndices.forEach(function (e, ind) {
+          src_select(".link.ind".concat(String(e))).attr("stroke-opacity", 0.7).attr("stroke", "#8cbb61");
+        });
+        src_select(".node.id".concat(String(d.id))).attr("fill", "#006268").attr("opacity", 1.0);
+      };
+
+      var nodeUnHighlightLinks = function nodeUnHighlightLinks(d) {
+        var linkIndices = [];
+        d.sourceLinks.forEach(function (e, ind) {
+          linkIndices.push(e["index"]);
+        });
+        d.targetLinks.forEach(function (e, ind) {
+          linkIndices.push(e["index"]);
+        });
+        linkIndices.forEach(function (e, ind) {
+          src_select(".link.ind".concat(String(e))).attr("stroke-opacity", 0.4).attr("stroke", "#afafaf");
+        });
+        src_select(".node.id".concat(String(d.id))).attr("fill", "#007b82").attr("opacity", 0.7);
+      }; // -----------------------------------------------------------------------------------
+      // DRAW SANKEY
+
+
       var dimensions = queryResponse.fields.dimension_like;
       var measures = queryResponse.fields.measure_like;
       console.log("queryResponse", queryResponse);
@@ -21235,17 +21272,19 @@ var sankey_object = {
       var graph = sankey(sank_map);
       console.log("defined sankey");
       console.log("graph.links", graph.links);
-      console.log("graph.nodes", graph.nodes); // -----------------------------------------------------------------------------------
-      // DRAW SANKEY
-
-      var links = group.append('g').attr("class", "links").selectAll("path").data(graph.links).enter().append("path").attr("class", "link").attr("d", sankeyLinkHorizontal()).attr("fill", "none").attr("stroke", "#afafaf").attr("stroke-width", function (d) {
+      console.log("graph.nodes", graph.nodes);
+      var links = group.append('g').attr("class", "links").selectAll("path").data(graph.links).enter().append("path").attr("class", function (d) {
+        return "link ind".concat(d.index);
+      }).attr("d", sankeyLinkHorizontal()).attr("fill", "none").attr("stroke", "#afafaf").attr("stroke-width", function (d) {
         return d.width;
       }).attr("stroke-opacity", 0.4).on("mouseover", function () {
-        src_select(this).attr("stroke-opacity", 0.9).attr("stroke", "#f1cc56");
+        src_select(this).attr("stroke-opacity", 0.9);
       }).on("mouseout", function () {
-        src_select(this).attr("stroke-opacity", 0.4).attr("stroke", "#afafaf");
+        src_select(this).attr("stroke-opacity", 0.4);
       });
-      var nodes = group.append('g').attr("class", "nodes").selectAll("rect").data(graph.nodes).enter().append("rect").attr("class", "node").attr("x", function (d) {
+      var nodes = group.append('g').attr("class", "nodes").selectAll("rect").data(graph.nodes).enter().append("rect").attr("class", function (d) {
+        return "node id".concat(d.id);
+      }).attr("x", function (d) {
         return d.x0;
       }).attr("y", function (d) {
         return d.y0;
@@ -21253,7 +21292,11 @@ var sankey_object = {
         return d.x1 - d.x0;
       }).attr("height", function (d) {
         return d.y1 - d.y0;
-      }).attr("fill", "#007b82").attr("opacity", 0.7);
+      }).attr("fill", "#007b82").attr("opacity", 0.7).on("mouseover", function (d) {
+        return nodeHighlightLinks(d);
+      }).on("mouseout", function (d) {
+        return nodeUnHighlightLinks(d);
+      });
       var labels = group.append('g').attr("class", "node-labels").selectAll("text").data(graph.nodes).enter().append("text").attr("class", "node-label").attr("x", function (d) {
         return d.x0 - 2;
       }).attr("y", function (d) {
@@ -21443,6 +21486,294 @@ json("http://localhost:3001/dataSankey").then(function (data) {
     resizer.addEventListener('mousedown', mouseDownHandler);
   });
 });
+
+/***/ }),
+
+/***/ 28:
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * @license
+ * Copyright 2016 Palantir Technologies, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+/**
+ * Enforces the invariant that the input is an array.
+ */
+
+function arrayify(arg) {
+  if (Array.isArray(arg)) {
+    return arg;
+  } else if (arg != undefined) {
+    return [arg];
+  } else {
+    return [];
+  }
+}
+
+exports.arrayify = arrayify;
+/**
+ * @deprecated (no longer used)
+ * Enforces the invariant that the input is an object.
+ */
+
+function objectify(arg) {
+  if (typeof arg === "object" && arg != undefined) {
+    return arg;
+  } else {
+    return {};
+  }
+}
+
+exports.objectify = objectify;
+
+function hasOwnProperty(arg, key) {
+  return Object.prototype.hasOwnProperty.call(arg, key);
+}
+
+exports.hasOwnProperty = hasOwnProperty;
+/**
+ * Replace hyphens in a rule name by upper-casing the letter after them.
+ * E.g. "foo-bar" -> "fooBar"
+ */
+
+function camelize(stringWithHyphens) {
+  return stringWithHyphens.replace(/-(.)/g, function (_, nextLetter) {
+    return nextLetter.toUpperCase();
+  });
+}
+
+exports.camelize = camelize;
+
+function isUpperCase(str) {
+  return str === str.toUpperCase();
+}
+
+exports.isUpperCase = isUpperCase;
+
+function isLowerCase(str) {
+  return str === str.toLowerCase();
+}
+
+exports.isLowerCase = isLowerCase;
+/**
+ * Removes leading indents from a template string without removing all leading whitespace
+ */
+
+function dedent(strings) {
+  var values = [];
+
+  for (var _i = 1; _i < arguments.length; _i++) {
+    values[_i - 1] = arguments[_i];
+  }
+
+  var fullString = strings.reduce(function (accumulator, str, i) {
+    return "" + accumulator + values[i - 1] + str;
+  }); // match all leading spaces/tabs at the start of each line
+
+  var match = fullString.match(/^[ \t]*(?=\S)/gm);
+
+  if (match === null) {
+    // e.g. if the string is empty or all whitespace.
+    return fullString;
+  } // find the smallest indent, we don't want to remove all leading whitespace
+
+
+  var indent = Math.min.apply(Math, match.map(function (el) {
+    return el.length;
+  }));
+  var regexp = new RegExp("^[ \\t]{" + indent + "}", "gm");
+  fullString = indent > 0 ? fullString.replace(regexp, "") : fullString;
+  return fullString;
+}
+
+exports.dedent = dedent;
+/**
+ * Strip comments from file content.
+ */
+
+function stripComments(content) {
+  /**
+   * First capturing group matches double quoted string
+   * Second matches single quotes string
+   * Third matches block comments
+   * Fourth matches line comments
+   */
+  var regexp = /("(?:[^\\\"]*(?:\\.)?)*")|('(?:[^\\\']*(?:\\.)?)*')|(\/\*(?:\r?\n|.)*?\*\/)|(\/{2,}.*?(?:(?:\r?\n)|$))/g;
+  var result = content.replace(regexp, function (match, _m1, _m2, m3, m4) {
+    // Only one of m1, m2, m3, m4 matches
+    if (m3 !== undefined) {
+      // A block comment. Replace with nothing
+      return "";
+    } else if (m4 !== undefined) {
+      // A line comment. If it ends in \r?\n then keep it.
+      var length = m4.length;
+
+      if (length > 2 && m4[length - 1] === "\n") {
+        return m4[length - 2] === "\r" ? "\r\n" : "\n";
+      } else {
+        return "";
+      }
+    } else {
+      // We match a string
+      return match;
+    }
+  });
+  return result;
+}
+
+exports.stripComments = stripComments;
+/**
+ * Escapes all special characters in RegExp pattern to avoid broken regular expressions and ensure proper matches
+ */
+
+function escapeRegExp(re) {
+  return re.replace(/[.+*?|^$[\]{}()\\]/g, "\\$&");
+}
+
+exports.escapeRegExp = escapeRegExp;
+
+function arraysAreEqual(a, b, eq) {
+  return a === b || a !== undefined && b !== undefined && a.length === b.length && a.every(function (x, idx) {
+    return eq(x, b[idx]);
+  });
+}
+
+exports.arraysAreEqual = arraysAreEqual;
+/** Returns the first non-`undefined` result. */
+
+function find(inputs, getResult) {
+  for (var _i = 0, inputs_1 = inputs; _i < inputs_1.length; _i++) {
+    var element = inputs_1[_i];
+    var result = getResult(element);
+
+    if (result !== undefined) {
+      return result;
+    }
+  }
+
+  return undefined;
+}
+
+exports.find = find;
+/** Returns an array that is the concatenation of all output arrays. */
+
+function flatMap(inputs, getOutputs) {
+  var out = [];
+
+  for (var i = 0; i < inputs.length; i++) {
+    out.push.apply(out, getOutputs(inputs[i], i));
+  }
+
+  return out;
+}
+
+exports.flatMap = flatMap;
+/** Returns an array of all outputs that are not `undefined`. */
+
+function mapDefined(inputs, getOutput) {
+  var out = [];
+
+  for (var _i = 0, inputs_2 = inputs; _i < inputs_2.length; _i++) {
+    var input = inputs_2[_i];
+    var output = getOutput(input);
+
+    if (output !== undefined) {
+      out.push(output);
+    }
+  }
+
+  return out;
+}
+
+exports.mapDefined = mapDefined;
+
+function readBufferWithDetectedEncoding(buffer) {
+  switch (detectBufferEncoding(buffer)) {
+    case "utf8":
+      return buffer.toString();
+
+    case "utf8-bom":
+      return buffer.toString("utf-8", 2);
+
+    case "utf16le":
+      return buffer.toString("utf16le", 2);
+
+    case "utf16be":
+      // Round down to nearest multiple of 2.
+      var len = buffer.length & ~1; // tslint:disable-line no-bitwise
+      // Flip all byte pairs, then read as little-endian.
+
+      for (var i = 0; i < len; i += 2) {
+        var temp = buffer[i];
+        buffer[i] = buffer[i + 1];
+        buffer[i + 1] = temp;
+      }
+
+      return buffer.toString("utf16le", 2);
+  }
+}
+
+exports.readBufferWithDetectedEncoding = readBufferWithDetectedEncoding;
+
+function detectBufferEncoding(buffer, length) {
+  if (length === void 0) {
+    length = buffer.length;
+  }
+
+  if (length < 2) {
+    return "utf8";
+  }
+
+  switch (buffer[0]) {
+    case 0xEF:
+      if (buffer[1] === 0xBB && length >= 3 && buffer[2] === 0xBF) {
+        return "utf8-bom";
+      }
+
+      break;
+
+    case 0xFE:
+      if (buffer[1] === 0xFF) {
+        return "utf16be";
+      }
+
+      break;
+
+    case 0xFF:
+      if (buffer[1] === 0xFE) {
+        return "utf16le";
+      }
+
+  }
+
+  return "utf8";
+}
+
+exports.detectBufferEncoding = detectBufferEncoding; // converts Windows normalized paths (with backwards slash `\`) to paths used by TypeScript (with forward slash `/`)
+
+function denormalizeWinPath(path) {
+  return path.replace(/\\/g, "/");
+}
+
+exports.denormalizeWinPath = denormalizeWinPath;
 
 /***/ })
 

@@ -3,6 +3,7 @@ import * as d3sank from 'd3-sankey'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
 import { selectAll } from 'd3'
+import { stripComments } from 'tslint/lib/utils'
 
 export const object = {
     id: "sankey-new",
@@ -152,6 +153,51 @@ export const object = {
             console.log("graph.nodes", graph.nodes)
 
             // -----------------------------------------------------------------------------------
+            // Interactions
+            function nodeHighlightLinks(d) {
+                console.log("d", d)
+                let linkIndices = []
+
+                d.sourceLinks.forEach((e, ind) => {
+                    linkIndices.push(e["index"])
+                })
+                d.targetLinks.forEach((e, ind) => {
+                    linkIndices.push(e["index"])
+                })
+
+                linkIndices.forEach((e, ind) => {
+                    d3.select(`.link.ind${String(e)}`)
+                        .attr("stroke-opacity", 0.7)
+                        .attr("stroke", "#8cbb61")
+                })
+
+                d3.select(`.node.id${String(d.id)}`)
+                    .attr("fill", "#006268")
+                    .attr("opacity", 1.0)
+            } 
+
+            function nodeUnHighlightLinks(d) {
+                let linkIndices = []
+
+                d.sourceLinks.forEach((e, ind) => {
+                    linkIndices.push(e["index"])
+                })
+                d.targetLinks.forEach((e, ind) => {
+                    linkIndices.push(e["index"])
+                })
+
+                linkIndices.forEach((e, ind) => {
+                    d3.select(`.link.ind${String(e)}`)
+                        .attr("stroke-opacity", 0.4)
+                        .attr("stroke", "#afafaf")
+                })
+
+                d3.select(`.node.id${String(d.id)}`)
+                    .attr("fill", "#007b82")
+                    .attr("opacity", 0.7)
+            }
+
+            // -----------------------------------------------------------------------------------
             // DRAW SANKEY
             let links = group.append('g')
                 .attr("class", "links")
@@ -159,7 +205,7 @@ export const object = {
                 .data(graph.links)
                 .enter()
                 .append("path")
-                    .attr("class", "link")
+                    .attr("class", d => `link ind${d.index}`)
                     .attr("d", d3sank.sankeyLinkHorizontal())
                     .attr("fill", "none")
                     .attr("stroke", "#afafaf")
@@ -168,12 +214,10 @@ export const object = {
                     .on("mouseover", function() {
                         d3.select(this)
                             .attr("stroke-opacity", 0.9)
-                            .attr("stroke", "#f1cc56")
                     })
                     .on("mouseout", function() {
                         d3.select(this)
                             .attr("stroke-opacity", 0.4)
-                            .attr("stroke", "#afafaf")
                     })
 
             let nodes = group.append('g')
@@ -182,13 +226,15 @@ export const object = {
                 .data(graph.nodes)
                 .enter()
                 .append("rect")
-                    .attr("class", "node")
+                    .attr("class", d => `node id${d.id}`)
                     .attr("x", d => d.x0)
                     .attr("y", d => d.y0)
                     .attr("width", d => d.x1 - d.x0)
                     .attr("height", d => d.y1 - d.y0)
                     .attr("fill", "#007b82")
                     .attr("opacity", 0.7)
+                    .on("mouseover", d => nodeHighlightLinks(d))
+                    .on("mouseout", d => nodeUnHighlightLinks(d))
 
             let labels = group.append('g')
                 .attr("class", "node-labels")
