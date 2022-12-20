@@ -117,8 +117,6 @@ export const object = {
                 return (a[dimensions[0].name].value > b[dimensions[0].name].value) ? 1 : ((b[dimensions[0].name].value > a[dimensions[0].name].value) ? -1 : 0)
             })
 
-            // library.sort(function(a,b) {return (a.title > b.title) ? 1 : ((b.title > a.title) ? -1 : 0);} );
-
             console.log("data sorted", data)
 
             // -----------------------------------------------------------------------------------
@@ -129,7 +127,7 @@ export const object = {
                     totalObj[dimensions[0].name] = {"value": "All"}
                 } 
                 console.log("totalObj", totalObj)
-                data.push(totalObj)
+                data.unshift(totalObj)
             }
 
             console.log("new data", data)
@@ -149,18 +147,10 @@ export const object = {
 
 
             data.forEach((entry, i) => {
-                if (queryResponse.has_totals) {
-                    if (i == data.length - 1) {
-                        listDropdown.append($(`<option></option>`).attr(`value`, entry[dimensions[0].name].value).text(entry[dimensions[0].name].value).attr("selected","selected"))
-                    } else {
-                        listDropdown.append($(`<option></option>`).attr(`value`, entry[dimensions[0].name].value).text(entry[dimensions[0].name].value))
-                    }
+                if (i == 0) {
+                    listDropdown.append($(`<option></option>`).attr(`value`, entry[dimensions[0].name].value).text(entry[dimensions[0].name].value).attr("selected","selected"))
                 } else {
-                    if (i == 0) {
-                        listDropdown.append($(`<option></option>`).attr(`value`, entry[dimensions[0].name].value).text(entry[dimensions[0].name].value).attr("selected","selected"))
-                    } else {
-                        listDropdown.append($(`<option></option>`).attr(`value`, entry[dimensions[0].name].value).text(entry[dimensions[0].name].value))
-                    }
+                    listDropdown.append($(`<option></option>`).attr(`value`, entry[dimensions[0].name].value).text(entry[dimensions[0].name].value))
                 }
             })
 
@@ -197,7 +187,7 @@ export const object = {
                 let NUMFORMAT;
     
                 if (config.currency == "true") {
-                    NUMFORMAT = "$,.2f"
+                    NUMFORMAT = "$,.0f"
                 } else {
                     NUMFORMAT = ",.0f"
                 }
