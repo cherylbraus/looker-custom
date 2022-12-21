@@ -112,6 +112,9 @@ export const object = {
             const width = element.clientWidth - margin.left - margin.right;
             const height = element.clientHeight - margin.top - margin.bottom;
 
+            // const flowmap = config.flowmap
+            // const renames = config.nodenames
+
             // SORT DATA
             data.sort(function(a, b) {
                 return (a[dimensions[0].name].value > b[dimensions[0].name].value) ? 1 : ((b[dimensions[0].name].value > a[dimensions[0].name].value) ? -1 : 0)
@@ -158,10 +161,12 @@ export const object = {
                 redraw()
             })
 
+            console.log("outside flowmap", config.flowmap)
+
             function redraw() {
                 // -----------------------------------------------------------------------------------
                 // FILTER DATA BASED ON DROPDOWN SELECTION
-                let entity = $(`#vis-options option:selected`).val()
+                const entity = $(`#vis-options option:selected`).val()
                 console.log("ENTITY SELECTED", entity)
 
                 let data_sank = data.filter(d => {
@@ -199,7 +204,8 @@ export const object = {
                 let measures_used = []
 
                 // pick apart config.flowmap
-                console.log("flowmap", config.flowmap.split(","))
+                console.log("flowmap", config.flowmap)
+                console.log("flowmap", config.flowmap.split(",")) // ERRORING
                 config.flowmap.split(",").forEach((d, i) => {
                     let source = parseInt(d.split(":")[0])
                     measures_used.push(source)
@@ -213,7 +219,7 @@ export const object = {
                 })
 
                 measures_used = [...new Set(measures_used)]
-                console.log("measures_used no-dups", measures_used)
+                console.log("measures_used no-dups", measures_used) 
 
                 // make sure any measures not used in sankey are hidden before importing data
                 measures.forEach((d, i) => {

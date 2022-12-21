@@ -38,7 +38,6 @@ looker.plugins.visualizations.add({
     },
 
     create: function(element, config) {
-        this.trigger("updateConfig", [{directionality: true, display_values:true,freeze_header:true}])
           // Insert a <style> tag with some styles we'll use later
         element.innerHTML = `
             <style>
@@ -175,7 +174,7 @@ looker.plugins.visualizations.add({
     updateAsync: function(data, element, config, queryResponse, details, done, environment = "prod") {
         if (environment == "prod") {
               if (!handleErrors(this, queryResponse, {
-                  min_pivots: 1, max_pivots: 1,
+                  min_pivots: 0, max_pivots: 0,
                   min_dimensions: 1, max_dimensions: 40,
                   min_measures: 1, max_measures: 40
               })) return
@@ -232,8 +231,6 @@ looker.plugins.visualizations.add({
             const listDropdown = $(`#vis-options`);
             listDropdown.empty()
 
-
-
             data.forEach((entry, i) => {
                 if (i == 0) {
                     listDropdown.append($(`<option></option>`).attr(`value`, entry[dimensions[0].name].value).text(entry[dimensions[0].name].value).attr("selected","selected"))
@@ -245,6 +242,9 @@ looker.plugins.visualizations.add({
             listDropdown.on("change", function() {
                 redraw()
             })
+
+            console.log("CONFIG", config)
+            console.log("OUTSIDE FLOWMAP", config.flowmap)
 
             function redraw() {
                 // -----------------------------------------------------------------------------------
@@ -287,14 +287,16 @@ looker.plugins.visualizations.add({
                 let measures_used = []
 
                 // pick apart config.flowmap
-                console.log("flowmap", config.flowmap.split(","))
+                console.log("redraw config", config)
+                console.log("flowmap", config.flowmap)
+                console.log("flowmap split", config.flowmap.split(","))
                 config.flowmap.split(",").forEach((d, i) => {
                     let source = parseInt(d.split(":")[0])
                     measures_used.push(source)
 
                     d.split("[")[1].split("]")[0].split(" ").forEach((d, i) => {
-                        console.log("measure", measures[parseInt(d)], data_sank[measures[parseInt(d)].name])
-                        console.log("sank_map: value", data_sank[measures[parseInt(d)].name].value)
+                        // console.log("measure", measures[parseInt(d)], data_sank[measures[parseInt(d)].name])
+                        // console.log("sank_map: value", data_sank[measures[parseInt(d)].name].value)
                         sank_map["links"].push({"source": source, "target": parseInt(d), "value": data_sank[measures[parseInt(d)].name].value})
                         measures_used.push(parseInt(d))
                     })
