@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 23);
+/******/ 	return __webpack_require__(__webpack_require__.s = 22);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -9560,294 +9560,6 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 /***/ }),
 
 /***/ 22:
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * @license
- * Copyright 2016 Palantir Technologies, Inc.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-/**
- * Enforces the invariant that the input is an array.
- */
-
-function arrayify(arg) {
-  if (Array.isArray(arg)) {
-    return arg;
-  } else if (arg != undefined) {
-    return [arg];
-  } else {
-    return [];
-  }
-}
-
-exports.arrayify = arrayify;
-/**
- * @deprecated (no longer used)
- * Enforces the invariant that the input is an object.
- */
-
-function objectify(arg) {
-  if (typeof arg === "object" && arg != undefined) {
-    return arg;
-  } else {
-    return {};
-  }
-}
-
-exports.objectify = objectify;
-
-function hasOwnProperty(arg, key) {
-  return Object.prototype.hasOwnProperty.call(arg, key);
-}
-
-exports.hasOwnProperty = hasOwnProperty;
-/**
- * Replace hyphens in a rule name by upper-casing the letter after them.
- * E.g. "foo-bar" -> "fooBar"
- */
-
-function camelize(stringWithHyphens) {
-  return stringWithHyphens.replace(/-(.)/g, function (_, nextLetter) {
-    return nextLetter.toUpperCase();
-  });
-}
-
-exports.camelize = camelize;
-
-function isUpperCase(str) {
-  return str === str.toUpperCase();
-}
-
-exports.isUpperCase = isUpperCase;
-
-function isLowerCase(str) {
-  return str === str.toLowerCase();
-}
-
-exports.isLowerCase = isLowerCase;
-/**
- * Removes leading indents from a template string without removing all leading whitespace
- */
-
-function dedent(strings) {
-  var values = [];
-
-  for (var _i = 1; _i < arguments.length; _i++) {
-    values[_i - 1] = arguments[_i];
-  }
-
-  var fullString = strings.reduce(function (accumulator, str, i) {
-    return "" + accumulator + values[i - 1] + str;
-  }); // match all leading spaces/tabs at the start of each line
-
-  var match = fullString.match(/^[ \t]*(?=\S)/gm);
-
-  if (match === null) {
-    // e.g. if the string is empty or all whitespace.
-    return fullString;
-  } // find the smallest indent, we don't want to remove all leading whitespace
-
-
-  var indent = Math.min.apply(Math, match.map(function (el) {
-    return el.length;
-  }));
-  var regexp = new RegExp("^[ \\t]{" + indent + "}", "gm");
-  fullString = indent > 0 ? fullString.replace(regexp, "") : fullString;
-  return fullString;
-}
-
-exports.dedent = dedent;
-/**
- * Strip comments from file content.
- */
-
-function stripComments(content) {
-  /**
-   * First capturing group matches double quoted string
-   * Second matches single quotes string
-   * Third matches block comments
-   * Fourth matches line comments
-   */
-  var regexp = /("(?:[^\\\"]*(?:\\.)?)*")|('(?:[^\\\']*(?:\\.)?)*')|(\/\*(?:\r?\n|.)*?\*\/)|(\/{2,}.*?(?:(?:\r?\n)|$))/g;
-  var result = content.replace(regexp, function (match, _m1, _m2, m3, m4) {
-    // Only one of m1, m2, m3, m4 matches
-    if (m3 !== undefined) {
-      // A block comment. Replace with nothing
-      return "";
-    } else if (m4 !== undefined) {
-      // A line comment. If it ends in \r?\n then keep it.
-      var length = m4.length;
-
-      if (length > 2 && m4[length - 1] === "\n") {
-        return m4[length - 2] === "\r" ? "\r\n" : "\n";
-      } else {
-        return "";
-      }
-    } else {
-      // We match a string
-      return match;
-    }
-  });
-  return result;
-}
-
-exports.stripComments = stripComments;
-/**
- * Escapes all special characters in RegExp pattern to avoid broken regular expressions and ensure proper matches
- */
-
-function escapeRegExp(re) {
-  return re.replace(/[.+*?|^$[\]{}()\\]/g, "\\$&");
-}
-
-exports.escapeRegExp = escapeRegExp;
-
-function arraysAreEqual(a, b, eq) {
-  return a === b || a !== undefined && b !== undefined && a.length === b.length && a.every(function (x, idx) {
-    return eq(x, b[idx]);
-  });
-}
-
-exports.arraysAreEqual = arraysAreEqual;
-/** Returns the first non-`undefined` result. */
-
-function find(inputs, getResult) {
-  for (var _i = 0, inputs_1 = inputs; _i < inputs_1.length; _i++) {
-    var element = inputs_1[_i];
-    var result = getResult(element);
-
-    if (result !== undefined) {
-      return result;
-    }
-  }
-
-  return undefined;
-}
-
-exports.find = find;
-/** Returns an array that is the concatenation of all output arrays. */
-
-function flatMap(inputs, getOutputs) {
-  var out = [];
-
-  for (var i = 0; i < inputs.length; i++) {
-    out.push.apply(out, getOutputs(inputs[i], i));
-  }
-
-  return out;
-}
-
-exports.flatMap = flatMap;
-/** Returns an array of all outputs that are not `undefined`. */
-
-function mapDefined(inputs, getOutput) {
-  var out = [];
-
-  for (var _i = 0, inputs_2 = inputs; _i < inputs_2.length; _i++) {
-    var input = inputs_2[_i];
-    var output = getOutput(input);
-
-    if (output !== undefined) {
-      out.push(output);
-    }
-  }
-
-  return out;
-}
-
-exports.mapDefined = mapDefined;
-
-function readBufferWithDetectedEncoding(buffer) {
-  switch (detectBufferEncoding(buffer)) {
-    case "utf8":
-      return buffer.toString();
-
-    case "utf8-bom":
-      return buffer.toString("utf-8", 2);
-
-    case "utf16le":
-      return buffer.toString("utf16le", 2);
-
-    case "utf16be":
-      // Round down to nearest multiple of 2.
-      var len = buffer.length & ~1; // tslint:disable-line no-bitwise
-      // Flip all byte pairs, then read as little-endian.
-
-      for (var i = 0; i < len; i += 2) {
-        var temp = buffer[i];
-        buffer[i] = buffer[i + 1];
-        buffer[i + 1] = temp;
-      }
-
-      return buffer.toString("utf16le", 2);
-  }
-}
-
-exports.readBufferWithDetectedEncoding = readBufferWithDetectedEncoding;
-
-function detectBufferEncoding(buffer, length) {
-  if (length === void 0) {
-    length = buffer.length;
-  }
-
-  if (length < 2) {
-    return "utf8";
-  }
-
-  switch (buffer[0]) {
-    case 0xEF:
-      if (buffer[1] === 0xBB && length >= 3 && buffer[2] === 0xBF) {
-        return "utf8-bom";
-      }
-
-      break;
-
-    case 0xFE:
-      if (buffer[1] === 0xFF) {
-        return "utf16be";
-      }
-
-      break;
-
-    case 0xFF:
-      if (buffer[1] === 0xFE) {
-        return "utf16le";
-      }
-
-  }
-
-  return "utf8";
-}
-
-exports.detectBufferEncoding = detectBufferEncoding; // converts Windows normalized paths (with backwards slash `\`) to paths used by TypeScript (with forward slash `/`)
-
-function denormalizeWinPath(path) {
-  return path.replace(/\\/g, "/");
-}
-
-exports.denormalizeWinPath = denormalizeWinPath;
-
-/***/ }),
-
-/***/ 23:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -21400,9 +21112,6 @@ var handleErrors = function (vis, res, options) {
         && check('mes-req', 'Measure', measures.length, options.min_measures, options.max_measures));
 };
 
-// EXTERNAL MODULE: ./node_modules/tslint/lib/utils.js
-var utils = __webpack_require__(22);
-
 // EXTERNAL MODULE: ./node_modules/jquery/dist/jquery.js
 var jquery = __webpack_require__(1);
 
@@ -21423,12 +21132,9 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
-
-
-
 looker.plugins.visualizations.add({
   id: "sankey-new",
-  label: "Sankey New",
+  label: "ZDev Sankey New",
   options: {
     flowmap: {
       section: "Setup",
@@ -21476,78 +21182,69 @@ looker.plugins.visualizations.add({
     }
 
     try {
-      var redraw = function redraw() {
-        // -----------------------------------------------------------------------------------
+      // function create_maps(data_filtered) {
+      // // -----------------------------------------------------------------------------------
+      // // RECONFIGURE DATA FOR SANKEY
+      // let sank_map = {"nodes":[], "links":[]}
+      // let node_name_map = {}
+      // let measures_used = []
+      // // pick apart config.flowmap
+      // console.log("redraw config", config)
+      // console.log("flowmap", config.flowmap)
+      // console.log("flowmap split", config.flowmap.split(","))
+      // config.flowmap.split(",").forEach((d, i) => {
+      //     let source = parseInt(d.split(":")[0])
+      //     measures_used.push(source)
+      //     d.split("[")[1].split("]")[0].split(" ").forEach((d, i) => {
+      //         // console.log("measure", measures[parseInt(d)], data_sank[measures[parseInt(d)].name])
+      //         // console.log("sank_map: value", data_sank[measures[parseInt(d)].name].value)
+      //         sank_map["links"].push({"source": source, "target": parseInt(d), "value": data_filtered[measures[parseInt(d)].name].value})
+      //         measures_used.push(parseInt(d))
+      //     })
+      // })
+      // measures_used = [...new Set(measures_used)]
+      // console.log("measures_used no-dups", measures_used)
+      // // make sure any measures not used in sankey are hidden before importing data
+      // measures.forEach((d, i) => {
+      //     if (measures_used.includes(i)) {
+      //         if (d.label_short) {
+      //             sank_map["nodes"].push({"id": i, "name": d.label_short})
+      //         } else {
+      //             sank_map["nodes"].push({"id": i, "name": d.label})
+      //         }
+      //     }                 
+      // })
+      //     // pick apart config.nodenames
+      //     console.log("nodeRenames", config.nodenames.split(","))
+      //     config.nodenames.split(",").forEach((d, i) => {
+      //         node_name_map[String(parseInt(d.split(":")[0]))] = d.split(":")[1]
+      //     })
+      //     console.log("sank_map", sank_map)
+      //     console.log("node_name_map", node_name_map)
+      //     console.log("measures_used", measures_used)
+      //     return [sank_map, node_name_map, measures_used]
+      // }
+      var redraw = function redraw(sank_map_all) {
+        console.log("first redraw config", config); // -----------------------------------------------------------------------------------
         // FILTER DATA BASED ON DROPDOWN SELECTION
+
         var entity = jquery("#vis-options option:selected").val();
         console.log("ENTITY SELECTED", entity);
         var data_sank = data.filter(function (d) {
           return d[dimensions[0].name].value == entity;
         })[0];
         console.log("data_sank", data_sank);
-        var svg = src_select(element).select('svg').html('').attr('width', '100%').attr('height', '100%');
-        var group = svg.append('g').attr('transform', "translate(".concat(margin.left, ",").concat(margin.top, ")")).attr('width', '100%').attr('height', height + 'px').classed('group', true); // SET GLOBAL VARIABLES
-
-        var NUMFORMAT;
-
-        if (config.currency == true) {
-          NUMFORMAT = "$,.0f";
-        } else {
-          NUMFORMAT = ",.0f";
-        } // -----------------------------------------------------------------------------------
-        // RECONFIGURE DATA FOR SANKEY
-
-
-        var sank_map = {
-          "nodes": [],
-          "links": []
-        };
-        var node_name_map = {};
-        var measures_used = []; // pick apart config.flowmap
-
-        console.log("redraw config", config);
-        console.log("flowmap", config.flowmap);
-        console.log("flowmap split", config.flowmap.split(","));
-        config.flowmap.split(",").forEach(function (d, i) {
-          var source = parseInt(d.split(":")[0]);
-          measures_used.push(source);
-          d.split("[")[1].split("]")[0].split(" ").forEach(function (d, i) {
-            // console.log("measure", measures[parseInt(d)], data_sank[measures[parseInt(d)].name])
-            // console.log("sank_map: value", data_sank[measures[parseInt(d)].name].value)
-            sank_map["links"].push({
-              "source": source,
-              "target": parseInt(d),
-              "value": data_sank[measures[parseInt(d)].name].value
-            });
-            measures_used.push(parseInt(d));
-          });
+        var svg = src_select("#vis").select('svg').html('').attr('width', '100%').attr('height', '100%');
+        var group = svg.append('g').attr('transform', "translate(".concat(margin.left, ",").concat(margin.top, ")")).attr('width', '100%').attr('height', height + 'px').classed('group', true);
+        console.log("sank_map_all inside redraw", sank_map_all);
+        var sank_map = sank_map_all.filter(function (d) {
+          return d.entity == entity;
         });
-        measures_used = _toConsumableArray(new Set(measures_used));
-        console.log("measures_used no-dups", measures_used); // make sure any measures not used in sankey are hidden before importing data
-
-        measures.forEach(function (d, i) {
-          if (measures_used.includes(i)) {
-            if (d.label_short) {
-              sank_map["nodes"].push({
-                "id": i,
-                "name": d.label_short
-              });
-            } else {
-              sank_map["nodes"].push({
-                "id": i,
-                "name": d.label
-              });
-            }
-          }
-        }); // pick apart config.nodenames
-
-        console.log("nodeRenames", config.nodenames.split(","));
-        config.nodenames.split(",").forEach(function (d, i) {
-          node_name_map[String(parseInt(d.split(":")[0]))] = d.split(":")[1];
-        });
-        console.log("data_sank", data_sank);
-        console.log("sank_map", sank_map);
-        console.log("node_name_map", node_name_map); // // -----------------------------------------------------------------------------------
+        console.log("sank_map for entity", sank_map[0]); // -----------------------------------------------------------------------------------
+        // RUN FUNCTION TO CONFIGURE DATA
+        // const [sank_map, node_name_map, measures_used] = create_maps(data_sank)
+        // console.log("ran function to configure data")
+        // // -----------------------------------------------------------------------------------
         // // SETUP THE TOOLTIP
         // let tooltip = d3.select(".tooltip")
         //     .style("opacity", 0)
@@ -21568,7 +21265,9 @@ looker.plugins.visualizations.add({
         var sankey = Sankey().nodeId(function (d) {
           return d.id;
         }).nodeWidth(20).nodePadding(50).size([width, height]).nodeAlign(align_center);
-        var sank_map2 = Object.assign({}, sank_map);
+        console.log("HERE 1");
+        var sank_map2 = Object.assign({}, sank_map[0]);
+        console.log("HERE 2");
         var graph = sankey(sank_map2);
         console.log("defined sankey");
         console.log("graph.links", graph.links);
@@ -21711,10 +21410,20 @@ looker.plugins.visualizations.add({
         top: 25,
         bottom: 35,
         left: 2,
-        right: 8
+        right: 10
       };
-      var width = element.clientWidth - margin.left - margin.right;
-      var height = element.clientHeight - margin.top - margin.bottom; // SORT DATA
+      var getNode = src_select("#vis"); // Update this once we have a better idea how Looker integration will look
+
+      var new_node_width = getNode.select(function () {
+        return this.parentNode;
+      });
+      var new_node_height = getNode.select(function () {
+        return this.parentNode;
+      });
+      var nodewidth = new_node_width.node().getBoundingClientRect().width;
+      var nodeheight = new_node_height.node().getBoundingClientRect().height;
+      var width = nodewidth - margin.left - margin.right;
+      var height = nodeheight - margin.top - margin.bottom; // SORT DATA
 
       data.sort(function (a, b) {
         return a[dimensions[0].name].value > b[dimensions[0].name].value ? 1 : b[dimensions[0].name].value > a[dimensions[0].name].value ? -1 : 0;
@@ -21726,9 +21435,12 @@ looker.plugins.visualizations.add({
         var totalObj = queryResponse.totals_data;
 
         if (!Object.keys(totalObj).includes(dimensions[0].name)) {
+          console.log("totalObj column", dimensions[0].name);
           totalObj[dimensions[0].name] = {
             "value": "All"
           };
+        } else {
+          totalObj[dimensions[0].name]["value"] = "All";
         }
 
         console.log("totalObj", totalObj);
@@ -21751,13 +21463,84 @@ looker.plugins.visualizations.add({
         } else {
           listDropdown.append(jquery("<option></option>").attr("value", entry[dimensions[0].name].value).text(entry[dimensions[0].name].value));
         }
-      });
-      listDropdown.on("change", function () {
-        redraw();
-      });
+      }); // listDropdown.on("change", function() {
+      //     redraw()
+      // })
+
       console.log("CONFIG", config);
-      console.log("OUTSIDE FLOWMAP", config.flowmap);
-      redraw();
+      console.log("OUTSIDE FLOWMAP", config.flowmap); // -----------------------------------------------------------------------------------
+      // SET GLOBAL VARIABLES
+
+      var NUMFORMAT;
+
+      if (config.currency == true) {
+        NUMFORMAT = "$,.0f";
+      } else {
+        NUMFORMAT = ",.0f";
+      } // -----------------------------------------------------------------------------------
+      // RECONFIGURE DATA FOR SANKEY
+
+
+      var sank_map_all = []; // let node_map = []
+
+      var node_name_map = {};
+      var measures_used = [];
+      console.log("original config", config);
+      data.forEach(function (entry, ind) {
+        var tmp_map = {
+          "entity": entry[dimensions[0].name].value,
+          "links": [],
+          "nodes": []
+        };
+        config.flowmap.split(",").forEach(function (d, i) {
+          var source = parseInt(d.split(":")[0]);
+          measures_used.push(source);
+          d.split("[")[1].split("]")[0].split(" ").forEach(function (di, ii) {
+            tmp_map["links"].push({
+              "source": source,
+              "target": parseInt(di),
+              "value": entry[measures[parseInt(di)].name].value
+            });
+            measures_used.push(parseInt(di));
+          });
+        });
+        sank_map_all.push(tmp_map);
+      });
+      measures_used = _toConsumableArray(new Set(measures_used));
+      console.log("measures_used no-dups", measures_used);
+      data.forEach(function (entry, ind) {
+        measures.forEach(function (d, i) {
+          if (measures_used.includes(i)) {
+            if (d.label_short) {
+              sank_map_all.find(function (obj) {
+                return obj.entity === entry[dimensions[0].name].value;
+              })["nodes"].push({
+                "id": i,
+                "name": d.label_short
+              }); // node_map.push({"id": i, "name": d.label_short})
+            } else {
+              sank_map_all.find(function (obj) {
+                return obj.entity === entry[dimensions[0].name].value;
+              })["nodes"].push({
+                "id": i,
+                "name": d.label
+              }); // node_map.push({"id": i, "name": d.label})
+            }
+          }
+        });
+      });
+      console.log("nodeRenames", config.nodenames.split(","));
+      config.nodenames.split(",").forEach(function (d, i) {
+        node_name_map[String(parseInt(d.split(":")[0]))] = d.split(":")[1];
+      });
+      console.log("sank_map", sank_map_all); // console.log("node_map", node_map)
+
+      console.log("node_name_map", node_name_map);
+      console.log("measures_used", measures_used);
+      listDropdown.on("change", function () {
+        redraw(sank_map_all);
+      });
+      redraw(sank_map_all);
     } catch (error) {
       console.log(error);
     }

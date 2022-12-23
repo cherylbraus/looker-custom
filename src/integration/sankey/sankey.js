@@ -1,14 +1,11 @@
 import * as d3 from 'd3'
 import * as d3sank from 'd3-sankey'
-import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
-import { line, selectAll } from 'd3'
-import { stripComments } from 'tslint/lib/utils'
 import * as $ from 'jquery'
 
 looker.plugins.visualizations.add({
     id: "sankey-new",
-    label: "Sankey New",
+    label: "ZDev Sankey New",
     options: {
         flowmap: {
             section: "Setup",
@@ -193,11 +190,20 @@ looker.plugins.visualizations.add({
                 top: 25,
                 bottom: 35,
                 left: 2, 
-                right: 8
+                right: 10
             }
 
-            const width = element.clientWidth - margin.left - margin.right;
-            const height = element.clientHeight - margin.top - margin.bottom;
+            const getNode = d3.select("#vis");
+
+            // Update this once we have a better idea how Looker integration will look
+            const new_node_width = getNode.select(function() { return this.parentNode; })
+            const new_node_height = getNode.select(function() { return this.parentNode; })
+            const nodewidth = new_node_width.node().getBoundingClientRect().width;
+            const nodeheight = new_node_height.node().getBoundingClientRect().height;
+
+            const width = nodewidth - margin.left - margin.right;
+            const height = nodeheight - margin.top - margin.bottom;
+            
 
             // SORT DATA
             data.sort(function(a, b) {
@@ -211,8 +217,11 @@ looker.plugins.visualizations.add({
             if (queryResponse.has_totals && data[data.length-1][dimensions[0].name]["value"] != "All") {
                 let totalObj = queryResponse.totals_data
                 if (!Object.keys(totalObj).includes(dimensions[0].name)) {
+                    console.log("totalObj column", dimensions[0].name)
                     totalObj[dimensions[0].name] = {"value": "All"}
-                } 
+                } else {
+                    totalObj[dimensions[0].name]["value"] = "All"
+                }
                 console.log("totalObj", totalObj)
                 data.unshift(totalObj)
             }
@@ -239,14 +248,134 @@ looker.plugins.visualizations.add({
                 }
             })
 
-            listDropdown.on("change", function() {
-                redraw()
-            })
+            // listDropdown.on("change", function() {
+            //     redraw()
+            // })
 
             console.log("CONFIG", config)
             console.log("OUTSIDE FLOWMAP", config.flowmap)
 
-            function redraw() {
+            // -----------------------------------------------------------------------------------
+            // SET GLOBAL VARIABLES
+            let NUMFORMAT;
+    
+            if (config.currency == true) {
+                NUMFORMAT = "$,.0f"
+            } else {
+                NUMFORMAT = ",.0f"
+            }
+
+            // -----------------------------------------------------------------------------------
+            // RECONFIGURE DATA FOR SANKEY
+            let sank_map_all = []
+            // let node_map = []
+            let node_name_map = {}
+            let measures_used = []
+
+            console.log("original config", config)
+            data.forEach((entry, ind) => {
+                let tmp_map = {"entity": entry[dimensions[0].name].value, "links": [], "nodes": []}
+                config.flowmap.split(",").forEach((d, i) => {
+                    let source = parseInt(d.split(":")[0])
+                    measures_used.push(source)                
+                    d.split("[")[1].split("]")[0].split(" ").forEach((di, ii) => {
+                        tmp_map["links"].push({"source": source, "target": parseInt(di), "value": entry[measures[parseInt(di)].name].value})
+                        measures_used.push(parseInt(di))
+                    })
+                })
+                sank_map_all.push(tmp_map)
+            })
+
+
+            measures_used = [...new Set(measures_used)]
+            console.log("measures_used no-dups", measures_used)
+
+            data.forEach((entry, ind) => {
+                measures.forEach((d, i) => {
+                    if (measures_used.includes(i)) {
+                        if (d.label_short) {
+                            sank_map_all.find(obj => obj.entity === entry[dimensions[0].name].value)["nodes"].push({"id": i, "name": d.label_short});
+                            // node_map.push({"id": i, "name": d.label_short})
+                        } else {
+                            sank_map_all.find(obj => obj.entity === entry[dimensions[0].name].value)["nodes"].push({"id": i, "name": d.label});
+                            // node_map.push({"id": i, "name": d.label})
+                        }
+                    }                 
+                })
+            })
+            
+
+            console.log("nodeRenames", config.nodenames.split(","))
+            config.nodenames.split(",").forEach((d, i) => {
+                node_name_map[String(parseInt(d.split(":")[0]))] = d.split(":")[1]
+            })
+
+            console.log("sank_map", sank_map_all)
+            // console.log("node_map", node_map)
+            console.log("node_name_map", node_name_map)
+            console.log("measures_used", measures_used)
+
+            listDropdown.on("change", function() {
+                redraw(sank_map_all)
+            })
+
+            
+
+
+            // function create_maps(data_filtered) {
+                // // -----------------------------------------------------------------------------------
+                // // RECONFIGURE DATA FOR SANKEY
+                // let sank_map = {"nodes":[], "links":[]}
+                // let node_name_map = {}
+                // let measures_used = []
+
+                // // pick apart config.flowmap
+                // console.log("redraw config", config)
+                // console.log("flowmap", config.flowmap)
+                // console.log("flowmap split", config.flowmap.split(","))
+                // config.flowmap.split(",").forEach((d, i) => {
+                //     let source = parseInt(d.split(":")[0])
+                //     measures_used.push(source)
+
+                //     d.split("[")[1].split("]")[0].split(" ").forEach((d, i) => {
+                //         // console.log("measure", measures[parseInt(d)], data_sank[measures[parseInt(d)].name])
+                //         // console.log("sank_map: value", data_sank[measures[parseInt(d)].name].value)
+                //         sank_map["links"].push({"source": source, "target": parseInt(d), "value": data_filtered[measures[parseInt(d)].name].value})
+                //         measures_used.push(parseInt(d))
+                //     })
+                // })
+
+                // measures_used = [...new Set(measures_used)]
+                // console.log("measures_used no-dups", measures_used)
+
+                // // make sure any measures not used in sankey are hidden before importing data
+                // measures.forEach((d, i) => {
+                //     if (measures_used.includes(i)) {
+                //         if (d.label_short) {
+                //             sank_map["nodes"].push({"id": i, "name": d.label_short})
+                //         } else {
+                //             sank_map["nodes"].push({"id": i, "name": d.label})
+                //         }
+                //     }                 
+                // })
+
+            //     // pick apart config.nodenames
+            //     console.log("nodeRenames", config.nodenames.split(","))
+            //     config.nodenames.split(",").forEach((d, i) => {
+            //         node_name_map[String(parseInt(d.split(":")[0]))] = d.split(":")[1]
+            //     })
+
+            //     console.log("sank_map", sank_map)
+            //     console.log("node_name_map", node_name_map)
+            //     console.log("measures_used", measures_used)
+
+            //     return [sank_map, node_name_map, measures_used]
+            // }
+
+
+
+            function redraw(sank_map_all) {
+                console.log("first redraw config", config)
                 // -----------------------------------------------------------------------------------
                 // FILTER DATA BASED ON DROPDOWN SELECTION
                 let entity = $(`#vis-options option:selected`).val()
@@ -259,7 +388,7 @@ looker.plugins.visualizations.add({
                 console.log("data_sank", data_sank)
 
                 const svg = (
-                    d3.select(element).select('svg')
+                    d3.select("#vis").select('svg')
                         .html('')
                         .attr('width', '100%')
                         .attr('height', '100%')
@@ -270,61 +399,19 @@ looker.plugins.visualizations.add({
                     .attr('width', '100%')
                     .attr('height', (height + 'px'))
                     .classed('group', true)
-    
-                // SET GLOBAL VARIABLES
-                let NUMFORMAT;
-    
-                if (config.currency == true) {
-                    NUMFORMAT = "$,.0f"
-                } else {
-                    NUMFORMAT = ",.0f"
-                }
+
+                console.log("sank_map_all inside redraw", sank_map_all)
+
+                let sank_map = sank_map_all.filter(d => {
+                    return (d.entity == entity)
+                })
+
+                console.log("sank_map for entity", sank_map[0])
 
                 // -----------------------------------------------------------------------------------
-                // RECONFIGURE DATA FOR SANKEY
-                let sank_map = {"nodes":[], "links":[]}
-                let node_name_map = {}
-                let measures_used = []
-
-                // pick apart config.flowmap
-                console.log("redraw config", config)
-                console.log("flowmap", config.flowmap)
-                console.log("flowmap split", config.flowmap.split(","))
-                config.flowmap.split(",").forEach((d, i) => {
-                    let source = parseInt(d.split(":")[0])
-                    measures_used.push(source)
-
-                    d.split("[")[1].split("]")[0].split(" ").forEach((d, i) => {
-                        // console.log("measure", measures[parseInt(d)], data_sank[measures[parseInt(d)].name])
-                        // console.log("sank_map: value", data_sank[measures[parseInt(d)].name].value)
-                        sank_map["links"].push({"source": source, "target": parseInt(d), "value": data_sank[measures[parseInt(d)].name].value})
-                        measures_used.push(parseInt(d))
-                    })
-                })
-
-                measures_used = [...new Set(measures_used)]
-                console.log("measures_used no-dups", measures_used)
-
-                // make sure any measures not used in sankey are hidden before importing data
-                measures.forEach((d, i) => {
-                    if (measures_used.includes(i)) {
-                        if (d.label_short) {
-                            sank_map["nodes"].push({"id": i, "name": d.label_short})
-                        } else {
-                            sank_map["nodes"].push({"id": i, "name": d.label})
-                        }
-                    }                 
-                })
-
-                // pick apart config.nodenames
-                console.log("nodeRenames", config.nodenames.split(","))
-                config.nodenames.split(",").forEach((d, i) => {
-                    node_name_map[String(parseInt(d.split(":")[0]))] = d.split(":")[1]
-                })
-
-                console.log("data_sank", data_sank)
-                console.log("sank_map", sank_map)
-                console.log("node_name_map", node_name_map)
+                // RUN FUNCTION TO CONFIGURE DATA
+                // const [sank_map, node_name_map, measures_used] = create_maps(data_sank)
+                // console.log("ran function to configure data")
 
                 // // -----------------------------------------------------------------------------------
                 // // SETUP THE TOOLTIP
@@ -352,7 +439,11 @@ looker.plugins.visualizations.add({
                     .size([width, height])
                     .nodeAlign(d3sank.sankeyCenter)
 
-                let sank_map2 = Object.assign({}, sank_map)
+                console.log("HERE 1")
+
+                let sank_map2 = Object.assign({}, sank_map[0])
+
+                console.log("HERE 2")
 
                 let graph = sankey(sank_map2)
 
@@ -513,7 +604,7 @@ looker.plugins.visualizations.add({
                             .attr("text-anchor", "start")
             }
             
-            redraw()
+            redraw(sank_map_all)
 
         } catch(error) {
             console.log(error)
