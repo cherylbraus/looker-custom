@@ -65,16 +65,34 @@ export const object = {
             placeholder: "Comma separated",
             default: ""
         },
+        totals_diverging: {
+            section: "Setup",
+            order: 7,
+            type: "string",
+            display: "text",
+            label: "Total measures using diverging color palette (diverge around 0)",
+            placeholder: "Comma separated",
+            default: ""
+        },
+        totals_negative: {
+            section: "Setup",
+            order: 8,
+            type: "string",
+            display: "text",
+            label: "Total measures using color palette to emphasize negatives",
+            placeholder: "Comma separated",
+            default: ""
+        },
         add_last_period_stats: { // ignore_last_week = false
             section: "Setup",
-            order:7,
+            order:9,
             type: "boolean",
             label: "Show last period data",
             default:"true"
         },
         first_chart_type: {
             section: 'Setup',
-            order:8,
+            order:10,
             type: 'string',
             label: 'First Chart Type',
             display: "select",
@@ -87,7 +105,7 @@ export const object = {
         },
         second_chart_type: {
             section: 'Setup',
-            order:9,
+            order:11,
             type: 'string',
             label: 'Second Chart Type',
             display: "select",
@@ -100,7 +118,7 @@ export const object = {
         },
         third_chart_type: {
             section: 'Setup',
-            order:10,
+            order:12,
             type: 'string',
             label: 'Third Chart Type',
             display: "select",
@@ -185,19 +203,26 @@ export const object = {
             section: 'Formatting',
             order:2,
             type: 'boolean',
-            label: 'Color negative trends',
+            label: 'Color trends in plots',
             default: "true" // false
+        },
+        text_directionality: {
+            section: "Formatting",
+            order: 3,
+            type: "boolean",
+            label: "Color trends in last period data",
+            default: "false"
         },
         freeze_header: {
             section: 'Formatting',
-            order:3,
+            order:4,
             type: 'boolean',
             label: 'Freeze header row',
             default: "true" // false
         },
         size_to_fit: {
             section: 'Formatting',
-            order:2,
+            order:5,
             type: 'boolean',
             label: 'Size-to-fit table width',
             default: "false"
@@ -537,6 +562,34 @@ export const object = {
 
                 console.log("where_conditional", where_conditional)
 
+                let totals_diverging = []
+                
+                if (config.totals_diverging.length < 1) {
+                    totals_diverging = []
+                } else {
+                    config.totals_diverging.split(',').forEach((d, i) => {
+                        if (d) {
+                            totals_diverging[i] = parseInt(d)
+                        }
+                    })
+                }
+
+                console.log("totals_diverging", totals_diverging)
+
+                let totals_negative = []
+
+                if (config.totals_negative.length < 1) {
+                    totals_negative = []
+                } else {
+                    config.totals_negative.split(',').forEach((d, i) => {
+                        if (d) {
+                            totals_negative[i] = parseInt(d)
+                        }
+                    })
+                }
+
+                console.log("totals_negative", totals_negative)
+
                 let condition_setups = {};
 
                 if (where_conditional != []) {
@@ -546,14 +599,25 @@ export const object = {
                                 return e[measures[d].name]["$$$_row_total_$$$"].value
                             })
                             
-                            // let condition_scale = d3.scaleSequential()
-                            //     .interpolator(d3.interpolate("rgba(245, 249, 242, 0.8)", "rgba(140, 187, 97, 0.8)"))
-                            //     .domain(col_extent)
-                            let condition_scale = d3.scaleLinear()
-                                .range(["rgba(245, 249, 242, 0.8)", "rgba(140, 187, 97, 0.8)"])
-                                .domain(col_extent)
+                            if (totals_diverging.includes(d) && col_extent[0] < 0) {
+                                let condition_scale = d3.scaleDiverging()
+                                    .domain([col_extent[0], 0, col_extent[1]])
+                                    .interpolator(d3.interpolate("rgba(223,128,55,1.0)","rgba(25,128,188,1.0)"))
 
-                            condition_setups[d] = {'extent': col_extent, 'scale': condition_scale}
+                                condition_setups[d] = {'extent': col_extent, 'scale': condition_scale}
+                            } else if (totals_negative.includes(d)) {
+                                let condition_scale = d3.scaleLinear()
+                                    .range(["rgba(241, 204, 86, 1.0)", "rgba(253, 249, 238, 0.8)"])
+                                    .domain(col_extent)
+
+                                condition_setups[d] = {'extent': col_extent, 'scale': condition_scale}
+                            } else {
+                                let condition_scale = d3.scaleLinear()
+                                    .range(["rgba(245, 249, 242, 0.8)", "rgba(140, 187, 97, 0.8)"])
+                                    .domain(col_extent)
+
+                                condition_setups[d] = {'extent': col_extent, 'scale': condition_scale}
+                            }
                         }
                     })
                 } else {
@@ -870,7 +934,7 @@ export const object = {
                         $('th').removeClass('stuck')
                     }
 
-                    if (config.directionality == "false") {
+                    if (config.text_directionality == "false") {
                         $('.value-down').addClass('color-off')
                         $('.value-up').addClass('color-off')
                     } else {
@@ -1018,17 +1082,17 @@ export const object = {
                                     .attr("height", heights[j] - margin.top - margin.bottom)
                                     .classed("group", true)
 
-                                var icons = d3.select(triangle_id_grabber).append("svg")
-                                    .attr("width", 30)
-                                    .attr("height", 30)
-                                    .append("g")
-                                        .attr("transform", "translate(15, 18)")
+                                if (config.text_directionality == "true") {
+                                    var icons = d3.select(triangle_id_grabber).append("svg")
+                                        .attr("width", 30)
+                                        .attr("height", 30)
+                                        .append("g")
+                                            .attr("transform", "translate(15, 18)")
 
-                                const tri = icons
-                                    .append("path")
-                                    .attr("d", d3.symbol().type(d3.symbolTriangle).size(30))
+                                    const tri = icons
+                                        .append("path")
+                                        .attr("d", d3.symbol().type(d3.symbolTriangle).size(30))
 
-                                if (config.directionality == "true") {
                                     if (dataset[dataset.length - 1].value < dataset[dataset.length - 2].value) {
                                         tri
                                             .attr("transform", "rotate(180)")
@@ -1037,12 +1101,18 @@ export const object = {
                                         tri
                                             .style("fill", "#0072b5")
                                     }
-                                } else {
-                                    if (dataset[dataset.length - 1].value < dataset[dataset.length - 2].value) {
-                                        tri
-                                            .attr("transform", "rotate(180)")
-                                    }
                                 }
+
+                                
+
+                                // if (config.text_directionality == "true") {
+                                    
+                                // } else {
+                                //     if (dataset[dataset.length - 1].value < dataset[dataset.length - 2].value) {
+                                //         tri
+                                //             .attr("transform", "rotate(180)")
+                                //     }
+                                // }
 
                                 if (OPTION_MAP[`chart_column-${j}`]["chart"] == "line") {
                                     group.append("path")
