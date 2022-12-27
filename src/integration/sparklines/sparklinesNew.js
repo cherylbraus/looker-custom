@@ -205,14 +205,14 @@ looker.plugins.visualizations.add({
             order:2,
             type: 'boolean',
             label: 'Color trends in plots',
-            default: "true" // false
+            default: true // false
         },
         text_directionality: {
             section: "Formatting",
             order: 3,
             type: "boolean",
             label: "Color trends in last period data",
-            default: "false"
+            default: false
         },
         freeze_header: {
             section: 'Formatting',
@@ -1083,7 +1083,7 @@ looker.plugins.visualizations.add({
                                     .attr("height", heights[j] - margin.top - margin.bottom)
                                     .classed("group", true)
 
-                                if (config.text_directionality == "true") {
+                                if (config.text_directionality == true) {
                                     var icons = d3.select(triangle_id_grabber).append("svg")
                                         .attr("width", 30)
                                         .attr("height", 30)
