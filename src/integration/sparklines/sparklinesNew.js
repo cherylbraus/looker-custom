@@ -1111,10 +1111,17 @@ looker.plugins.visualizations.add({
                                         .attr("d", line)
                                         .attr("stroke", (e) => {
                                             if (config.directionality == true) {
+                                                const allValues = dataset.map(function(a, ai) {
+                                                    return a.value
+                                                })
+                                                const firstNonNull = allValues.filter(arg => arg != null)[0]
+
                                                 // if first value of chart is more than last value, consider it decrease/orange
-                                                if (dataset[dataset.length - 1].value != null && dataset[0].value > dataset[dataset.length - 1].value) {
+                                                // if (dataset[dataset.length - 1].value != null && dataset[0].value > dataset[dataset.length - 1].value) {
+                                                if (dataset[dataset.length - 1].value != null && firstNonNull > dataset[dataset.length - 1].value) {
                                                     return "#d76106"
-                                                } else if (dataset[dataset.length - 1].value != null && dataset[0].value < dataset[dataset.length - 1].value) {
+                                                // } else if (dataset[dataset.length - 1].value != null && dataset[0].value < dataset[dataset.length - 1].value) {
+                                                } else if (dataset[dataset.length - 1].value != null && firstNonNull < dataset[dataset.length - 1].value) {
                                                     return "#0072b5"
                                                 } else {
                                                     return "#c2c2c2"
@@ -1136,9 +1143,14 @@ looker.plugins.visualizations.add({
                                             .attr("r", 1)
                                             .attr("fill", (d) => {
                                                 if (config.directionality == true) {
-                                                    if (dataset[dataset.length - 1].value != null && dataset[0].value > dataset[dataset.length - 1].value) {
+                                                    const allValues = dataset.map(function(a, ai) {
+                                                        return a.value
+                                                    })
+                                                    const firstNonNull = allValues.filter(arg => arg != null)[0]
+
+                                                    if (dataset[dataset.length - 1].value != null && firstNonNull > dataset[dataset.length - 1].value) {
                                                         return "#d76106"
-                                                    } else if (dataset[dataset.length - 1].value != null && dataset[0].value < dataset[dataset.length - 1].value) {
+                                                    } else if (dataset[dataset.length - 1].value != null && firstNonNull < dataset[dataset.length - 1].value) {
                                                         return "#0072b5"
                                                     } else {
                                                         return "#c2c2c2"
@@ -1154,9 +1166,14 @@ looker.plugins.visualizations.add({
                                             .attr("d", area)
                                             .attr("stroke",(d) => {
                                                 if (config.directionality == true) {
-                                                    if (dataset[dataset.length-1].value != null && dataset[0].value > dataset[dataset.length-1].value) {
+                                                    const allValues = dataset.map(function(a, ai) {
+                                                        return a.value
+                                                    })
+                                                    const firstNonNull = allValues.filter(arg => arg != null)[0]
+
+                                                    if (dataset[dataset.length-1].value != null && firstNonNull > dataset[dataset.length-1].value) {
                                                     return "#D76106"
-                                                    } else if (dataset[dataset.length-1].value != null && dataset[0].value < dataset[dataset.length-1].value) {
+                                                    } else if (dataset[dataset.length-1].value != null && firstNonNull < dataset[dataset.length-1].value) {
                                                     return "#0072b5"
                                                     } else {
                                                     return "#c2c2c2"
@@ -1167,9 +1184,14 @@ looker.plugins.visualizations.add({
                                             })
                                             .attr("fill", (d) => {
                                                 if (config.directionality == true) {
-                                                    if (dataset[dataset.length-1].value != null && dataset[0].value > dataset[dataset.length-1].value) {
+                                                    const allValues = dataset.map(function(a, ai) {
+                                                        return a.value
+                                                    })
+                                                    const firstNonNull = allValues.filter(arg => arg != null)[0]
+
+                                                    if (dataset[dataset.length-1].value != null && firstNonNull > dataset[dataset.length-1].value) {
                                                     return "#D76106"
-                                                    } else if (dataset[dataset.length-1].value != null && dataset[0].value < dataset[dataset.length-1].value) {
+                                                    } else if (dataset[dataset.length-1].value != null && firstNonNull < dataset[dataset.length-1].value) {
                                                     return "#0072b5"
                                                     } else {
                                                     return "#c2c2c2"
@@ -1202,10 +1224,15 @@ looker.plugins.visualizations.add({
                                                 return Math.abs(y(d.value) - y(0))
                                             })
                                             .attr("fill", (d) => {
-                                                if (config.directionality == true) {
-                                                    if (dataset[dataset.length-1].value != null && dataset[0].value > dataset[dataset.length-1].value) {
+                                                if (config.directionality == "true") {
+                                                    const allValues = dataset.map(function(a, ai) {
+                                                        return a.value
+                                                    })
+                                                    const firstNonNull = allValues.filter(arg => arg != null)[0]
+                                                    
+                                                    if (dataset[dataset.length-1].value != null && firstNonNull > dataset[dataset.length-1].value) {
                                                       return "#D76106"
-                                                    } else if (dataset[dataset.length-1].value != null && dataset[0].value < dataset[dataset.length-1].value) {
+                                                    } else if (dataset[dataset.length-1].value != null && firstNonNull < dataset[dataset.length-1].value) {
                                                       return "#0072b5"
                                                     } else {
                                                       return "#c2c2c2"

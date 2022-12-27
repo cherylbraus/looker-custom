@@ -1,4 +1,3 @@
-import availablePlugins from '@babel/preset-env/lib/available-plugins';
 import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
@@ -1122,20 +1121,17 @@ export const object = {
                                         .attr("d", line)
                                         .attr("stroke", (e) => {
                                             if (config.directionality == "true") {
-                                                console.log("LAST VALUE", dataset[dataset.length - 1].value)
-                                                console.log("FIRST VALUE", dataset[0].value)
-                                                console.log("DATASET", dataset)
-                                                // const allValues = dataset.map(function(a, ai) {
-                                                //     return a.value
-                                                // })
-                                                // console.log("ALLVALUES", allValues)
-                                                // const firstNonNull = allValues.filter(arg => arg != null)[0]
-                                                // console.log("FIRSTNONNULL", firstNonNull)
+                                                const allValues = dataset.map(function(a, ai) {
+                                                    return a.value
+                                                })
+                                                const firstNonNull = allValues.filter(arg => arg != null)[0]
 
                                                 // if first value of chart is more than last value, consider it decrease/orange
-                                                if (dataset[dataset.length - 1].value != null && dataset[0].value > dataset[dataset.length - 1].value) {
+                                                // if (dataset[dataset.length - 1].value != null && dataset[0].value > dataset[dataset.length - 1].value) {
+                                                if (dataset[dataset.length - 1].value != null && firstNonNull > dataset[dataset.length - 1].value) {
                                                     return "#d76106"
-                                                } else if (dataset[dataset.length - 1].value != null && dataset[0].value < dataset[dataset.length - 1].value) {
+                                                // } else if (dataset[dataset.length - 1].value != null && dataset[0].value < dataset[dataset.length - 1].value) {
+                                                } else if (dataset[dataset.length - 1].value != null && firstNonNull < dataset[dataset.length - 1].value) {
                                                     return "#0072b5"
                                                 } else {
                                                     return "#c2c2c2"
@@ -1157,9 +1153,14 @@ export const object = {
                                             .attr("r", 1)
                                             .attr("fill", (d) => {
                                                 if (config.directionality == "true") {
-                                                    if (dataset[dataset.length - 1].value != null && dataset[0].value > dataset[dataset.length - 1].value) {
+                                                    const allValues = dataset.map(function(a, ai) {
+                                                        return a.value
+                                                    })
+                                                    const firstNonNull = allValues.filter(arg => arg != null)[0]
+
+                                                    if (dataset[dataset.length - 1].value != null && firstNonNull > dataset[dataset.length - 1].value) {
                                                         return "#d76106"
-                                                    } else if (dataset[dataset.length - 1].value != null && dataset[0].value < dataset[dataset.length - 1].value) {
+                                                    } else if (dataset[dataset.length - 1].value != null && firstNonNull < dataset[dataset.length - 1].value) {
                                                         return "#0072b5"
                                                     } else {
                                                         return "#c2c2c2"
@@ -1175,9 +1176,14 @@ export const object = {
                                             .attr("d", area)
                                             .attr("stroke",(d) => {
                                                 if (config.directionality == "true") {
-                                                    if (dataset[dataset.length-1].value != null && dataset[0].value > dataset[dataset.length-1].value) {
+                                                    const allValues = dataset.map(function(a, ai) {
+                                                        return a.value
+                                                    })
+                                                    const firstNonNull = allValues.filter(arg => arg != null)[0]
+
+                                                    if (dataset[dataset.length-1].value != null && firstNonNull > dataset[dataset.length-1].value) {
                                                     return "#D76106"
-                                                    } else if (dataset[dataset.length-1].value != null && dataset[0].value < dataset[dataset.length-1].value) {
+                                                    } else if (dataset[dataset.length-1].value != null && firstNonNull < dataset[dataset.length-1].value) {
                                                     return "#0072b5"
                                                     } else {
                                                     return "#c2c2c2"
@@ -1188,9 +1194,14 @@ export const object = {
                                             })
                                             .attr("fill", (d) => {
                                                 if (config.directionality == "true") {
-                                                    if (dataset[dataset.length-1].value != null && dataset[0].value > dataset[dataset.length-1].value) {
+                                                    const allValues = dataset.map(function(a, ai) {
+                                                        return a.value
+                                                    })
+                                                    const firstNonNull = allValues.filter(arg => arg != null)[0]
+
+                                                    if (dataset[dataset.length-1].value != null && firstNonNull > dataset[dataset.length-1].value) {
                                                     return "#D76106"
-                                                    } else if (dataset[dataset.length-1].value != null && dataset[0].value < dataset[dataset.length-1].value) {
+                                                    } else if (dataset[dataset.length-1].value != null && firstNonNull < dataset[dataset.length-1].value) {
                                                     return "#0072b5"
                                                     } else {
                                                     return "#c2c2c2"
@@ -1224,9 +1235,14 @@ export const object = {
                                             })
                                             .attr("fill", (d) => {
                                                 if (config.directionality == "true") {
-                                                    if (dataset[dataset.length-1].value != null && dataset[0].value > dataset[dataset.length-1].value) {
+                                                    const allValues = dataset.map(function(a, ai) {
+                                                        return a.value
+                                                    })
+                                                    const firstNonNull = allValues.filter(arg => arg != null)[0]
+                                                    
+                                                    if (dataset[dataset.length-1].value != null && firstNonNull > dataset[dataset.length-1].value) {
                                                       return "#D76106"
-                                                    } else if (dataset[dataset.length-1].value != null && dataset[0].value < dataset[dataset.length-1].value) {
+                                                    } else if (dataset[dataset.length-1].value != null && firstNonNull < dataset[dataset.length-1].value) {
                                                       return "#0072b5"
                                                     } else {
                                                       return "#c2c2c2"
