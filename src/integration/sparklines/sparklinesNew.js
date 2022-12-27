@@ -67,7 +67,7 @@ looker.plugins.visualizations.add({
             default: ""
         },
         totals_diverging: {
-            section: "Setup",
+            section: "Arrange",
             order: 7,
             type: "string",
             display: "text",
@@ -76,7 +76,7 @@ looker.plugins.visualizations.add({
             default: ""
         },
         totals_negative: {
-            section: "Setup",
+            section: "Arrange",
             order: 8,
             type: "string",
             display: "text",
