@@ -86,14 +86,14 @@ looker.plugins.visualizations.add({
         },
         add_last_period_stats: { // ignore_last_week = false
             section: "Arrange",
-            order:7,
+            order:9,
             type: "boolean",
             label: "Show last period data",
             default:true
         },
         first_chart_type: {
             section: 'Arrange',
-            order:8,
+            order:10,
             type: 'string',
             label: 'First Chart Type',
             display: "select",
@@ -106,7 +106,7 @@ looker.plugins.visualizations.add({
         },
         second_chart_type: {
             section: 'Arrange',
-            order:9,
+            order:11,
             type: 'string',
             label: 'Second Chart Type',
             display: "select",
@@ -119,7 +119,7 @@ looker.plugins.visualizations.add({
         },
         third_chart_type: {
             section: 'Arrange',
-            order:10,
+            order:12,
             type: 'string',
             label: 'Third Chart Type',
             display: "select",
@@ -216,14 +216,14 @@ looker.plugins.visualizations.add({
         },
         freeze_header: {
             section: 'Formatting',
-            order:3,
+            order:4,
             type: 'boolean',
             label: 'Freeze header row',
             default: true // false
         },
         size_to_fit: {
             section: 'Formatting',
-            order:2,
+            order:5,
             type: 'boolean',
             label: 'Size-to-fit table width',
             default: false
