@@ -1,3 +1,4 @@
+import availablePlugins from '@babel/preset-env/lib/available-plugins';
 import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
@@ -1050,8 +1051,8 @@ export const object = {
                                         return ent.value
                                     })
 
-                                    console.log("VARIABLE y-scale heights", heights)
-                                    console.log("VARIABLE y-scale mins and maxs", col_mins, col_maxs)
+                                    // console.log("VARIABLE y-scale heights", heights)
+                                    // console.log("VARIABLE y-scale mins and maxs", col_mins, col_maxs)
                                 }
                                 
                                 if (OPTION_MAP[`chart_column-${j}`]["ylower"] == "" && OPTION_MAP[`chart_column-${j}`]["yupper"] == "") {
@@ -1121,6 +1122,16 @@ export const object = {
                                         .attr("d", line)
                                         .attr("stroke", (e) => {
                                             if (config.directionality == "true") {
+                                                console.log("LAST VALUE", dataset[dataset.length - 1].value)
+                                                console.log("FIRST VALUE", dataset[0].value)
+                                                console.log("DATASET", dataset)
+                                                // const allValues = dataset.map(function(a, ai) {
+                                                //     return a.value
+                                                // })
+                                                // console.log("ALLVALUES", allValues)
+                                                // const firstNonNull = allValues.filter(arg => arg != null)[0]
+                                                // console.log("FIRSTNONNULL", firstNonNull)
+
                                                 // if first value of chart is more than last value, consider it decrease/orange
                                                 if (dataset[dataset.length - 1].value != null && dataset[0].value > dataset[dataset.length - 1].value) {
                                                     return "#d76106"

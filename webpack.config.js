@@ -30,7 +30,7 @@ var webpackConfig = {
     // topTileMonth: './src/integration/topTextTile/topTileMonth.js',
     // line: './src/integration/line/line.js',
     // sparklines: './src/integration/sparklines/sparklines.js',
-    sparklinesNew: './src/integration/sparklines/sparklinesNew.js',
+    // sparklinesNew: './src/integration/sparklines/sparklinesNew.js',
     // fever: './src/integration/fever/fever.js',
     // coloredBar: './src/integration/coloredBar/coloredBar.js',
     // weekDayBar: './src/integration/weekDayBar/weekDayBar.js',
@@ -39,7 +39,7 @@ var webpackConfig = {
     // linedropdown: './src/integration/line/linedropdown.js',
     // hexmapWithLine: './src/integration/map/hexmap_with_line.js',
     // sankeyNew: './src/integration/sankey/sankey.js',
-    // template: './src/integration/template/template.js',
+    template: './src/integration/template/template.js',
   },
   output: {
     filename: "[name].js",
@@ -50,12 +50,12 @@ var webpackConfig = {
   resolve: {
     extensions: [".ts", ".js"]
   },
-  // optimization: {
-  //   minimize: false
-  // },
-  plugins: [
-    new UglifyJSPlugin()
-  ],
+  optimization: {
+    minimize: false
+  },
+  // plugins: [
+  //   new UglifyJSPlugin()
+  // ],
   module: {
     rules: [
       { test: /\.js$/, loader: "babel-loader" },
