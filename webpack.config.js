@@ -38,8 +38,8 @@ var webpackConfig = {
     // monthlyGoals: './src/integration/monthlyGoals/monthlyGoals.js',
     // linedropdown: './src/integration/line/linedropdown.js',
     // hexmapWithLine: './src/integration/map/hexmap_with_line.js',
-    // sankeyNew: './src/integration/sankey/sankey.js',
-    template: './src/integration/template/template.js',
+    sankeyNew: './src/integration/sankey/sankey.js',
+    // template: './src/integration/template/template.js',
   },
   output: {
     filename: "[name].js",

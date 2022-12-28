@@ -21143,7 +21143,7 @@ looker.plugins.visualizations.add({
       display: "text",
       label: "Flow Mapping",
       placeholder: "0:[1 2], 1:[3 4] (see docs)",
-      "default": ""
+      "default": "0:[1]"
     },
     nodenames: {
       section: "Setup",
@@ -21164,7 +21164,7 @@ looker.plugins.visualizations.add({
   },
   create: function create(element, config) {
     // Insert a <style> tag with some styles we'll use later
-    element.innerHTML = "\n            <style>\n                @font-face { \n                    font-family: Roboto; \n                    font-weight: 300; \n                    font-style: normal;\n                    src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');\n                }\n                @font-face { font-family: Roboto; font-weight: 400; font-style: normal;\n                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');\n                }\n                    @font-face { font-family: Roboto; font-weight: 500; font-style: normal;\n                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');\n                }\n                @font-face { font-family: Roboto; font-weight: 700; font-style: normal;\n                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');\n                }\n                body {\n                    font-family: Roboto;\n                    font-size: 12px;\n                }\n                text {\n                    font-family: 'Roboto';\n                }\n                .domain {\n                    display: none;\n                }\n                .gridline {\n                    stroke: rgb(230, 230, 230);\n                    shape-rendering: crispEdges;\n                    stroke-opacity: .1;\n                }\n                .gridline2 {\n                    stroke: white;\n                    shape-rendering: crispEdges;\n                    stroke-opacity: 1;\n                }\n                #viz-container {\n                    z-index: 9;\n                    position: relative;\n                    background-color: none;\n                    border: 1px solid #d3d3d3;\n                    text-align: center;\n                    // width: 600px;\n                    // height: 360px;\n                }\n                #dimension-header {\n                    font-size: 12px;\n                }\n                .value-headers {\n                    font-size: 12px;\n                }\n                .value-headers-body {\n                    font-weight: 500;\n                }\n                #vis {\n                    font-family: 'Open Sans', 'Helvetica', 'sans-serif';\n                    cursor: move;\n                    z-index: 10;\n                    background-color: none;\n                    color: #fff;\n                    // height: 100%;\n                    // width: 100%;\n                    fill: black;\n                    color: black;\n                }\n                .error-container {\n                    margin: 0;\n                    position: absolute;\n                    top: 50%;\n                    -ms-transform: translateY(-50%);\n                    transform: translateY(-50%);\n                    text-align:center;\n                    width:100%;\n                }\n                .error {\n                    font-family:Roboto;\n                    font-size:16px\n                }\n                .error-header {\n                    font-family:Roboto;\n                    font-weight:700;\n                    font-size:16px\n                }\n                #menu-options p {\n                    font-weight: 500;\n                }\n                #vis-options-container {\n                  display: flex;\n                  margin: 12px 8px, 4px;\n                }\n                #vis-options-container p {\n                  font-size: 14px;\n                  margin: 0 4px 0 0;\n                }\n                .backdrop {\n                  opacity: .5;\n                }\n                .tooltip {\n                    box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;\n                    font-size: 12px;\n                    pointer-events: none;\n                }\n\n                .tooltip #tt-header {\n                    font-size: 12px;\n                    font-weight: 600;\n                    color: #c3c3c3;\n                    text-transform: uppercase;\n                }\n\n                .tooltip h1 {\n                    font-size: 11px;\n                    color: #c3c3c3;\n                    text-transform: uppercase;\n                }\n                hr { \n                    margin-top: 1px; \n                    margin-bottom: 1px \n                }\n\n                #tt-body {\n                    margin-top: 5px;\n                }\n                </style>\n                <div id=\"vis-options-container\"><p class=\"dropdown-title\"></p>\n                    <select name=\"vis-options\" id=\"vis-options\"></select>\n                </div>\n                <svg></svg>";
+    element.innerHTML = "\n            <style>\n                @font-face { \n                    font-family: Roboto; \n                    font-weight: 300; \n                    font-style: normal;\n                    src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');\n                }\n                @font-face { font-family: Roboto; font-weight: 400; font-style: normal;\n                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');\n                }\n                    @font-face { font-family: Roboto; font-weight: 500; font-style: normal;\n                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');\n                }\n                @font-face { font-family: Roboto; font-weight: 700; font-style: normal;\n                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');\n                }\n                body {\n                    font-family: Roboto;\n                    font-size: 12px;\n                }\n                text {\n                    font-family: 'Roboto';\n                }\n                .domain {\n                    display: none;\n                }\n                .gridline {\n                    stroke: rgb(230, 230, 230);\n                    shape-rendering: crispEdges;\n                    stroke-opacity: .1;\n                }\n                .gridline2 {\n                    stroke: white;\n                    shape-rendering: crispEdges;\n                    stroke-opacity: 1;\n                }\n                #viz-container {\n                    z-index: 9;\n                    position: relative;\n                    background-color: none;\n                    border: 1px solid #d3d3d3;\n                    text-align: center;\n                    // width: 600px;\n                    // height: 360px;\n                }\n                #dimension-header {\n                    font-size: 12px;\n                }\n                .value-headers {\n                    font-size: 12px;\n                }\n                .value-headers-body {\n                    font-weight: 500;\n                }\n                #vis {\n                    font-family: 'Open Sans', 'Helvetica', 'sans-serif';\n                    cursor: move;\n                    z-index: 10;\n                    background-color: none;\n                    color: #fff;\n                    // height: 100%;\n                    // width: 100%;\n                    fill: black;\n                    color: black;\n                }\n                .error-container {\n                    margin: 0;\n                    position: absolute;\n                    top: 50%;\n                    -ms-transform: translateY(-50%);\n                    transform: translateY(-50%);\n                    text-align:center;\n                    width:100%;\n                }\n                .error {\n                    font-family:Roboto;\n                    font-size:16px\n                }\n                .error-header {\n                    font-family:Roboto;\n                    font-weight:700;\n                    font-size:16px\n                }\n                #menu-options p {\n                    font-weight: 500;\n                }\n                #vis-options-container {\n                  display: flex;\n                  margin: 12px 8px, 4px;\n                }\n                #vis-options-container p {\n                  font-size: 14px;\n                  margin: 0 4px 0 0;\n                }\n                .backdrop {\n                  opacity: .5;\n                }\n                .tooltip {\n                    box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;\n                    font-size: 12px;\n                    pointer-events: none;\n                }\n\n                .tooltip #tt-header {\n                    font-size: 12px;\n                    font-weight: 600;\n                    color: #afafaf;\n                    text-transform: uppercase;\n                }\n\n                .tooltip h1 {\n                    font-size: 11px;\n                    color: #afafaf;\n                    text-transform: uppercase;\n                }\n                hr { \n                    margin-top: 1px; \n                    margin-bottom: 1px \n                }\n\n                #tt-body {\n                    margin-top: 5px;\n                }\n                </style>\n                <div id=\"vis-options-container\"><p class=\"dropdown-title\"></p>\n                    <select name=\"vis-options\" id=\"vis-options\"></select>\n                </div>\n                <svg></svg>\n                <div class=\"tooltip\"></div>";
     element.style.fontFamily = "Roboto,\"Open Sans\", \"Helvetica\", sans-serif";
   },
   updateAsync: function updateAsync(data, element, config, queryResponse, details, done) {
@@ -21182,48 +21182,6 @@ looker.plugins.visualizations.add({
     }
 
     try {
-      // function create_maps(data_filtered) {
-      // // -----------------------------------------------------------------------------------
-      // // RECONFIGURE DATA FOR SANKEY
-      // let sank_map = {"nodes":[], "links":[]}
-      // let node_name_map = {}
-      // let measures_used = []
-      // // pick apart config.flowmap
-      // console.log("redraw config", config)
-      // console.log("flowmap", config.flowmap)
-      // console.log("flowmap split", config.flowmap.split(","))
-      // config.flowmap.split(",").forEach((d, i) => {
-      //     let source = parseInt(d.split(":")[0])
-      //     measures_used.push(source)
-      //     d.split("[")[1].split("]")[0].split(" ").forEach((d, i) => {
-      //         // console.log("measure", measures[parseInt(d)], data_sank[measures[parseInt(d)].name])
-      //         // console.log("sank_map: value", data_sank[measures[parseInt(d)].name].value)
-      //         sank_map["links"].push({"source": source, "target": parseInt(d), "value": data_filtered[measures[parseInt(d)].name].value})
-      //         measures_used.push(parseInt(d))
-      //     })
-      // })
-      // measures_used = [...new Set(measures_used)]
-      // console.log("measures_used no-dups", measures_used)
-      // // make sure any measures not used in sankey are hidden before importing data
-      // measures.forEach((d, i) => {
-      //     if (measures_used.includes(i)) {
-      //         if (d.label_short) {
-      //             sank_map["nodes"].push({"id": i, "name": d.label_short})
-      //         } else {
-      //             sank_map["nodes"].push({"id": i, "name": d.label})
-      //         }
-      //     }                 
-      // })
-      //     // pick apart config.nodenames
-      //     console.log("nodeRenames", config.nodenames.split(","))
-      //     config.nodenames.split(",").forEach((d, i) => {
-      //         node_name_map[String(parseInt(d.split(":")[0]))] = d.split(":")[1]
-      //     })
-      //     console.log("sank_map", sank_map)
-      //     console.log("node_name_map", node_name_map)
-      //     console.log("measures_used", measures_used)
-      //     return [sank_map, node_name_map, measures_used]
-      // }
       var redraw = function redraw(sank_map_all) {
         console.log("first redraw config", config); // -----------------------------------------------------------------------------------
         // FILTER DATA BASED ON DROPDOWN SELECTION
@@ -21244,23 +21202,105 @@ looker.plugins.visualizations.add({
         // RUN FUNCTION TO CONFIGURE DATA
         // const [sank_map, node_name_map, measures_used] = create_maps(data_sank)
         // console.log("ran function to configure data")
-        // // -----------------------------------------------------------------------------------
-        // // SETUP THE TOOLTIP
-        // let tooltip = d3.select(".tooltip")
-        //     .style("opacity", 0)
-        //     .style("background-color", "white")
-        //     .style("border-radius", "4px")
-        //     .style("padding", "5px")
-        //     .style("position", "absolute")
-        //     .style("display", "block")
-        //     .style("border", "solid")
-        //     .style("border-color", "lightgrey")
-        //     .style("border-width", ".5px")
-        // tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>')
-        // const tooltipHeader = tooltip.select("#tt-header")
-        // const tooltipBody = tooltip.select("#tt-body")
         // -----------------------------------------------------------------------------------
+        // SETUP THE TOOLTIP
+
+        var tooltip = src_select(".tooltip").style("opacity", 0).style("background-color", "white").style("border-radius", "4px").style("padding", "5px").style("position", "absolute").style("display", "block").style("border", "solid").style("border-color", "lightgrey").style("border-width", ".5px");
+        tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>');
+        var tooltipHeader = tooltip.select("#tt-header");
+        var tooltipBody = tooltip.select("#tt-body");
+
+        var mouseoverNode = function mouseoverNode(d) {
+          tooltip.transition().duration(0).style("opacity", 0.95);
+          nodeHighlightLinks(d);
+          console.log("MOUSEOVER-NODE", d);
+        };
+
+        var mousemoveNode = function mousemoveNode(d) {
+          console.log("mousemoveNode", d);
+
+          if (d.targetLinks.length > 0) {
+            var sourceTotals = [];
+            var sourceNames = [];
+            d.targetLinks.forEach(function (tl, i) {
+              sourceTotals.push(tl.source.value);
+              sourceNames.push(tl.source.name);
+            });
+            var sourceSum = sourceTotals.reduce(function (acc, cur) {
+              return acc + cur;
+            }, 0);
+            var sourceHTML = "";
+            sourceNames.forEach(function (sn, i) {
+              if (i < sourceNames.length - 1) {
+                sourceHTML += "<span style=\"float:right;\">".concat(sn, "</span><br>");
+              } else {
+                sourceHTML += "<span style=\"float:right;\">".concat(sn, "</span>");
+              }
+            });
+            tooltipHeader.html("Node: ".concat(d.name, "<hr>"));
+            tooltipBody.html("<span style=\"float:left;\">% of Sources:&nbsp&nbsp</span>" + "<span style=\"float:right;\">".concat(defaultLocale_format(",.1%")(d.value / sourceSum), "</span><br>") + "<span style=\"float:left;\">Sources:&nbsp&nbsp</span>" + sourceHTML);
+          } else {
+            tooltipHeader.html("Node: ".concat(d.name, "<hr>"));
+            tooltipBody.html("<span style=\"float:left;\">No Sources</span>");
+          }
+
+          var tooltipWidth = src_select(".tooltip").node().getBoundingClientRect().width;
+          var tooltipHeight = src_select(".tooltip").node().getBoundingClientRect().height;
+
+          if (on_event.pageY < height * .7) {
+            tooltip.style("top", on_event.pageY - 40 + "px");
+          } else {
+            tooltip.style("top", on_event.pageY - 80 - tooltipHeight + "px");
+          }
+
+          if (on_event.pageX < width * .5) {
+            tooltip.style("left", on_event.pageX + "px");
+          } else {
+            tooltip.style("left", on_event.pageX - 20 - tooltipWidth + "px");
+          }
+
+          console.log("MOUSEMOVE-NODE");
+        };
+
+        var mouseoutNode = function mouseoutNode(d) {
+          tooltip.transition().duration(0).style("opacity", 0);
+          nodeUnHighlightLinks(d);
+          console.log("MOUSEOUT-NODE");
+        };
+
+        var mouseoverLink = function mouseoverLink(d) {
+          tooltip.transition().duration(0).style("opacity", 0.95);
+          src_select(this).attr("stroke-opacity", 0.9);
+          console.log("MOUSEOVER-LINK", d);
+        };
+
+        var mousemoveLink = function mousemoveLink(d) {
+          tooltipHeader.html("Link to ".concat(d.target.name, "<hr>"));
+          tooltipBody.html("<span style=\"float:left;\">% of ".concat(d.source.name, ":&nbsp&nbsp</span>") + "<span style=\"float:right;\">".concat(defaultLocale_format(",.1%")(d.value / d.source.value), "</span>"));
+          var tooltipWidth = src_select(".tooltip").node().getBoundingClientRect().width;
+          var tooltipHeight = src_select(".tooltip").node().getBoundingClientRect().height;
+
+          if (on_event.pageY < height * .7) {
+            tooltip.style("top", on_event.pageY - 40 + "px");
+          } else {
+            tooltip.style("top", on_event.pageY - 80 - tooltipHeight + "px");
+          }
+
+          if (on_event.pageX < width * .5) {
+            tooltip.style("left", on_event.pageX + "px");
+          } else {
+            tooltip.style("left", on_event.pageX - 20 - tooltipWidth + "px");
+          }
+
+          console.log("MOUSEMOVE-LINK");
+        };
+
+        var mouseoutLink = function mouseoutLink(d) {
+          tooltip.transition().duration(0).style("opacity", 0);
+          src_select(this).attr("stroke-opacity", 0.4);
+        }; // -----------------------------------------------------------------------------------
         // SETUP SANKEY
+
 
         var sankey = Sankey().nodeId(function (d) {
           return d.id;
@@ -21352,11 +21392,7 @@ looker.plugins.visualizations.add({
           return "link ind".concat(d.index);
         }).attr("d", sankeyLinkHorizontal()).attr("fill", "none").attr("stroke", "#afafaf").attr("stroke-width", function (d) {
           return d.width;
-        }).attr("stroke-opacity", 0.4).on("mouseover", function () {
-          src_select(this).attr("stroke-opacity", 0.9);
-        }).on("mouseout", function () {
-          src_select(this).attr("stroke-opacity", 0.4);
-        });
+        }).attr("stroke-opacity", 0.4).on("mouseover", mouseoverLink).on("mousemove", mousemoveLink).on("mouseout", mouseoutLink);
         var nodes = group.append('g').attr("class", "nodes").selectAll("rect").data(graph.nodes).enter().append("rect").attr("class", function (d) {
           return "node id".concat(d.id);
         }).attr("x", function (d) {
@@ -21367,11 +21403,7 @@ looker.plugins.visualizations.add({
           return d.x1 - d.x0;
         }).attr("height", function (d) {
           return d.y1 - d.y0;
-        }).attr("fill", "#27566b").attr("opacity", 0.7).on("mouseover", function (d) {
-          return nodeHighlightLinks(d);
-        }).on("mouseout", function (d) {
-          return nodeUnHighlightLinks(d);
-        });
+        }).attr("fill", "#27566b").attr("opacity", 0.7).on("mouseover", mouseoverNode).on("mousemove", mousemoveNode).on("mouseout", mouseoutNode);
         var labels = group.append('g').attr("class", "node-labels").selectAll("text").data(graph.nodes).enter().append("text").attr("class", "node-label").attr("x", function (d) {
           return d.x0 - 2;
         }).attr("y", function (d) {
@@ -21411,19 +21443,17 @@ looker.plugins.visualizations.add({
         bottom: 35,
         left: 2,
         right: 10
-      };
-      var getNode = src_select("#vis"); // Update this once we have a better idea how Looker integration will look
+      }; // const getNode = d3.select("#vis");
+      // // Update this once we have a better idea how Looker integration will look
+      // const new_node_width = getNode.select(function() { return this.parentNode; })
+      // const new_node_height = getNode.select(function() { return this.parentNode; })
+      // const nodewidth = new_node_width.node().getBoundingClientRect().width;
+      // const nodeheight = new_node_height.node().getBoundingClientRect().height;
+      // const width = nodewidth - margin.left - margin.right;
+      // const height = nodeheight - margin.top - margin.bottom;
 
-      var new_node_width = getNode.select(function () {
-        return this.parentNode;
-      });
-      var new_node_height = getNode.select(function () {
-        return this.parentNode;
-      });
-      var nodewidth = new_node_width.node().getBoundingClientRect().width;
-      var nodeheight = new_node_height.node().getBoundingClientRect().height;
-      var width = nodewidth - margin.left - margin.right;
-      var height = nodeheight - margin.top - margin.bottom; // SORT DATA
+      var width = element.clientWidth - margin.left - margin.right;
+      var height = element.clientHeight - margin.top - margin.bottom; // SORT DATA
 
       data.sort(function (a, b) {
         return a[dimensions[0].name].value > b[dimensions[0].name].value ? 1 : b[dimensions[0].name].value > a[dimensions[0].name].value ? -1 : 0;
@@ -21468,7 +21498,8 @@ looker.plugins.visualizations.add({
       // })
 
       console.log("CONFIG", config);
-      console.log("OUTSIDE FLOWMAP", config.flowmap); // -----------------------------------------------------------------------------------
+      console.log("OUTSIDE FLOWMAP", config.flowmap);
+      console.log("flowmap", config.flowmap.split(",")); // -----------------------------------------------------------------------------------
       // SET GLOBAL VARIABLES
 
       var NUMFORMAT;
@@ -21487,12 +21518,14 @@ looker.plugins.visualizations.add({
       var measures_used = [];
       console.log("original config", config);
       data.forEach(function (entry, ind) {
+        console.log("data entry", entry);
         var tmp_map = {
           "entity": entry[dimensions[0].name].value,
           "links": [],
           "nodes": []
         };
         config.flowmap.split(",").forEach(function (d, i) {
+          console.log("flowmap.split", d);
           var source = parseInt(d.split(":")[0]);
           measures_used.push(source);
           d.split("[")[1].split("]")[0].split(" ").forEach(function (di, ii) {

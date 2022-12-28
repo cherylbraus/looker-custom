@@ -194,16 +194,19 @@ looker.plugins.visualizations.add({
                 right: 10
             }
 
-            const getNode = d3.select("#vis");
+            // const getNode = d3.select("#vis");
 
-            // Update this once we have a better idea how Looker integration will look
-            const new_node_width = getNode.select(function() { return this.parentNode; })
-            const new_node_height = getNode.select(function() { return this.parentNode; })
-            const nodewidth = new_node_width.node().getBoundingClientRect().width;
-            const nodeheight = new_node_height.node().getBoundingClientRect().height;
+            // // Update this once we have a better idea how Looker integration will look
+            // const new_node_width = getNode.select(function() { return this.parentNode; })
+            // const new_node_height = getNode.select(function() { return this.parentNode; })
+            // const nodewidth = new_node_width.node().getBoundingClientRect().width;
+            // const nodeheight = new_node_height.node().getBoundingClientRect().height;
 
-            const width = nodewidth - margin.left - margin.right;
-            const height = nodeheight - margin.top - margin.bottom;
+            // const width = nodewidth - margin.left - margin.right;
+            // const height = nodeheight - margin.top - margin.bottom;
+
+            const width = element.clientWidth - margin.left - margin.right;
+            const height = element.clientHeight - margin.top - margin.bottom;
             
 
             // SORT DATA
@@ -255,6 +258,7 @@ looker.plugins.visualizations.add({
 
             console.log("CONFIG", config)
             console.log("OUTSIDE FLOWMAP", config.flowmap)
+            console.log("flowmap", config.flowmap.split(","))
 
             // -----------------------------------------------------------------------------------
             // SET GLOBAL VARIABLES
@@ -275,8 +279,10 @@ looker.plugins.visualizations.add({
 
             console.log("original config", config)
             data.forEach((entry, ind) => {
+                console.log("data entry", entry)
                 let tmp_map = {"entity": entry[dimensions[0].name].value, "links": [], "nodes": []}
                 config.flowmap.split(",").forEach((d, i) => {
+                    console.log("flowmap.split", d)
                     let source = parseInt(d.split(":")[0])
                     measures_used.push(source)                
                     d.split("[")[1].split("]")[0].split(" ").forEach((di, ii) => {
