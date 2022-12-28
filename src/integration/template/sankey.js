@@ -211,8 +211,8 @@ export const object = {
                     measures_used.push(source)
 
                     d.split("[")[1].split("]")[0].split(" ").forEach((d, i) => {
-                        console.log("measure", measures[parseInt(d)], data_sank[measures[parseInt(d)].name])
-                        console.log("sank_map: value", data_sank[measures[parseInt(d)].name].value)
+                        // console.log("measure", measures[parseInt(d)], data_sank[measures[parseInt(d)].name])
+                        // console.log("sank_map: value", data_sank[measures[parseInt(d)].name].value)
                         sank_map["links"].push({"source": source, "target": parseInt(d), "value": data_sank[measures[parseInt(d)].name].value})
                         measures_used.push(parseInt(d))
                     })
@@ -242,22 +242,152 @@ export const object = {
                 console.log("sank_map", sank_map)
                 console.log("node_name_map", node_name_map)
 
-                // // -----------------------------------------------------------------------------------
-                // // SETUP THE TOOLTIP
-                // let tooltip = d3.select(".tooltip")
-                //     .style("opacity", 0)
-                //     .style("background-color", "white")
-                //     .style("border-radius", "4px")
-                //     .style("padding", "5px")
-                //     .style("position", "absolute")
-                //     .style("display", "block")
-                //     .style("border", "solid")
-                //     .style("border-color", "lightgrey")
-                //     .style("border-width", ".5px")
+                // -----------------------------------------------------------------------------------
+                // SETUP THE TOOLTIP
+                let tooltip = d3.select(".tooltip")
+                    .style("opacity", 0)
+                    .style("background-color", "white")
+                    .style("border-radius", "4px")
+                    .style("padding", "5px")
+                    .style("position", "absolute")
+                    .style("display", "block")
+                    .style("border", "solid")
+                    .style("border-color", "lightgrey")
+                    .style("border-width", ".5px")
 
-                // tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>')
-                // const tooltipHeader = tooltip.select("#tt-header")
-                // const tooltipBody = tooltip.select("#tt-body")
+                tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>')
+
+                const tooltipHeader = tooltip.select("#tt-header")
+                const tooltipBody = tooltip.select("#tt-body")
+
+                const mouseoverNode = function(d) {
+                    tooltip
+                        .transition()
+                        .duration(0)
+                        .style("opacity", 0.95)
+
+                    nodeHighlightLinks(d)
+
+                    console.log("MOUSEOVER-NODE", d)
+                }
+
+                const mousemoveNode = function(d) {
+                    console.log("mousemoveNode", d)
+
+                    if (d.targetLinks.length > 0) {
+                        let sourceTotals = []
+                        let sourceNames = []
+
+                        d.targetLinks.forEach((tl, i) => {
+                            sourceTotals.push(tl.source.value)
+                            sourceNames.push(tl.source.name)
+                        })
+
+                        const sourceSum = sourceTotals.reduce((acc, cur) => {
+                            return acc + cur;
+                        }, 0)
+
+                        let sourceHTML = "";
+                        sourceNames.forEach((sn, i) => {
+                            if (i < sourceNames.length - 1) {
+                                sourceHTML += `<span style="float:right;">${sn}</span><br>` 
+                            } else {
+                                sourceHTML += `<span style="float:right;">${sn}</span>` 
+                            }  
+                        })
+
+                        tooltipHeader.html(`Node: ${d.name}<hr>`)
+                        tooltipBody.html(
+                            `<span style="float:left;">% of Sources:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.1%")(d.value / sourceSum)}</span><br>` +
+                            `<span style="float:left;">Sources:&nbsp&nbsp</span>` + sourceHTML
+                        )
+                    } else {
+                        tooltipHeader.html(`Node: ${d.name}<hr>`)
+                        tooltipBody.html(`<span style="float:left;">No Sources</span>`)
+                    }
+
+                    let tooltipWidth = d3.select(".tooltip").node().getBoundingClientRect().width
+                    let tooltipHeight = d3.select(".tooltip").node().getBoundingClientRect().height
+
+                    if (d3.event.pageY < height * .7) {
+                        tooltip
+                            .style("top", d3.event.pageY - 40 + "px")
+                    } else {
+                        tooltip
+                            .style("top", d3.event.pageY - 80 - tooltipHeight + "px")
+                    }
+
+                    if (d3.event.pageX < width * .5) {
+                        tooltip
+                            .style("left", d3.event.pageX + "px")
+                    } else {
+                        tooltip
+                            .style("left", d3.event.pageX - 20 - tooltipWidth + "px")
+                    }
+
+                    console.log("MOUSEMOVE-NODE")
+                }
+
+                const mouseoutNode = function(d) {
+                    tooltip
+                        .transition()
+                        .duration(0)
+                        .style("opacity", 0)
+
+                    nodeUnHighlightLinks(d)
+
+                    console.log("MOUSEOUT-NODE")
+                }
+
+                const mouseoverLink = function(d) {
+                    tooltip
+                        .transition()
+                        .duration(0)
+                        .style("opacity", 0.95)
+
+                    d3.select(this)
+                        .attr("stroke-opacity", 0.9)
+
+                    console.log("MOUSEOVER-LINK", d)
+                }
+
+                const mousemoveLink = function(d) {
+                    tooltipHeader.html(`Link to ${d.target.name}<hr>`)
+                    tooltipBody.html(
+                        `<span style="float:left;">% of ${d.source.name}:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.1%")(d.value / d.source.value)}</span>`
+                    )
+
+                    let tooltipWidth = d3.select(".tooltip").node().getBoundingClientRect().width
+                    let tooltipHeight = d3.select(".tooltip").node().getBoundingClientRect().height
+
+                    if (d3.event.pageY < height * .7) {
+                        tooltip
+                            .style("top", d3.event.pageY - 40 + "px")
+                    } else {
+                        tooltip
+                            .style("top", d3.event.pageY - 80 - tooltipHeight + "px")
+                    }
+
+                    if (d3.event.pageX < width * .5) {
+                        tooltip
+                            .style("left", d3.event.pageX + "px")
+                    } else {
+                        tooltip
+                            .style("left", d3.event.pageX - 20 - tooltipWidth + "px")
+                    }
+
+                    console.log("MOUSEMOVE-LINK")
+                }
+
+                const mouseoutLink = function(d) {
+                    tooltip
+                        .transition()
+                        .duration(0)
+                        .style("opacity", 0)
+
+                    d3.select(this)
+                        .attr("stroke-opacity", 0.4)
+                }
 
                 // -----------------------------------------------------------------------------------
                 // SETUP SANKEY
@@ -360,14 +490,9 @@ export const object = {
                         .attr("stroke", "#afafaf")
                         .attr("stroke-width", d => d.width)
                         .attr("stroke-opacity", 0.4)
-                        .on("mouseover", function() {
-                            d3.select(this)
-                                .attr("stroke-opacity", 0.9)
-                        })
-                        .on("mouseout", function() {
-                            d3.select(this)
-                                .attr("stroke-opacity", 0.4)
-                        })
+                        .on("mouseover", mouseoverLink)
+                        .on("mousemove", mousemoveLink)
+                        .on("mouseout", mouseoutLink)
 
                 let nodes = group.append('g')
                     .attr("class", "nodes")
@@ -382,8 +507,9 @@ export const object = {
                         .attr("height", d => d.y1 - d.y0)
                         .attr("fill", "#27566b")
                         .attr("opacity", 0.7)
-                        .on("mouseover", d => nodeHighlightLinks(d))
-                        .on("mouseout", d => nodeUnHighlightLinks(d))
+                        .on("mouseover", mouseoverNode)
+                        .on("mousemove", mousemoveNode)
+                        .on("mouseout", mouseoutNode)
 
                 let labels = group.append('g')
                     .attr("class", "node-labels")

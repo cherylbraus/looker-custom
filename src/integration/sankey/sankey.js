@@ -14,7 +14,7 @@ looker.plugins.visualizations.add({
             display: "text",
             label: "Flow Mapping",
             placeholder: "0:[1 2], 1:[3 4] (see docs)",
-            default: ""
+            default: "0:[1]"
         },
         nodenames: {
             section: "Setup",
@@ -143,13 +143,13 @@ looker.plugins.visualizations.add({
                 .tooltip #tt-header {
                     font-size: 12px;
                     font-weight: 600;
-                    color: #c3c3c3;
+                    color: #afafaf;
                     text-transform: uppercase;
                 }
 
                 .tooltip h1 {
                     font-size: 11px;
-                    color: #c3c3c3;
+                    color: #afafaf;
                     text-transform: uppercase;
                 }
                 hr { 
@@ -164,7 +164,8 @@ looker.plugins.visualizations.add({
                 <div id="vis-options-container"><p class="dropdown-title"></p>
                     <select name="vis-options" id="vis-options"></select>
                 </div>
-                <svg></svg>`;
+                <svg></svg>
+                <div class="tooltip"></div>`;
         element.style.fontFamily = `Roboto,"Open Sans", "Helvetica", sans-serif`
     },
 
@@ -319,61 +320,7 @@ looker.plugins.visualizations.add({
                 redraw(sank_map_all)
             })
 
-            
-
-
-            // function create_maps(data_filtered) {
-                // // -----------------------------------------------------------------------------------
-                // // RECONFIGURE DATA FOR SANKEY
-                // let sank_map = {"nodes":[], "links":[]}
-                // let node_name_map = {}
-                // let measures_used = []
-
-                // // pick apart config.flowmap
-                // console.log("redraw config", config)
-                // console.log("flowmap", config.flowmap)
-                // console.log("flowmap split", config.flowmap.split(","))
-                // config.flowmap.split(",").forEach((d, i) => {
-                //     let source = parseInt(d.split(":")[0])
-                //     measures_used.push(source)
-
-                //     d.split("[")[1].split("]")[0].split(" ").forEach((d, i) => {
-                //         // console.log("measure", measures[parseInt(d)], data_sank[measures[parseInt(d)].name])
-                //         // console.log("sank_map: value", data_sank[measures[parseInt(d)].name].value)
-                //         sank_map["links"].push({"source": source, "target": parseInt(d), "value": data_filtered[measures[parseInt(d)].name].value})
-                //         measures_used.push(parseInt(d))
-                //     })
-                // })
-
-                // measures_used = [...new Set(measures_used)]
-                // console.log("measures_used no-dups", measures_used)
-
-                // // make sure any measures not used in sankey are hidden before importing data
-                // measures.forEach((d, i) => {
-                //     if (measures_used.includes(i)) {
-                //         if (d.label_short) {
-                //             sank_map["nodes"].push({"id": i, "name": d.label_short})
-                //         } else {
-                //             sank_map["nodes"].push({"id": i, "name": d.label})
-                //         }
-                //     }                 
-                // })
-
-            //     // pick apart config.nodenames
-            //     console.log("nodeRenames", config.nodenames.split(","))
-            //     config.nodenames.split(",").forEach((d, i) => {
-            //         node_name_map[String(parseInt(d.split(":")[0]))] = d.split(":")[1]
-            //     })
-
-            //     console.log("sank_map", sank_map)
-            //     console.log("node_name_map", node_name_map)
-            //     console.log("measures_used", measures_used)
-
-            //     return [sank_map, node_name_map, measures_used]
-            // }
-
-
-
+        
             function redraw(sank_map_all) {
                 console.log("first redraw config", config)
                 // -----------------------------------------------------------------------------------
@@ -413,22 +360,152 @@ looker.plugins.visualizations.add({
                 // const [sank_map, node_name_map, measures_used] = create_maps(data_sank)
                 // console.log("ran function to configure data")
 
-                // // -----------------------------------------------------------------------------------
-                // // SETUP THE TOOLTIP
-                // let tooltip = d3.select(".tooltip")
-                //     .style("opacity", 0)
-                //     .style("background-color", "white")
-                //     .style("border-radius", "4px")
-                //     .style("padding", "5px")
-                //     .style("position", "absolute")
-                //     .style("display", "block")
-                //     .style("border", "solid")
-                //     .style("border-color", "lightgrey")
-                //     .style("border-width", ".5px")
+                // -----------------------------------------------------------------------------------
+                // SETUP THE TOOLTIP
+                let tooltip = d3.select(".tooltip")
+                    .style("opacity", 0)
+                    .style("background-color", "white")
+                    .style("border-radius", "4px")
+                    .style("padding", "5px")
+                    .style("position", "absolute")
+                    .style("display", "block")
+                    .style("border", "solid")
+                    .style("border-color", "lightgrey")
+                    .style("border-width", ".5px")
 
-                // tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>')
-                // const tooltipHeader = tooltip.select("#tt-header")
-                // const tooltipBody = tooltip.select("#tt-body")
+                tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>')
+
+                const tooltipHeader = tooltip.select("#tt-header")
+                const tooltipBody = tooltip.select("#tt-body")
+
+                const mouseoverNode = function(d) {
+                    tooltip
+                        .transition()
+                        .duration(0)
+                        .style("opacity", 0.95)
+
+                    nodeHighlightLinks(d)
+
+                    console.log("MOUSEOVER-NODE", d)
+                }
+
+                const mousemoveNode = function(d) {
+                    console.log("mousemoveNode", d)
+
+                    if (d.targetLinks.length > 0) {
+                        let sourceTotals = []
+                        let sourceNames = []
+
+                        d.targetLinks.forEach((tl, i) => {
+                            sourceTotals.push(tl.source.value)
+                            sourceNames.push(tl.source.name)
+                        })
+
+                        const sourceSum = sourceTotals.reduce((acc, cur) => {
+                            return acc + cur;
+                        }, 0)
+
+                        let sourceHTML = "";
+                        sourceNames.forEach((sn, i) => {
+                            if (i < sourceNames.length - 1) {
+                                sourceHTML += `<span style="float:right;">${sn}</span><br>` 
+                            } else {
+                                sourceHTML += `<span style="float:right;">${sn}</span>` 
+                            }  
+                        })
+
+                        tooltipHeader.html(`Node: ${d.name}<hr>`)
+                        tooltipBody.html(
+                            `<span style="float:left;">% of Sources:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.1%")(d.value / sourceSum)}</span><br>` +
+                            `<span style="float:left;">Sources:&nbsp&nbsp</span>` + sourceHTML
+                        )
+                    } else {
+                        tooltipHeader.html(`Node: ${d.name}<hr>`)
+                        tooltipBody.html(`<span style="float:left;">No Sources</span>`)
+                    }
+
+                    let tooltipWidth = d3.select(".tooltip").node().getBoundingClientRect().width
+                    let tooltipHeight = d3.select(".tooltip").node().getBoundingClientRect().height
+
+                    if (d3.event.pageY < height * .7) {
+                        tooltip
+                            .style("top", d3.event.pageY - 40 + "px")
+                    } else {
+                        tooltip
+                            .style("top", d3.event.pageY - 80 - tooltipHeight + "px")
+                    }
+
+                    if (d3.event.pageX < width * .5) {
+                        tooltip
+                            .style("left", d3.event.pageX + "px")
+                    } else {
+                        tooltip
+                            .style("left", d3.event.pageX - 20 - tooltipWidth + "px")
+                    }
+
+                    console.log("MOUSEMOVE-NODE")
+                }
+
+                const mouseoutNode = function(d) {
+                    tooltip
+                        .transition()
+                        .duration(0)
+                        .style("opacity", 0)
+
+                    nodeUnHighlightLinks(d)
+
+                    console.log("MOUSEOUT-NODE")
+                }
+
+                const mouseoverLink = function(d) {
+                    tooltip
+                        .transition()
+                        .duration(0)
+                        .style("opacity", 0.95)
+
+                    d3.select(this)
+                        .attr("stroke-opacity", 0.9)
+
+                    console.log("MOUSEOVER-LINK", d)
+                }
+
+                const mousemoveLink = function(d) {
+                    tooltipHeader.html(`Link to ${d.target.name}<hr>`)
+                    tooltipBody.html(
+                        `<span style="float:left;">% of ${d.source.name}:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.1%")(d.value / d.source.value)}</span>`
+                    )
+
+                    let tooltipWidth = d3.select(".tooltip").node().getBoundingClientRect().width
+                    let tooltipHeight = d3.select(".tooltip").node().getBoundingClientRect().height
+
+                    if (d3.event.pageY < height * .7) {
+                        tooltip
+                            .style("top", d3.event.pageY - 40 + "px")
+                    } else {
+                        tooltip
+                            .style("top", d3.event.pageY - 80 - tooltipHeight + "px")
+                    }
+
+                    if (d3.event.pageX < width * .5) {
+                        tooltip
+                            .style("left", d3.event.pageX + "px")
+                    } else {
+                        tooltip
+                            .style("left", d3.event.pageX - 20 - tooltipWidth + "px")
+                    }
+
+                    console.log("MOUSEMOVE-LINK")
+                }
+
+                const mouseoutLink = function(d) {
+                    tooltip
+                        .transition()
+                        .duration(0)
+                        .style("opacity", 0)
+
+                    d3.select(this)
+                        .attr("stroke-opacity", 0.4)
+                }
 
                 // -----------------------------------------------------------------------------------
                 // SETUP SANKEY
@@ -535,14 +612,9 @@ looker.plugins.visualizations.add({
                         .attr("stroke", "#afafaf")
                         .attr("stroke-width", d => d.width)
                         .attr("stroke-opacity", 0.4)
-                        .on("mouseover", function() {
-                            d3.select(this)
-                                .attr("stroke-opacity", 0.9)
-                        })
-                        .on("mouseout", function() {
-                            d3.select(this)
-                                .attr("stroke-opacity", 0.4)
-                        })
+                        .on("mouseover", mouseoverLink)
+                        .on("mousemove", mousemoveLink)
+                        .on("mouseout", mouseoutLink)
 
                 let nodes = group.append('g')
                     .attr("class", "nodes")
@@ -557,8 +629,9 @@ looker.plugins.visualizations.add({
                         .attr("height", d => d.y1 - d.y0)
                         .attr("fill", "#27566b")
                         .attr("opacity", 0.7)
-                        .on("mouseover", d => nodeHighlightLinks(d))
-                        .on("mouseout", d => nodeUnHighlightLinks(d))
+                        .on("mouseover", mouseoverNode)
+                        .on("mousemove", mousemoveNode)
+                        .on("mouseout", mouseoutNode)
 
                 let labels = group.append('g')
                     .attr("class", "node-labels")
