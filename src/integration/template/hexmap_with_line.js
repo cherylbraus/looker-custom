@@ -5,11 +5,25 @@ export const object = {
     id: "mapTest",
     label: "ZDev Map Test",
     options: {
-        test: {
+        radius: {
+            type: "number",
+            label: "Diameter of hexagons",
+            display: "number",
+            default: 10,
+            section: "Setup",
+            order: 1
+        },
+        calc_type: {
             type: "string",
-            label: "test",
-            display: "text",
-            default: "",
+            label: "Colored metric",
+            display: "radio",
+            values: [
+                {"Overall rate average": "average"},
+                {"% Change in average": "change_average"}
+            ],
+            default: "average",
+            section: "Setup",
+            order: 2
         }
     },
 
@@ -141,7 +155,7 @@ export const object = {
         let margin2 = {
             top: 20,
             right: 40,
-            bottom: 20,
+            bottom: 30,
             left: 40,
         }
 
@@ -229,7 +243,7 @@ export const object = {
 
             const monthAccessor = d => d.month;
             const rateAvgAccessor = d => d.rateAvg;
-
+ 
             console.log("data_month", data_month)
 
             // axes
@@ -239,13 +253,19 @@ export const object = {
 
             const xAxisGenerator = d3.axisBottom()
                 .scale(xScale)
-                .tickFormat(d3.timeFormat("%b'%y"))
-                .tickSize(0)
+                .tickFormat(d3.timeFormat("%b'%-y"))
+                .tickSizeInner(0)
+                .tickSizeOuter(0)
+                .tickPadding(10)
+                .ticks(8)
 
             const xAxis = group2
                 .append('g')
                 .call(xAxisGenerator)
-                .style("transform", `translateY(${height2}px)`)
+                    .style("transform", `translateY(${height2}px)`)
+                    .attr("class", "x-axis")
+
+            d3.select(".x-axis path").attr("class", "zero-line")
 
             const yScale = d3.scaleLinear()
                 // .domain(d3.extent(data_month, d => d.rateAvg))
@@ -254,11 +274,16 @@ export const object = {
 
             const yAxisGenerator = d3.axisLeft()
                 .scale(yScale)
-                .tickFormat(d3.format("$.0s"))
+                .tickFormat(d3.format("$.1s"))
+                // .tickSize(-width2)
+                .tickSize(0)
+                .tickPadding(10)
+                .ticks(5)
 
             const yAxis = group2
                 .append('g')
                 .call(yAxisGenerator)
+                    .attr("class", "y-axis")
 
             const lineGenerator = d3.line()
                 .curve(d3.curveNatural)
@@ -416,6 +441,7 @@ export const object = {
 
             }
 
+            // ---------------------------------------------------------------------
             // BUTTONS
             const buttonContainer = group.append("g")
                 .attr("transform", `translate(${width / 1.33},${height + 15})`)
@@ -556,7 +582,8 @@ export const object = {
                     .geography(topojson.feature(mdata, mdata.objects.nation))
                     .projection(projection)
                     .pathGenerator(path)
-                    .hexRadius(10)
+                    .hexRadius(config.radius)
+                    // .hexRadius(10)
 
                 // console.log("mapdata", mapdata)
 
@@ -567,27 +594,68 @@ export const object = {
                     
                 const totalVolumes = []
                 const averageRates = []
+                const changeAverageRates = []
                     
                 hex.grid.layout.forEach((d, i) => {
+                    // console.log("HEX.GRID.LAYOUT", d)
                     let vol = 0;
                     if (+d.datapoints > 0) {
-                        let rateList = []
+                        if (config.calc_type === "average") {
+                            let rateList = []
 
-                        d.forEach((sd, si) => {
-                            vol += +sd.volume
-                            rateList.push(+sd.rate)
-                        })
+                            d.forEach((sd, si) => {
+                                vol += +sd.volume
+                                rateList.push(+sd.rate)
+                            })
 
-                        const avg = rateList.reduce((a,b) => a + b) / rateList.length;
+                            const avg = rateList.reduce((a,b) => a + b) / rateList.length;
 
-                        averageRates.push(avg)
-                        d.rate = avg
+                            averageRates.push(avg)
+                            d.rate = avg
+                        } else if (config.calc_type === "change_average") {
+                            let firstMonth;
+                            let lastMonth;
+                            let firstMonthVals = []
+                            let lastMonthVals = []
+
+                            let monthsInData = d.map(date => date.month)
+
+                            firstMonth = monthsInData[monthsInData.length - 1]
+                            lastMonth = monthsInData[0]
+
+                            // console.log("first and last", firstMonth, lastMonth)
+
+                            d.forEach((sd, si) => {
+                                vol += +sd.volume
+
+                                if (sd.month.valueOf() === firstMonth.valueOf()) {
+                                    // console.log("in first")
+                                    firstMonthVals.push(+sd.rate)
+                                } 
+                                
+                                if (sd.month.valueOf() === lastMonth.valueOf()) {
+                                    // console.log("in last")
+                                    lastMonthVals.push(+sd.rate)
+                                }
+                            })
+
+                            const firstAvg = firstMonthVals.reduce((a,b) => a + b) / firstMonthVals.length;
+                            const lastAvg = lastMonthVals.reduce((a,b) => a + b) / lastMonthVals.length;
+                            const avgChange = (+lastAvg - +firstAvg) / +firstAvg     
+                            if (avgChange == Infinity) {
+                                console.log("INFINITY", firstMonthVals, lastMonthVals, firstAvg, lastAvg, d)
+                            }
+                            changeAverageRates.push(avgChange)
+                            d.changerate = avgChange
+                        }
                     } else {
                         d.rate = 0
                     }
                     d.volume = vol
                     totalVolumes.push(vol)
                 })
+
+                console.log("changeAverageRates", changeAverageRates.sort())
 
                 // console.log("AVERAGE RATES MIN/MAX", Math.min(...averageRates), Math.max(...averageRates))
 
@@ -608,16 +676,28 @@ export const object = {
                         .style("stroke", d => !d.pointDensity ? "none" : "#b2b2b2")
 
                 // create scale for inner hexagons
+                const middleRadius = 2 + ((Number(config.radius) - 2) / 2)
+
                 const innerHexScale = d3.scaleQuantize()
                     .domain([Math.max(.001, d3.min(totalVolumes)), d3.max(totalVolumes)])
-                    .range([2,6,10]) // [2,4,6,8,10]
+                    .range([2, Number(middleRadius), Number(config.radius)])
+                    // .range([2,6,10])
                     // .domain([0, d3.max(totalVolumes)])
                     // .range([0,1,2,3,4,5,6,7])
 
                 // create color scale for rate *change*
                 const colorRateScale = d3.scaleQuantize()
-                    .domain(d3.extent(averageRates))
                     .range(["#27566b", "#f1cc56", "#8cbb61"])
+
+                if (config.calc_type === "average") {
+                    colorRateScale
+                        .domain(d3.extent(averageRates))
+                } else if (config.calc_type === "change_average") {
+                    colorRateScale
+                        // .domain(d3.extent(changeAverageRates))
+                        .domain(d3.extent(changeAverageRates.filter(d => d != Infinity)))
+                }
+                
 
                 // hexagon function
                 const hexagonPoints = ( radius ) => {
@@ -643,7 +723,16 @@ export const object = {
                         .attr("transform", d => `translate(${d.x}, ${d.y})`)
                         .style("fill", d => {
                             if (+d.volume > 0) {
-                                return colorRateScale(d.rate)
+                                if (config.calc_type === "average") {
+                                    return colorRateScale(d.rate)
+                                } else if (config.calc_type === "change_average") {
+                                    if (d.changerate != Infinity) {
+                                        return colorRateScale(d.changerate)
+                                    } else {
+                                        console.log("COLOR IT GREY", d.changerate)
+                                        return "#b2b2b2"
+                                    }
+                                }
                             } else {
                                 return "none"
                             }
@@ -655,6 +744,9 @@ export const object = {
                     let domain = innerHexScale.domain()
                     let range = innerHexScale.range()
                     let scale = d3.scaleQuantize().domain(range).range(domain)
+                    console.log("DOMAIN", domain)
+                    console.log("RANGE", range)
+                    console.log("SCALE reversed", scale)
                     return function(x) {
                         return scale(x)
                     }
@@ -663,7 +755,7 @@ export const object = {
                 console.log("INNERHEXSCALE ORIGINAL DOMAIN", innerHexScale.domain())
 
                 const legendContainer = group.append("g")
-                    .attr("transform", `translate(${width / 4},${height + 10})`)
+                    .attr("transform", `translate(${width / 4},${height + 6})`) //10
                     .classed("legendContainer", true)
 
                 const legendSize = legendContainer.append("g")
@@ -696,12 +788,12 @@ export const object = {
                 
                 legendSize.append("polygon")
                     .attr("points", d => hexagonPoints(2))
-                    .attr("transform", "translate(-100, 17)")
+                    .attr("transform", "translate(-110, 20)")
                     .style("fill", "#27566b")
 
                 legendSize.append("text")
-                    .attr("x", -94)
-                    .attr("y", 18)
+                    .attr("x", -104)
+                    .attr("y", 21)
                     .style("text-anchor", "start")
                     .style("dominant-baseline", "middle")
                     .style("font-size", 9)
@@ -710,39 +802,45 @@ export const object = {
                     .classed("legend-text", true)
 
                 legendSize.append("polygon")
-                    .attr("points", d => hexagonPoints(6))
-                    .attr("transform", "translate(-30, 17)")
+                    .attr("points", d => hexagonPoints(Number(middleRadius)))
+                    .attr("transform", "translate(-30, 20)")
                     .style("fill", "#27566b")
 
                 legendSize.append("text")
-                    .attr("x", -20)
-                    .attr("y", 18)
+                    .attr("x", -17)
+                    .attr("y", 21)
                     .style("text-anchor", "start")
                     .style("dominant-baseline", "middle")
                     .style("font-size", 9)
                     .attr("fill", "#323232")
-                    .text(`${d3.format(".2s")(innerHexScale.invertExtent(6)[0])} to ${d3.format(".2s")(innerHexScale.invertExtent(6)[1])}`)
+                    .text(`${d3.format(".2s")(innerHexScale.invertExtent(Number(middleRadius))[0])} to ${d3.format(".2s")(innerHexScale.invertExtent(Number(middleRadius))[1])}`)
                     .classed("legend-text", true)
 
                 legendSize.append("polygon")
-                    .attr("points", d => hexagonPoints(10))
-                    .attr("transform", "translate(45, 17)")
+                    .attr("points", d => hexagonPoints(Number(config.radius)))
+                    .attr("transform", "translate(55, 20)")
                     .style("fill", "#27566b")
 
                 legendSize.append("text")
-                    .attr("x", 59)
-                    .attr("y", 18)
+                    .attr("x", 72)
+                    .attr("y", 21)
                     .style("text-anchor", "start")
                     .style("dominant-baseline", "middle")
                     .style("font-size", 9)
                     .attr("fill", "#323232")
-                    .text(`${d3.format(".2s")(innerHexScale.invertExtent(10)[0])} to ${d3.format(".2s")(innerHexScale.invertExtent(10)[1])}`)
+                    .text(`${d3.format(".2s")(innerHexScale.invertExtent(Number(config.radius))[0])} to ${d3.format(".2s")(innerHexScale.invertExtent(Number(config.radius))[1])}`)
                     .classed("legend-text", true)
 
+                let legendColorFormat;
+                if (config.calc_type === "average") {
+                    legendColorFormat = ",.2s"
+                } else if (config.calc_type === "change_average") {
+                    legendColorFormat = ",.0%"
+                }
 
                 const legendColor = legendContainer.append("g")
                     .classed("legend", true)
-                    .attr("transform", "translate(0, 40)")
+                    .attr("transform", "translate(0, 45)")
 
                 legendColor.append("text")
                     .attr("x", 0)
@@ -751,57 +849,72 @@ export const object = {
                     .style("dominant-baseline", "middle")
                     .style("font-size", 11)
                     .attr("fill", "#323232")
-                    .text("% Change in RPM")
+                    .text(config.calc_type === "average" ? "Average RPM" : "% Change in RPM")
+                    // .text("% Change in RPM")
 
                 legendColor.append("polygon")
-                    .attr("points", d => hexagonPoints(6))
-                    .attr("transform", "translate(-100, 17)")
+                    .attr("points", d => hexagonPoints(8))
+                    .attr("transform", "translate(-110, 20)")
                     .style("fill", "#27566b")
 
                 legendColor.append("text")
-                    .attr("x", -90)
-                    .attr("y", 18)
+                    .attr("x", -99)
+                    .attr("y", 21)
                     .style("text-anchor", "start")
                     .style("dominant-baseline", "middle")
                     .style("font-size", 9)
                     .attr("fill", "#323232")
-                    .text(`${d3.format(".2s")(colorRateScale.invertExtent("#27566b")[0])} to ${d3.format(".2s")(colorRateScale.invertExtent("#27566b")[1])}`)
+                    .text(`${d3.format(legendColorFormat)(colorRateScale.invertExtent("#27566b")[0])} to ${d3.format(legendColorFormat)(colorRateScale.invertExtent("#27566b")[1])}`)
                     .classed("legend-text", true)
 
                 legendColor.append("polygon")
-                    .attr("points", d => hexagonPoints(6))
-                    .attr("transform", "translate(-30, 17)")
+                    .attr("points", d => hexagonPoints(8))
+                    .attr("transform", "translate(-30, 20)")
                     .style("fill", "#f1cc56")
 
                 legendColor.append("text")
-                    .attr("x", -20)
-                    .attr("y", 18)
+                    .attr("x", -19)
+                    .attr("y", 21)
                     .style("text-anchor", "start")
                     .style("dominant-baseline", "middle")
                     .style("font-size", 9)
                     .attr("fill", "#323232")
-                    .text(`${d3.format(".2s")(colorRateScale.invertExtent("#f1cc56")[0])} to ${d3.format(".2s")(colorRateScale.invertExtent("#f1cc56")[1])}`)
+                    .text(`${d3.format(legendColorFormat)(colorRateScale.invertExtent("#f1cc56")[0])} to ${d3.format(legendColorFormat)(colorRateScale.invertExtent("#f1cc56")[1])}`)
                     .classed("legend-text", true)
 
                 legendColor.append("polygon")
-                    .attr("points", d => hexagonPoints(6))
-                    .attr("transform", "translate(45, 17)")
+                    .attr("points", d => hexagonPoints(8))
+                    .attr("transform", "translate(55, 20)")
                     .style("fill", "#8cbb61")
 
                 legendColor.append("text")
-                    .attr("x", 55)
-                    .attr("y", 18)
+                    .attr("x", 66)
+                    .attr("y", 21)
                     .style("text-anchor", "start")
                     .style("dominant-baseline", "middle")
                     .style("font-size", 9)
                     .attr("fill", "#323232")
-                    .text(`${d3.format(".2s")(colorRateScale.invertExtent("#8cbb61")[0])} to ${d3.format(".2s")(colorRateScale.invertExtent("#8cbb61")[1])}`)
+                    .text(`${d3.format(legendColorFormat)(colorRateScale.invertExtent("#8cbb61")[0])} to ${d3.format(legendColorFormat)(colorRateScale.invertExtent("#8cbb61")[1])}`)
                     .classed("legend-text", true)
 
-                console.log('colorscale', colorRateScale.domain())
+                if (config.calc_type === "change_average" && changeAverageRates.filter(d => d == Infinity).length > 0) {
+                    legendColor.append("polygon")
+                        .attr("points", d => hexagonPoints(8))
+                        .attr("transform", "translate(-110, 40)")
+                        .style("fill", "#b2b2b2")
 
-                
+                    legendColor.append("text")
+                        .attr("x", -99)
+                        .attr("y", 41)
+                        .style("text-anchor", "start")
+                        .style("dominant-baseline", "middle")
+                        .style("font-size", 9)
+                        .attr("fill", "#323232")
+                        .text(`Infinity`)
+                        .classed("legend-text", true)
+                }
 
+                console.log('colorscale', colorRateScale.domain())              
             }
         })
 
