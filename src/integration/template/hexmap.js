@@ -13,24 +13,12 @@ export const object = {
             section: "Setup",
             order: 1
         },
-        calc_type: {
-            type: "string",
-            label: "Colored metric",
-            display: "radio",
-            values: [
-                {"Overall rate average": "average"},
-                {"% Change in average": "change_average"}
-            ],
-            default: "average",
-            section: "Setup",
-            order: 2
-        },
         directions: {
             type: "boolean",
             label: "Include direction buttons",
             default: "true",
             section: "Setup",
-            order: 3
+            order: 2
         }
     },
 
@@ -170,12 +158,11 @@ export const object = {
         data.forEach((d) => {
             let entry = {}
 
-            entry['month'] = new Date(d[dimensions[0].name].value + 'T00:00')
             entry['lat'] = +d[dimensions[1].name].value
             entry['lon'] = +d[dimensions[2].name].value
             entry['direction'] = d[dimensions[3].name].value
-            entry['rate'] = +d[measures[0].name].value
-            entry['volume'] = +d[measures[1].name].value
+            entry['volume'] = +d[measures[0].name].value
+            entry['rate'] = +d[measures[1].name].value
 
             data_ready.push(entry)
         })
@@ -186,201 +173,9 @@ export const object = {
             console.log("map", mdata)
             console.log("data_ready", data_ready)
 
-            // ---------------------------------------------------------------------
-            // LINE PLOT -----------------------------------------------------------
-
-            function group_by_month(arr) {
-                return Object.values(
-                    arr.reduce((a, {month: month,
-                                    rate: rate
-                                }) => {
-                        const key = month;
-        
-                        if (a[key] === undefined) {
-                            a[key] = {month: month, 
-                                rate: 0, 
-                                count: 0};
-                        }
-        
-                        a[key].rate += rate;
-                        a[key].count += 1;
-        
-                        return a;
-                    }, {})
-                )
-            }
-                
-            const data_month = group_by_month(data_ready)
-
-            data_month.forEach((d, i) => {
-                d['rateAvg'] = +d['rate'] / +d['count']
-            })
-
-            const monthAccessor = d => d.month;
-            const rateAvgAccessor = d => d.rateAvg;
- 
-            console.log("data_month", data_month)
-
-            // axes
-            const xScale = d3.scaleTime()
-                .domain(d3.extent(data_month, d => d.month))
-                .range([0, width2])
-
-            const xAxisGenerator = d3.axisBottom()
-                .scale(xScale)
-                .tickFormat(d3.timeFormat("%b'%-y"))
-                .tickSizeInner(0)
-                .tickSizeOuter(0)
-                .tickPadding(10)
-                .ticks(8)
-
-            const xAxis = group2
-                .append('g')
-                .call(xAxisGenerator)
-                    .style("transform", `translateY(${height2}px)`)
-                    .attr("class", "x-axis")
-
-            d3.select(".x-axis path").attr("class", "zero-line")
-
-            const yScale = d3.scaleLinear()
-                // .domain(d3.extent(data_month, d => d.rateAvg))
-                .domain([d3.min(data_month, d => d.rateAvg) - 0.5, d3.max(data_month, d => d.rateAvg) + 0.5])
-                .range([height2, 0])
-
-            const yAxisGenerator = d3.axisLeft()
-                .scale(yScale)
-                .tickFormat(d3.format("$.1s"))
-                // .tickSize(-width2)
-                .tickSize(0)
-                .tickPadding(10)
-                .ticks(5)
-
-            const yAxis = group2
-                .append('g')
-                .call(yAxisGenerator)
-                    .attr("class", "y-axis")
-
-            const lineGenerator = d3.line()
-                .curve(d3.curveNatural)
-                .x(d => xScale(monthAccessor(d)))
-                .y(d => yScale(rateAvgAccessor(d)))
-
-            const timeline = group2
-                .append('path')
-                    .attr("fill", "none")
-                    .attr("stroke", "darkgrey")
-                    .attr("stroke-width", 1.5)
-                    .attr("d", lineGenerator(data_month))
-                    .attr("class", "timeline")
-
             
             // INTERACTIONS ------------------------------------------------------
             createHexMap(data_ready)
-
-            group2
-                .call(d3.brushX()
-                    .extent([[0,0], [width2, height2]])
-                    .on("end", brushed)    
-                    .on("brush", brushing)
-                )        
-
-            // placeholder dots
-            const dots = group2
-                .selectAll("circle")
-                .data(data_month)
-                .enter()
-                .append("circle")
-                    .attr("cx", d => xScale(monthAccessor(d)))
-                    .attr("cy", d => yScale(rateAvgAccessor(d)))
-                    .attr("r", 3)
-                    .attr("fill", "black")
-                    .attr("fill-opacity", 0.0)
-
-            let extent = null;
-
-            // console.log("extent", extent)
-
-            function brushing(extent) {
-                extent = d3.event.selection;
-                // console.log("brushing extent", extent)
-
-                if (extent) {
-                    dots
-                        .attr('fill-opacity', d => {
-                            const bool = xScale(monthAccessor(d)) >= extent[0] && xScale(monthAccessor(d)) <= extent[1];
-                            return bool ? 1.0 : 0.0;
-                        })
-                } 
-            }
-
-            function brushed(extentArg) {
-                const extent = d3.event.selection;
-
-                // if there is an extent, use it, otherwise use the extentArg, which is from the rect button function
-                let extentActual = extent !== undefined ? extent : extentArg;
-                console.log("extentActual", extentActual)             
-
-                // let brushRect = d3.select(`rect.selection[style="display: none;"]`)
-                // console.log("brushRect", brushRect)
-
-                // determine which button is currently pressed by text color
-                const selectedDirection = d3.select(`text[fill="white"]`).attr("class")
-                console.log("selectedDirection", selectedDirection)
-
-                if (extentActual) {
-                    SELECTED_RANGE = extentActual
-                    console.log("SELECTED_RANGE", SELECTED_RANGE)
-
-                    // let monthsSelected = d3.select("#second").select(".group").selectAll(`circle[fill-opacity="1"]`)
-
-                    // let endDate2 = monthsSelected["_groups"][0][0]["__data__"]['month']
-
-                    // const circleCount = monthsSelected["_groups"][0]["length"]
-                    // let startDate2 = monthsSelected["_groups"][0][circleCount - 1]["__data__"]["month"]
-
-                    // console.log("HTML DATES", startDate2, circleCount, endDate2)
-
-                    let startDateExact = xScale.invert(SELECTED_RANGE[0])
-                    let endDateExact = xScale.invert(SELECTED_RANGE[1])
-                    let startDate = new Date(startDateExact.getFullYear(), startDateExact.getMonth() + 1, 1)
-                    let endDate = new Date(endDateExact.getFullYear(), endDateExact.getMonth() + 1, 0)
-
-                    console.log("CALC DATES", startDate, endDate, startDate.getTime(), endDate.getTime())
-
-                    let data_map;
-                    if (selectedDirection != "All") {
-                        console.log("NOT ALL")
-                        data_map = data_ready.filter(function(d) {
-                            return d.month.getTime() >= startDate.getTime() && d.month.getTime() <= endDate.getTime() && d.direction === selectedDirection
-                        })
-                    } else {
-                        console.log("ALL")
-                        data_map = data_ready.filter(function(d) {
-                            return d.month.getTime() >= startDate.getTime() && d.month.getTime() <= endDate.getTime() 
-                        })
-                    }
-
-                    console.log("data_map", data_map)
-                    createHexMap(data_map)
-
-                } else {
-                    SELECTED_RANGE = undefined;
-                    dots
-                        .attr('fill-opacity', 0.0)
-
-                    let data_map;
-                    if (selectedDirection != "All") {
-                        data_map = data_ready.filter(function(d) {
-                            return d.direction === selectedDirection
-                        })
-                        console.log("data_map", data_map)
-                        createHexMap(data_map)
-                    } else {
-                        console.log("data_map = data_ready", data_ready)
-                        createHexMap(data_ready)
-                    }
-                }
-            }
 
             function rectClick(clickedElement) {
                 // console.log("clickedElement", clickedElement)
@@ -410,9 +205,20 @@ export const object = {
                     }
                 })
 
-                console.log("RECTCLICK SELECTED_RANGE", SELECTED_RANGE)
+                const selectedDirection = d3.select(`text[fill="white"]`).attr("class")
+                console.log("selectedDirection", selectedDirection)
 
-                brushed(SELECTED_RANGE)
+                let data_map;
+                if (selectedDirection != "All") {
+                    data_map = data_ready.filter(function(d) {
+                        return d.direction === selectedDirection
+                    })
+                    console.log("data_map", data_map)
+                    createHexMap(data_map)
+                } else {
+                    console.log("data_map = data_ready", data_ready)
+                    createHexMap(data_ready)
+                }
 
             }
 
@@ -569,71 +375,28 @@ export const object = {
                     
                 const totalVolumes = []
                 const averageRates = []
-                const changeAverageRates = []
                     
                 hex.grid.layout.forEach((d, i) => {
                     // console.log("HEX.GRID.LAYOUT", d)
                     let vol = 0;
                     if (+d.datapoints > 0) {
-                        if (config.calc_type === "average") {
-                            let rateList = []
+                        let rateList = []
 
-                            d.forEach((sd, si) => {
-                                vol += +sd.volume
-                                rateList.push(+sd.rate)
-                            })
+                        d.forEach((sd, si) => {
+                            vol += +sd.volume
+                            rateList.push(+sd.rate)
+                        })
 
-                            const avg = rateList.reduce((a,b) => a + b) / rateList.length;
+                        const avg = rateList.reduce((a,b) => a + b) / rateList.length;
 
-                            averageRates.push(avg)
-                            d.rate = avg
-                        } else if (config.calc_type === "change_average") {
-                            let firstMonth;
-                            let lastMonth;
-                            let firstMonthVals = []
-                            let lastMonthVals = []
-
-                            let monthsInData = d.map(date => date.month)
-
-                            firstMonth = monthsInData[monthsInData.length - 1]
-                            lastMonth = monthsInData[0]
-
-                            // console.log("first and last", firstMonth, lastMonth)
-
-                            d.forEach((sd, si) => {
-                                vol += +sd.volume
-
-                                if (sd.month.valueOf() === firstMonth.valueOf()) {
-                                    // console.log("in first")
-                                    firstMonthVals.push(+sd.rate)
-                                } 
-                                
-                                if (sd.month.valueOf() === lastMonth.valueOf()) {
-                                    // console.log("in last")
-                                    lastMonthVals.push(+sd.rate)
-                                }
-                            })
-
-                            const firstAvg = firstMonthVals.reduce((a,b) => a + b) / firstMonthVals.length;
-                            const lastAvg = lastMonthVals.reduce((a,b) => a + b) / lastMonthVals.length;
-                            const avgChange = (+lastAvg - +firstAvg) / +firstAvg     
-                            if (avgChange == Infinity) {
-                                console.log("INFINITY", firstMonthVals, lastMonthVals, firstAvg, lastAvg, d)
-                            }
-                            changeAverageRates.push(avgChange)
-                            d.changerate = avgChange
-                        }
+                        averageRates.push(avg)
+                        d.rate = avg
                     } else {
                         d.rate = 0
                     }
                     d.volume = vol
                     totalVolumes.push(vol)
                 })
-
-                console.log("changeAverageRates", changeAverageRates.sort())
-
-                // console.log("AVERAGE RATES MIN/MAX", Math.min(...averageRates), Math.max(...averageRates))
-
 
                 // plot empty hexagons for only areas that have data
                 const grid = group.append('g')
@@ -645,9 +408,7 @@ export const object = {
                         .attr('class', 'hex')
                         .attr('d', hex.hexagon())
                         .attr('transform', d => `translate(${d.x}, ${d.y})`)
-                        // .style('fill', d => !d.pointDensity ? '#fff' : colorScale(d.pointDensity))
                         .style("fill", "none")
-                        // .style("stroke", "lightgrey")
                         .style("stroke", d => !d.pointDensity ? "none" : "#b2b2b2")
 
                 // create scale for inner hexagons
@@ -662,17 +423,8 @@ export const object = {
 
                 // create color scale for rate *change*
                 const colorRateScale = d3.scaleQuantize()
-                    .range(["#27566b", "#f1cc56", "#8cbb61"])
-
-                if (config.calc_type === "average") {
-                    colorRateScale
-                        .domain(d3.extent(averageRates))
-                } else if (config.calc_type === "change_average") {
-                    colorRateScale
-                        // .domain(d3.extent(changeAverageRates))
-                        .domain(d3.extent(changeAverageRates.filter(d => d != Infinity)))
-                }
-                
+                    .domain(d3.extent(averageRates))
+                    .range(["#27566b", "#f1cc56", "#8cbb61"])                
 
                 // hexagon function
                 const hexagonPoints = ( radius ) => {
@@ -698,16 +450,7 @@ export const object = {
                         .attr("transform", d => `translate(${d.x}, ${d.y})`)
                         .style("fill", d => {
                             if (+d.volume > 0) {
-                                if (config.calc_type === "average") {
-                                    return colorRateScale(d.rate)
-                                } else if (config.calc_type === "change_average") {
-                                    if (d.changerate != Infinity) {
-                                        return colorRateScale(d.changerate)
-                                    } else {
-                                        console.log("COLOR IT GREY", d.changerate)
-                                        return "#b2b2b2"
-                                    }
-                                }
+                                return colorRateScale(d.rate)
                             } else {
                                 return "none"
                             }
@@ -745,21 +488,6 @@ export const object = {
                     .style("font-size", 11)
                     .attr("fill", "#323232")
                     .text("Volume")
-
-                // const legendSizeEntries = legendSize.append("g")
-                //     .attr("transform", "translate(-30, 20)")
-
-                // const legendS = d3.legendSize()
-                //     .labelFormat(d3.format("~s"))
-                //     .orient("horizontal")
-                //     .useClass("true")
-                //     .labelAlign("start")
-                //     .title("Volume")
-                //     .titleWidth(100)
-                //     .scale(innerHexScale)
-                //     .shape("circle")
-
-                // legendSizeEntries.call(legendS)
                 
                 legendSize.append("polygon")
                     .attr("points", d => hexagonPoints(2))
@@ -806,12 +534,6 @@ export const object = {
                     .text(`${d3.format(".2s")(innerHexScale.invertExtent(Number(config.radius))[0])} to ${d3.format(".2s")(innerHexScale.invertExtent(Number(config.radius))[1])}`)
                     .classed("legend-text", true)
 
-                let legendColorFormat;
-                if (config.calc_type === "average") {
-                    legendColorFormat = ",.2s"
-                } else if (config.calc_type === "change_average") {
-                    legendColorFormat = ",.0%"
-                }
 
                 const legendColor = legendContainer.append("g")
                     .classed("legend", true)
@@ -839,7 +561,7 @@ export const object = {
                     .style("dominant-baseline", "middle")
                     .style("font-size", 9)
                     .attr("fill", "#323232")
-                    .text(`${d3.format(legendColorFormat)(colorRateScale.invertExtent("#27566b")[0])} to ${d3.format(legendColorFormat)(colorRateScale.invertExtent("#27566b")[1])}`)
+                    .text(`${d3.format(",.2s")(colorRateScale.invertExtent("#27566b")[0])} to ${d3.format(",.2s")(colorRateScale.invertExtent("#27566b")[1])}`)
                     .classed("legend-text", true)
 
                 legendColor.append("polygon")
@@ -854,7 +576,7 @@ export const object = {
                     .style("dominant-baseline", "middle")
                     .style("font-size", 9)
                     .attr("fill", "#323232")
-                    .text(`${d3.format(legendColorFormat)(colorRateScale.invertExtent("#f1cc56")[0])} to ${d3.format(legendColorFormat)(colorRateScale.invertExtent("#f1cc56")[1])}`)
+                    .text(`${d3.format(",.2s")(colorRateScale.invertExtent("#f1cc56")[0])} to ${d3.format(",.2s")(colorRateScale.invertExtent("#f1cc56")[1])}`)
                     .classed("legend-text", true)
 
                 legendColor.append("polygon")
@@ -869,25 +591,8 @@ export const object = {
                     .style("dominant-baseline", "middle")
                     .style("font-size", 9)
                     .attr("fill", "#323232")
-                    .text(`${d3.format(legendColorFormat)(colorRateScale.invertExtent("#8cbb61")[0])} to ${d3.format(legendColorFormat)(colorRateScale.invertExtent("#8cbb61")[1])}`)
+                    .text(`${d3.format(",.2s")(colorRateScale.invertExtent("#8cbb61")[0])} to ${d3.format(",.2s")(colorRateScale.invertExtent("#8cbb61")[1])}`)
                     .classed("legend-text", true)
-
-                if (config.calc_type === "change_average" && changeAverageRates.filter(d => d == Infinity).length > 0) {
-                    legendColor.append("polygon")
-                        .attr("points", d => hexagonPoints(8))
-                        .attr("transform", "translate(-110, 40)")
-                        .style("fill", "#b2b2b2")
-
-                    legendColor.append("text")
-                        .attr("x", -99)
-                        .attr("y", 41)
-                        .style("text-anchor", "start")
-                        .style("dominant-baseline", "middle")
-                        .style("font-size", 9)
-                        .attr("fill", "#323232")
-                        .text(`Infinity`)
-                        .classed("legend-text", true)
-                }
 
                 console.log('colorscale', colorRateScale.domain())              
             }
