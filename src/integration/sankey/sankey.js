@@ -270,6 +270,42 @@ looker.plugins.visualizations.add({
                 NUMFORMAT = ",.0f"
             }
 
+
+            // -----------------------------------------------------------------------------------
+            // DETERMINE WHICH MEASURES HAVE MULTIPLE SOURCES
+            let targetCount = {}
+
+            config.flowmap.split(",").forEach((d, i) => {
+                let sourceVal = d.split(":")[0]
+
+                d.split("[")[1].split("]")[0].split(" ").forEach((dd, ii) => {
+                    if (Object.keys(targetCount).includes(dd)) {
+                        targetCount[dd]["count"] += 1
+                        targetCount[dd]["sources"].push(sourceVal)
+                    } else {
+                        targetCount[dd] = {count: 1, sources: [sourceVal]}
+                    }
+                })
+            })
+
+            console.log("targetCount", targetCount)
+
+            // -----------------------------------------------------------------------------------
+            // DETERMINE WHICH MEASURES HAVE MULTIPLE TARGETS
+            let sourceCount = {}
+
+            config.flowmap.split(",").forEach((d, i) => {
+                let sourceVal = d.split(":")[0]
+
+                if (Object.keys(sourceCount).includes(sourceVal)) {
+                    sourceCount[sourceVal] += 1
+                } else {
+                    sourceCount[sourceVal = 1]
+                }
+            })
+
+            console.log("sourceCount", sourceCount)
+
             // -----------------------------------------------------------------------------------
             // RECONFIGURE DATA FOR SANKEY
             let sank_map_all = []
@@ -285,9 +321,15 @@ looker.plugins.visualizations.add({
                     console.log("flowmap.split", d)
                     let source = parseInt(d.split(":")[0])
                     measures_used.push(source)                
-                    d.split("[")[1].split("]")[0].split(" ").forEach((di, ii) => {
-                        tmp_map["links"].push({"source": source, "target": parseInt(di), "value": entry[measures[parseInt(di)].name].value})
-                        measures_used.push(parseInt(di))
+                    d.split("[")[1].split("]")[0].split(" ").forEach((dd, ii) => {
+                        if (targetCount[dd] == 1) {
+                            tmp_map["links"].push({"source": source, "target": parseInt(dd), "value": entry[measures[parseInt(dd)].name].value})
+                            measures_used.push(parseInt(dd))
+                        } else {
+
+                            tmp_map["links"].push({"source": source, "target": parseInt(dd), "value": entry[measures[source].name].value})
+                            measures_used.push(parseInt(dd))
+                        }                        
                     })
                 })
                 sank_map_all.push(tmp_map)
@@ -528,6 +570,10 @@ looker.plugins.visualizations.add({
 
                 console.log("HERE 2")
 
+                console.log("mapping", sank_map2)
+                console.log("sankey", sankey)
+                console.log(sankey(sank_map2))
+
                 let graph = sankey(sank_map2)
 
                 console.log("defined sankey")
@@ -647,7 +693,7 @@ looker.plugins.visualizations.add({
                     .append("text")
                         .attr("class", "node-label")
                         .attr("x", d => { return d.x0 - 2 })
-                        .attr("y", d => d.y0 + ((d.y1 - d.y0) / 2))
+                        .attr("y", d => d.y0 + ((d.y1 - d.y0) / 2 - 4))
                         .attr("font-size", "11px")
                         .attr("text-anchor", "end")
                         .attr("dominant-baseline", "middle")
@@ -672,7 +718,7 @@ looker.plugins.visualizations.add({
                         .attr("class", "node-label value")
                         .attr("x", d => { return d.x0 - 2 })
                         .attr("y", d => d.y0 + ((d.y1 - d.y0) / 2))
-                        .attr("dy", 1.1 + "em")
+                        .attr("dy", 0.7 + "em") // 1.1
                         .attr("font-size", "10px")
                         .attr("text-anchor", "end")
                         .attr("dominant-baseline", "middle")

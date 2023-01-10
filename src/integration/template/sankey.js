@@ -17,7 +17,7 @@ export const object = {
             display: "text",
             label: "Flow Mapping",
             placeholder: "see docs",
-            default: "0:[5 6], 5:[7 1], 7:[2 3]"
+            default: "9:[6], 0:[6 7], 6:[1 2], 1:[3 4 8]"
             // default: ["0:[1]", "1:[6 2]", "6:[3 4]"]
         },
         nodenames: {
@@ -27,7 +27,7 @@ export const object = {
             display: "text",
             label: "Node Renames",
             placeholder: "see docs",
-            default: "0:Awarded to Date, 1:Rejected, 2:Cancelled, 3:Covered, 5:Tendered, 7:Accepted"
+            default: ""
         },
         currency: {
             type: "boolean",
@@ -167,7 +167,7 @@ export const object = {
                 // -----------------------------------------------------------------------------------
                 // FILTER DATA BASED ON DROPDOWN SELECTION
                 const entity = $(`#vis-options option:selected`).val()
-                console.log("ENTITY SELECTED", entity)
+                console.log("ENTITY SELECTED", entity) 
 
                 let data_sank = data.filter(d => {
                     return (d[dimensions[0].name].value == entity)
@@ -198,6 +198,34 @@ export const object = {
                 }
 
                 // -----------------------------------------------------------------------------------
+                // DETERMINE WHICH MEASURES HAVE MULTIPLE SOURCES
+                let targetList = []
+                let targetCount = {}
+                let sourceCount = {}
+
+                config.flowmap.split(",").forEach((d, i) => {
+                    let sourceVal = parseInt(d.split(":")[0])
+
+                    sourceCount[sourceVal] = {count: 0, targets: []}
+    
+                    d.split("[")[1].split("]")[0].split(" ").forEach((dd, ii) => {
+                        sourceCount[sourceVal]["count"] += 1
+                        sourceCount[sourceVal]["targets"].push(parseInt(dd))
+
+                        if (targetList.includes(dd)) {
+                            targetCount[dd]["count"] += 1
+                            targetCount[dd]["sources"].push(sourceVal)
+                        } else {
+                            targetCount[dd] = {count: 1, sources: [sourceVal]}
+                            targetList.push(dd)
+                        }
+                    })
+                })
+
+                console.log("targetCount", targetCount)
+                console.log("sourceCount", sourceCount)
+
+                // -----------------------------------------------------------------------------------
                 // RECONFIGURE DATA FOR SANKEY
                 let sank_map = {"nodes":[], "links":[]}
                 let node_name_map = {}
@@ -208,15 +236,29 @@ export const object = {
                 console.log("flowmap", config.flowmap.split(",")) // ERRORING
                 config.flowmap.split(",").forEach((d, i) => {
                     let source = parseInt(d.split(":")[0])
-                    measures_used.push(source)
+                    measures_used.push(source, d)
 
-                    d.split("[")[1].split("]")[0].split(" ").forEach((d, i) => {
-                        // console.log("measure", measures[parseInt(d)], data_sank[measures[parseInt(d)].name])
-                        // console.log("sank_map: value", data_sank[measures[parseInt(d)].name].value)
-                        sank_map["links"].push({"source": source, "target": parseInt(d), "value": data_sank[measures[parseInt(d)].name].value})
-                        measures_used.push(parseInt(d))
+                    d.split("[")[1].split("]")[0].split(" ").forEach((dd, ii) => {
+                        if (targetCount[dd]["count"] == 1) {
+                            sank_map["links"].push({"source": source, "target": parseInt(dd), "value": data_sank[measures[parseInt(dd)].name].value})
+                            measures_used.push(parseInt(dd))
+                        } else {
+                            if (sourceCount[source]["count"] == 1) {
+                                sank_map["links"].push({"source": source, "target": parseInt(dd), "value": data_sank[measures[source].name].value})
+                            } else if (sourceCount[source]["count"] == 2) {
+                                sourceCount[source]["targets"].forEach((t, ti) => {
+                                    if (t != dd && targetCount[t]["count"] == 1) {
+                                        sank_map["links"].push({"source": source, "target": parseInt(dd), 
+                                        "value": data_sank[measures[source].name].value - data_sank[measures[parseInt(t)].name].value})
+                                    }
+                                })
+                            }
+                            measures_used.push(parseInt(dd))
+                        }                        
                     })
                 })
+
+                console.log("sank_map links", sank_map)
 
                 measures_used = [...new Set(measures_used)]
                 console.log("measures_used no-dups", measures_used) 
@@ -519,7 +561,7 @@ export const object = {
                     .append("text")
                         .attr("class", "node-label")
                         .attr("x", d => { return d.x0 - 2 })
-                        .attr("y", d => d.y0 + ((d.y1 - d.y0) / 2))
+                        .attr("y", d => d.y0 + ((d.y1 - d.y0) / 2 - 4))
                         .attr("font-size", "11px")
                         .attr("text-anchor", "end")
                         .attr("dominant-baseline", "middle")
@@ -544,7 +586,8 @@ export const object = {
                         .attr("class", "node-label value")
                         .attr("x", d => { return d.x0 - 2 })
                         .attr("y", d => d.y0 + ((d.y1 - d.y0) / 2))
-                        .attr("dy", 1.1 + "em")
+                        .attr("dy", 0.7 + "em")
+                        // .attr("dy", 1.1 + "em")
                         .attr("font-size", "10px")
                         .attr("text-anchor", "end")
                         .attr("dominant-baseline", "middle")

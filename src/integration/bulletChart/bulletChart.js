@@ -201,7 +201,7 @@ try {
             top: 15,
             right: 155,
             bottom: 15,
-            left: 20
+            left: 50
         }
     }
 
@@ -484,11 +484,20 @@ try {
                 })
             .attr("text-anchor", "left")
             .style("dominant-baseline", "middle")
-            .attr("fill", "#ffffff")
+            // .attr("fill", "#ffffff")
             .attr("font-size", "0.7em")
             .attr("font-weight", "500")
             .attr("font-family", "sans-serif")
             .attr("class", "inner-text")
+
+    innerBarText
+        .attr("fill", (d) => {
+            if (d3.select('.inner-text').node().getComputedTextLength() < xScale(parseInt(d['monthly-actual']))) {
+                return "#ffffff"
+            } else {
+                return "black"
+            }
+        })
 
 
     // For each label, we assign a group, add a symbol, add text above and add hidden text in the same position. 

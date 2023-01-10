@@ -19,6 +19,22 @@ export const object = {
             default: "true",
             section: "Setup",
             order: 2
+        },
+        size_label: {
+            type: "string",
+            label: "Hex Size Legend Label",
+            display: "text",
+            default: "Volume",
+            section: "Setup",
+            order: 3
+        },
+        color_label: {
+            type: "string",
+            label: "Hex Color Legend Label",
+            display: "text",
+            default: "Average RPM",
+            section: "Setup",
+            order: 4
         }
     },
 
@@ -131,7 +147,7 @@ export const object = {
         }
 
         const width = element.clientWidth - margin.left - margin.right;
-        const height = (element.clientHeight * .7) - margin.top - margin.bottom;
+        const height = element.clientHeight - margin.top - margin.bottom;
 
         const svg = (
             d3.select(element).select('svg')
@@ -158,9 +174,9 @@ export const object = {
         data.forEach((d) => {
             let entry = {}
 
-            entry['lat'] = +d[dimensions[1].name].value
-            entry['lon'] = +d[dimensions[2].name].value
-            entry['direction'] = d[dimensions[3].name].value
+            entry['lat'] = +d[dimensions[0].name].value
+            entry['lon'] = +d[dimensions[1].name].value
+            entry['direction'] = d[dimensions[2].name].value
             entry['volume'] = +d[measures[0].name].value
             entry['rate'] = +d[measures[1].name].value
 
@@ -224,100 +240,105 @@ export const object = {
 
             // ---------------------------------------------------------------------
             // BUTTONS
-            const buttonContainer = group.append("g")
-                .attr("transform", `translate(${width / 1.33},${height + 15})`)
-                .classed("buttonContainer", true)
+            if (config.directions == "true") {
+                const buttonContainer = group.append("g")
+                    .attr("transform", `translate(${width / 1.25},${height + 35})`)
+                    .classed("buttonContainer", true)
 
-            buttonContainer.append("text")
-                .attr("x", 0)
-                .attr("y", 2)
-                .style("text-anchor", "middle")
-                .style("dominant-baseline", "middle")
-                .style("font-size", 11)
-                .attr("fill", "#323232")
-                .text("Freight Direction")
+                buttonContainer.append("text")
+                    .attr("x", 0)
+                    .attr("y", 2)
+                    .style("text-anchor", "middle")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 11)
+                    .attr("fill", "#323232")
+                    .text("Freight Direction")
 
-            buttonContainer.append("rect")
-                .attr("x", -90)
-                .attr("y", 15)
-                .attr("width", 60)
-                .attr("height", 28)
-                .attr("stroke", "#323232")
-                .attr("fill", "#323232") 
-                .classed("All", true)
-                // .on("click", rectClick(d3.select(this)))
-                .on("click", function() {
-                    const d3This = d3.select(this)
-                    rectClick(d3This)
-                })
+                buttonContainer.append("rect")
+                    .attr("x", -90)
+                    .attr("y", 15)
+                    .attr("width", 60)
+                    .attr("height", 28)
+                    .attr("stroke", "#323232")
+                    .attr("fill", "#323232") 
+                    .classed("All", true)
+                    // .on("click", rectClick(d3.select(this)))
+                    .on("click", function() {
+                        const d3This = d3.select(this)
+                        rectClick(d3This)
+                    })
 
-            buttonContainer.append("text")
-                .attr("x", -60)
-                .attr("y", 29)
-                .style("text-anchor", "middle")
-                .style("dominant-baseline", "middle")
-                .style("font-size", 11)
-                .attr("fill", "white")
-                .text("All")
-                .classed("All", true)
-                .on("click", function() {
-                    const d3This = d3.select(this)
-                    rectClick(d3This)
-                })
+                buttonContainer.append("text")
+                    .attr("x", -60)
+                    .attr("y", 29)
+                    .style("text-anchor", "middle")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 11)
+                    .attr("fill", "white")
+                    .text("All")
+                    .classed("All", true)
+                    .on("click", function() {
+                        const d3This = d3.select(this)
+                        rectClick(d3This)
+                    })
 
-            buttonContainer.append("rect")
-                .attr("x", -30)
-                .attr("y", 15)
-                .attr("width", 60)
-                .attr("height", 28)
-                .attr("stroke", "#323232")
-                .attr("fill", "#f9f9f9")
-                .classed("Inbound", true)
-                .on("click", function() {
-                    const d3This = d3.select(this)
-                    rectClick(d3This)
-                })
+                buttonContainer.append("rect")
+                    .attr("x", -30)
+                    .attr("y", 15)
+                    .attr("width", 60)
+                    .attr("height", 28)
+                    .attr("stroke", "#323232")
+                    .attr("fill", "#f9f9f9")
+                    .classed("Inbound", true)
+                    .on("click", function() {
+                        const d3This = d3.select(this)
+                        rectClick(d3This)
+                    })
 
-            buttonContainer.append("text")
-                .attr("x", 0)
-                .attr("y", 29)
-                .style("text-anchor", "middle")
-                .style("dominant-baseline", "middle")
-                .style("font-size", 11)
-                .attr("fill", "#323232")
-                .text("Inbound")
-                .classed("Inbound", true)
-                .on("click", function() {
-                    const d3This = d3.select(this)
-                    rectClick(d3This)
-                })
+                buttonContainer.append("text")
+                    .attr("x", 0)
+                    .attr("y", 29)
+                    .style("text-anchor", "middle")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 11)
+                    .attr("fill", "#323232")
+                    .text("Inbound")
+                    .classed("Inbound", true)
+                    .on("click", function() {
+                        const d3This = d3.select(this)
+                        rectClick(d3This)
+                    })
 
-            buttonContainer.append("rect")
-                .attr("x", 30)
-                .attr("y", 15)
-                .attr("width", 60)
-                .attr("height", 28)
-                .attr("stroke", "#323232")
-                .attr("fill", "#f9f9f9")
-                .classed("Outbound", true)
-                .on("click", function() {
-                    const d3This = d3.select(this)
-                    rectClick(d3This)
-                })
+                buttonContainer.append("rect")
+                    .attr("x", 30)
+                    .attr("y", 15)
+                    .attr("width", 60)
+                    .attr("height", 28)
+                    .attr("stroke", "#323232")
+                    .attr("fill", "#f9f9f9")
+                    .classed("Outbound", true)
+                    .on("click", function() {
+                        const d3This = d3.select(this)
+                        rectClick(d3This)
+                    })
 
-            buttonContainer.append("text")
-                .attr("x", 60)
-                .attr("y", 29)
-                .style("text-anchor", "middle")
-                .style("dominant-baseline", "middle")
-                .style("font-size", 11)
-                .attr("fill", "#323232")
-                .text("Outbound")
-                .classed("Outbound", true)
-                .on("click", function() {
-                    const d3This = d3.select(this)
-                    rectClick(d3This)
-                })
+                buttonContainer.append("text")
+                    .attr("x", 60)
+                    .attr("y", 29)
+                    .style("text-anchor", "middle")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 11)
+                    .attr("fill", "#323232")
+                    .text("Outbound")
+                    .classed("Outbound", true)
+                    .on("click", function() {
+                        const d3This = d3.select(this)
+                        rectClick(d3This)
+                    })
+            } else {
+                d3.select(".buttonContainer").remove()
+            }
+            
 
 
             // console.log("select chosen one", d3.select(`text[fill="white"]`).attr("class"))
@@ -473,7 +494,7 @@ export const object = {
                 console.log("INNERHEXSCALE ORIGINAL DOMAIN", innerHexScale.domain())
 
                 const legendContainer = group.append("g")
-                    .attr("transform", `translate(${width / 4},${height + 6})`) //10
+                    .attr("transform", `translate(${width / 4},${height + 12})`) //10
                     .classed("legendContainer", true)
 
                 const legendSize = legendContainer.append("g")
@@ -487,7 +508,7 @@ export const object = {
                     .style("dominant-baseline", "middle")
                     .style("font-size", 11)
                     .attr("fill", "#323232")
-                    .text("Volume")
+                    .text(config.size_label)
                 
                 legendSize.append("polygon")
                     .attr("points", d => hexagonPoints(2))
@@ -546,8 +567,7 @@ export const object = {
                     .style("dominant-baseline", "middle")
                     .style("font-size", 11)
                     .attr("fill", "#323232")
-                    .text(config.calc_type === "average" ? "Average RPM" : "% Change in RPM")
-                    // .text("% Change in RPM")
+                    .text(config.color_label)
 
                 legendColor.append("polygon")
                     .attr("points", d => hexagonPoints(8))
