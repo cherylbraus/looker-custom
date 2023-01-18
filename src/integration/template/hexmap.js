@@ -455,7 +455,6 @@ export const object = {
 
                 const quartile = (arr, q) => {
                     const sorted = arr.sort((a, b) => a - b)
-                    console.log("list sorted", sorted)
 
                     let pos = (sorted.length - 1) * q;
                     if (pos % 1 === 0) {
@@ -509,6 +508,8 @@ export const object = {
                         quartile2.push(quart2)
                         d.metric1_quart = quart1
                         d.metric2_quart = quart2
+
+                        console.log("hexagon stats", list1.length, avg1, med1, quart1)                        
                     } else {
                         d.metric1_avg = 0
                         d.metric2_avg = 0
@@ -524,6 +525,8 @@ export const object = {
                     totals2.push(sum2)
                     d.metric1_sum = sum1
                     d.metric2_sum = sum2
+
+                    // console.log("hexagon stats sum", sum1)
                 })
 
                 const metricMap = {
@@ -531,9 +534,10 @@ export const object = {
                     "average": ["_avg", average1, average2],
                     "median": ["_med", median1, median2],
                     "quartile": ["_quart", quartile1, quartile2]
-                }
+                } 
 
                 console.log("hex.grid.layout", hex.grid.layout)
+                console.log("1st extents", d3.extent(average1), d3.extent(median1), d3.extent(quartile1))
 
                 // plot empty hexagons for only areas that have data
                 const grid = group.append('g')

@@ -72,7 +72,7 @@ looker.plugins.visualizations.add({
                 {"Median": "median"},
                 {"75% Quartile": "quartile"}
             ],
-            default: "count",
+            default: "average",
             section: "Setup",
             order: 7
         },
@@ -455,9 +455,8 @@ looker.plugins.visualizations.add({
 
                 // console.log("mapdata", mapdata)
 
-                const hex = hexgrid(mapdata, ["volume", "rate", "direction", "month"])
+                const hex = hexgrid(mapdata, ["metric1", "metric2", "direction", "month"])
 
-                console.log("grid", hex.grid)
                 // console.log("pointdensity points", [...hex.grid.extentPointDensity].reverse())
                     
                 const totals1 = []
@@ -477,7 +476,6 @@ looker.plugins.visualizations.add({
 
                 const quartile = (arr, q) => {
                     const sorted = arr.sort((a, b) => a - b)
-                    console.log("list sorted", sorted)
 
                     let pos = (sorted.length - 1) * q;
                     if (pos % 1 === 0) {
@@ -531,6 +529,8 @@ looker.plugins.visualizations.add({
                         quartile2.push(quart2)
                         d.metric1_quart = quart1
                         d.metric2_quart = quart2
+
+                        console.log("hexagon stats", list1.length, avg1, med1, quart1)   
                     } else {
                         d.metric1_avg = 0
                         d.metric2_avg = 0
@@ -581,6 +581,7 @@ looker.plugins.visualizations.add({
                     // .range([2,6,10])
 
                 // create color scale for rate *change*
+                console.log("color extent", d3.extent(metricMap[config.color_metric][2]))
                 const colorRateScale = d3.scaleQuantize()
                     .domain(d3.extent(metricMap[config.color_metric][2]))
                     // .domain(d3.extent(averageRates))
