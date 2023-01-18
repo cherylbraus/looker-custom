@@ -29,9 +29,9 @@
             text {
               font-family: 'Roboto';
             }
-            .domain {
+            /* .domain {
               display: none;
-            }
+            } */
             .gridline {
               stroke: rgb(230, 230, 230);
               shape-rendering: crispEdges;
@@ -90,7 +90,8 @@
             }
 
             .x-axis .domain {
-              stroke: #ccd6eb;
+              /* stroke: #ccd6eb; */
+              stroke: #323232;
               stroke-width: 1;
             }
 
@@ -100,7 +101,9 @@
             }
 
             .y-axis .domain {
-              stroke: none;
+              /* stroke: none; */
+              stroke: #323232;
+              stroke-width: 1
             }
 
             .x-axis text, .y-axis text {
@@ -458,12 +461,13 @@
                 <div class="resizer resizer-r"></div>
                 <div class="resizer resizer-b"></div>
                 <div id="vis">
-                  <div id="vis-options-container"><p class="dropdown-title"></p>
+                  <!-- <div id="vis-options-container"><p class="dropdown-title"></p>
                     <select name="vis-options" id="vis-options"></select>
-                  </div>
+                  </div> -->
                   <svg></svg>
-                  <!-- <svg id="first"></svg> -->
-                  <!-- <svg id="second"></svg> -->
+                  <!-- <svg id="first"></svg>
+                  <svg id="second"></svg>
+                  <svg id="third"></svg> -->
                 </div>
                 <div class="tooltip"></div>                
             </div>

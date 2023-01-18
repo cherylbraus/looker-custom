@@ -20,13 +20,57 @@ export const object = {
             section: "Setup",
             order: 2
         },
+        size_col: {
+            type: "string",
+            label: "Measure column index",
+            display: "text",
+            default: "0",
+            section: "Setup",
+            order: 3
+        },
+        size_metric: {
+            type: "string",
+            label: "Metric for Size",
+            display: "radio",
+            values: [
+                {"Raw Count": "count"},
+                {"Average": "average"},
+                {"Median": "median"},
+                {"75% Quartile": "quartile"}
+            ],
+            default: "count",
+            section: "Setup",
+            order: 4
+        },
         size_label: {
             type: "string",
             label: "Hex Size Legend Label",
             display: "text",
             default: "Volume",
             section: "Setup",
-            order: 3
+            order: 5
+        },
+        color_col: {
+            type: "string",
+            label: "Measure column index",
+            display: "text",
+            default: "1",
+            section: "Setup",
+            order: 6
+        },
+        color_metric: {
+            type: "string",
+            label: "Metric for Size",
+            display: "radio",
+            values: [
+                {"Raw Count": "count"},
+                {"Average": "average"},
+                {"Median": "median"},
+                {"75% Quartile": "quartile"}
+            ],
+            default: "count",
+            section: "Setup",
+            order: 7
         },
         color_label: {
             type: "string",
@@ -34,7 +78,7 @@ export const object = {
             display: "text",
             default: "Average RPM",
             section: "Setup",
-            order: 4
+            order: 8
         }
     },
 
@@ -154,7 +198,7 @@ export const object = {
                 .html('')
                 .attr('width', '100%')
                 .attr('height', '100%')
-        )
+        ) 
 
         const group = svg.append('g')
             .attr('transform', `translate(${margin.left},${margin.top})`)
@@ -177,8 +221,8 @@ export const object = {
             entry['lat'] = +d[dimensions[0].name].value
             entry['lon'] = +d[dimensions[1].name].value
             entry['direction'] = d[dimensions[2].name].value
-            entry['volume'] = +d[measures[0].name].value
-            entry['rate'] = +d[measures[1].name].value
+            entry['metric1'] = +d[measures[parseInt(config.size_col)].name].value
+            entry['metric2'] = +d[measures[parseInt(config.color_col)].name].value
 
             data_ready.push(entry)
         })
@@ -389,35 +433,107 @@ export const object = {
 
                 // console.log("mapdata", mapdata)
 
-                const hex = hexgrid(mapdata, ["volume", "rate", "direction", "month"])
+                const hex = hexgrid(mapdata, ["metric1", "metric2", "direction", "month"])
 
                 console.log("grid", hex.grid)
                 // console.log("pointdensity points", [...hex.grid.extentPointDensity].reverse())
                     
-                const totalVolumes = []
-                const averageRates = []
+                const totals1 = []
+                const totals2 = []
+                const average1 = []
+                const average2 = []
+                const median1 = []
+                const median2 = []
+                const quartile1 = []
+                const quartile2 = []
+
+                const median = (arr) => {
+                    const mid = Math.floor(arr.length / 2)
+                    const nums = [...arr].sort((a, b) => a - b)
+                    return arr.length % 2 !== 0 ? nums[mid] : (nums[mid - 1] + nums[mid]) / 2 
+                }
+
+                const quartile = (arr, q) => {
+                    const sorted = arr.sort((a, b) => a - b)
+                    console.log("list sorted", sorted)
+
+                    let pos = (sorted.length - 1) * q;
+                    if (pos % 1 === 0) {
+                        return sorted[pos]
+                    }
+
+                    pos = Math.floor(pos)
+                    if (sorted[pos + 1] !== undefined) {
+                        return (sorted[pos] + sorted[pos + 1]) / 2
+                    }
+
+                    return sorted[pos]
+                }
                     
                 hex.grid.layout.forEach((d, i) => {
                     // console.log("HEX.GRID.LAYOUT", d)
-                    let vol = 0;
+                    let sum1 = 0;
+                    let sum2 = 0;
                     if (+d.datapoints > 0) {
-                        let rateList = []
+                        let list1 = []
+                        let list2 = []
 
                         d.forEach((sd, si) => {
-                            vol += +sd.volume
-                            rateList.push(+sd.rate)
+                            sum1 += +sd.metric1
+                            list1.push(+sd.metric1)
+
+                            sum2 += +sd.metric2
+                            list2.push(+sd.metric2)
                         })
 
-                        const avg = rateList.reduce((a,b) => a + b) / rateList.length;
+                        // averages
+                        const avg1 = list1.reduce((a,b) => a + b) / list1.length;
+                        const avg2 = list2.reduce((a,b) => a + b) / list2.length;
+                        average1.push(avg1)
+                        average2.push(avg2)
+                        d.metric1_avg = avg1
+                        d.metric2_avg = avg2
 
-                        averageRates.push(avg)
-                        d.rate = avg
+                        // median
+                        const med1 = median(list1)
+                        const med2 = median(list2)
+                        median1.push(med1)
+                        median2.push(med2)
+                        d.metric1_med = med1
+                        d.metric2_med = med2
+
+                        // upper quartile
+                        const quart1 = quartile(list1, 0.75)
+                        const quart2 = quartile(list2, 0.75)
+                        quartile1.push(quart1)
+                        quartile2.push(quart2)
+                        d.metric1_quart = quart1
+                        d.metric2_quart = quart2
                     } else {
-                        d.rate = 0
+                        d.metric1_avg = 0
+                        d.metric2_avg = 0
+
+                        d.metric1_med = 0
+                        d.metric2_med = 0
+
+                        d.metric1_quart = 0
+                        d.metric2_quart = 0
                     }
-                    d.volume = vol
-                    totalVolumes.push(vol)
+                    // sum counts
+                    totals1.push(sum1)
+                    totals2.push(sum2)
+                    d.metric1_sum = sum1
+                    d.metric2_sum = sum2
                 })
+
+                const metricMap = {
+                    "count": ["_sum", totals1, totals2],
+                    "average": ["_avg", average1, average2],
+                    "median": ["_med", median1, median2],
+                    "quartile": ["_quart", quartile1, quartile2]
+                }
+
+                console.log("hex.grid.layout", hex.grid.layout)
 
                 // plot empty hexagons for only areas that have data
                 const grid = group.append('g')
@@ -436,15 +552,15 @@ export const object = {
                 const middleRadius = 2 + ((Number(config.radius) - 2) / 2)
 
                 const innerHexScale = d3.scaleQuantize()
-                    .domain([Math.max(.001, d3.min(totalVolumes)), d3.max(totalVolumes)])
+                    .domain([Math.max(.001, d3.min(metricMap[config.size_metric][1])), d3.max(metricMap[config.size_metric][1])])
                     .range([2, Number(middleRadius), Number(config.radius)])
                     // .range([2,6,10])
                     // .domain([0, d3.max(totalVolumes)])
                     // .range([0,1,2,3,4,5,6,7])
 
-                // create color scale for rate *change*
+                // create color scale for metric2 *change*
                 const colorRateScale = d3.scaleQuantize()
-                    .domain(d3.extent(averageRates))
+                    .domain(d3.extent(metricMap[config.color_metric][2]))
                     .range(["#27566b", "#f1cc56", "#8cbb61"])                
 
                 // hexagon function
@@ -459,6 +575,10 @@ export const object = {
                         ${-halfWidth},${-radius / 2}`;
                 };
 
+                console.log("inner hex scale", innerHexScale.domain(), innerHexScale.range())
+                console.log("metric 1 col", `metric1${metricMap[config.size_metric][0]}`)
+                console.log("metric 2 col", `metric2${metricMap[config.color_metric][0]}`)
+
                 const innerHexs = group
                     .append('g')
                     .attr("class", "inner-hexs")
@@ -467,11 +587,11 @@ export const object = {
                     .enter()
                     .append("polygon")
                         .attr("class", "innerhex")
-                        .attr("points", d => hexagonPoints(innerHexScale(d.volume)))
+                        .attr("points", d => hexagonPoints(innerHexScale(d[`metric1${metricMap[config.size_metric][0]}`]))) 
                         .attr("transform", d => `translate(${d.x}, ${d.y})`)
                         .style("fill", d => {
-                            if (+d.volume > 0) {
-                                return colorRateScale(d.rate)
+                            if (+d[`metric1${metricMap[config.size_metric][0]}`] > 0) {
+                                return colorRateScale(d[`metric2${metricMap[config.color_metric][0]}`])
                             } else {
                                 return "none"
                             }
