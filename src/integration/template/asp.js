@@ -139,7 +139,7 @@ export const object = {
                     top: 10, 
                     right: 20,
                     bottom: 40, 
-                    left: 60
+                    left: 90
                 }
 
                 const width = element.clientWidth - margin.left - margin.right;
@@ -242,7 +242,154 @@ export const object = {
                     .tickFormat("")
                     .tickSize(0)
                     .tickPadding(10)
-             
+
+                // ----------------------------------------------------------------
+                // INTERACTIONS
+                const bisect = d3.bisector(function(d) { return d.bid_to_dat; }).left;
+                
+                function mouseover() {
+                    focusCircle1.style("opacity", 1)
+                    focusX1.style("opacity", 1)
+                    focusY1.style("opacity", 1)
+                    focusXtext1.style("opacity", 1)
+                    focusYtext1.style("opacity", 1)
+
+                    focusCircle2.style("opacity", 1)
+                    focusX2.style("opacity", 1)
+                    focusY2.style("opacity", 1)
+                    focusXtext2.style("opacity", 1)
+                    focusYtext2.style("opacity", 1)
+
+                    focusCircle3.style("opacity", 1)
+                    focusX3.style("opacity", 1)
+                    focusY3.style("opacity", 1)
+                    focusXtext3.style("opacity", 1)
+                    focusYtext3.style("opacity", 1)
+
+                    tooltipFocus.style("opacity", 1)
+                }
+
+                function mousemove() {
+                    const x0 = xScale.invert(d3.mouse(this)[0])
+                    const i = bisect(dataBid, x0, 1)
+                    const selectedData = dataBid[i]
+
+                    focusCircle1
+                        .transition()
+                        .duration(0)
+                        .attr("cx", xScale(selectedData.bid_to_dat))
+                        .attr("cy", yScale1(selectedData.pwin))
+
+                    focusX1
+                        .attr("x1", xScale(selectedData.bid_to_dat))
+                        .attr("x2", xScale(selectedData.bid_to_dat))
+                        .attr("y1", yScale1(selectedData.pwin))
+                        .attr("y2", yScale1(yScale1.domain()[0]))
+
+                    focusY1
+                        .attr("x1", xScale(xScale.domain()[0]))
+                        .attr("x2", xScale(selectedData.bid_to_dat))
+                        .attr("y1", yScale1(selectedData.pwin))
+                        .attr("y2", yScale1(selectedData.pwin))
+
+                    focusXtext1
+                        .text(d3.format(",.0%")(selectedData.bid_to_dat))
+                        .attr("x", xScale(selectedData.bid_to_dat))
+                        .attr("y", yScale1(yScale1.domain()[0]) + 17)
+
+                    focusYtext1
+                        .text(d3.format(",.0%")(selectedData.pwin))
+                        .attr("x", xScale(xScale.domain()[0]) - 30)
+                        .attr("y", yScale1(selectedData.pwin))
+
+                    focusCircle2
+                        .transition()
+                        .duration(0)
+                        .attr("cx", xScale(selectedData.bid_to_dat))
+                        .attr("cy", yScale2(selectedData.margin_dollars))
+
+                    focusX2
+                        .attr("x1", xScale(selectedData.bid_to_dat))
+                        .attr("x2", xScale(selectedData.bid_to_dat))
+                        .attr("y1", yScale2(selectedData.margin_dollars))
+                        .attr("y2", yScale2(yScale2.domain()[0]))
+
+                    focusY2
+                        .attr("x1", xScale(xScale.domain()[0]))
+                        .attr("x2", xScale(selectedData.bid_to_dat))
+                        .attr("y1", yScale2(selectedData.margin_dollars))
+                        .attr("y2", yScale2(selectedData.margin_dollars))
+
+                    focusXtext2
+                        .text(d3.format(",.0%")(selectedData.bid_to_dat))
+                        .attr("x", xScale(selectedData.bid_to_dat))
+                        .attr("y", yScale2(yScale2.domain()[0]) + 17)
+
+                    focusYtext2
+                        .text(d3.format("$,.0f")(selectedData.margin_dollars))
+                        .attr("x", xScale(xScale.domain()[0]) - 30)
+                        .attr("y", yScale2(selectedData.margin_dollars))
+
+                    focusCircle3
+                        .transition()
+                        .duration(0)
+                        .attr("cx", xScale(selectedData.bid_to_dat))
+                        .attr("cy", yScale3(selectedData.expected_margin_dollars))
+
+                    focusX3
+                        .attr("x1", xScale(selectedData.bid_to_dat))
+                        .attr("x2", xScale(selectedData.bid_to_dat))
+                        .attr("y1", yScale3(selectedData.expected_margin_dollars))
+                        .attr("y2", yScale3(yScale3.domain()[0]))
+
+                    focusY3
+                        .attr("x1", xScale(xScale.domain()[0]))
+                        .attr("x2", xScale(selectedData.bid_to_dat))
+                        .attr("y1", yScale3(selectedData.expected_margin_dollars))
+                        .attr("y2", yScale3(selectedData.expected_margin_dollars))
+
+                    focusXtext3
+                        .text(d3.format(",.0%")(selectedData.bid_to_dat))
+                        .attr("x", xScale(selectedData.bid_to_dat))
+                        .attr("y", yScale3(yScale3.domain()[0]) + 17)
+
+                    focusYtext3
+                        .text(d3.format("$,.0f")(selectedData.expected_margin_dollars))
+                        .attr("x", xScale(xScale.domain()[0]) - 30)
+                        .attr("y", yScale3(selectedData.expected_margin_dollars))
+
+                    tooltipFocusBody.html(
+                        `<span style="float:left;"><b>Possible Bid</b></span><br>` + 
+                        `<span style="float:left;">Ratio to DAT:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(selectedData.bid_to_dat)}</span><br>` + 
+                        `<span style="float:left;">Win Probability:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(selectedData.pwin)}</span><br>` + 
+                        `<span style="float:left;">Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(selectedData.margin_dollars)}</span><br>` + 
+                        `<span style="float:left;">Expected Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(selectedData.expected_margin_dollars)}</span>` 
+                    )
+                }
+
+                function mouseout() {
+                    focusCircle1.style("opacity", 0)
+                    focusX1.style("opacity", 0)
+                    focusY1.style("opacity", 0)
+                    focusXtext1.style("opacity", 0)
+                    focusYtext1.style("opacity", 0)
+
+                    focusCircle2.style("opacity", 0)
+                    focusX2.style("opacity", 0)
+                    focusY2.style("opacity", 0)
+                    focusXtext2.style("opacity", 0)
+                    focusYtext2.style("opacity", 0)
+
+                    focusCircle3.style("opacity", 0)
+                    focusX3.style("opacity", 0)
+                    focusY3.style("opacity", 0)
+                    focusXtext3.style("opacity", 0)
+                    focusYtext3.style("opacity", 0)
+
+                    tooltipFocus.style("opacity", 0)
+                }
+
+                // ----------------------------------------------------------------
                 // FIRST LINE PLOT
                 const xAxis1 = group1
                     .append("g")
@@ -282,7 +429,7 @@ export const object = {
                 const circleBid1 = group1
                     .append("circle")
                         .style("fill", "#3a4245")
-                        .attr("r", 5)
+                        .attr("r", 6)
                         .attr("cx", xScale(dataBidYes[0].bid_to_dat))
                         .attr("cy", yScale1(dataBidYes[0].pwin))
 
@@ -310,7 +457,7 @@ export const object = {
                     .append("text")
                         .text(d3.format(",.0%")(dataBidYes[0].bid_to_dat))
                         .attr("x", xScale(dataBidYes[0].bid_to_dat))
-                        .attr("y", yScale1(yScale1.domain()[0]) + 15)
+                        .attr("y", yScale1(yScale1.domain()[0]) + 17)
                         .attr("text-anchor", "middle")
                         .style("fill", "#3a4245")
                         .style("font-size", "11px")
@@ -325,17 +472,69 @@ export const object = {
                         .style("fill", "#3a4245")
                         .style("font-size", "11px")
                         .style("font-family", "Roboto")
+                        .style("dominant-baseline", "middle")
 
                 const yAxisText1 = group1
                     .append("text")
                         .text("Win Probability")
-                        .attr("y", yScale1(yScale1.domain()[1]) - 40)
+                        .attr("y", yScale1(yScale1.domain()[1]) - 70)
                         .attr("text-anchor", "end")
                         .style("fill", "#3a4245")
                         .style("font-size", "12px")
                         .style("font-family", "Roboto")
-                        .attr("transform", `rotate(-90)`) 
+                        .attr("transform", `rotate(-90)`)
 
+                // interactions
+                const focus1 = group1
+                    .append("g")
+
+                const focusCircle1 = focus1
+                    .append("circle")
+                        .style("fill", "#007B82")
+                        .attr("stroke", "none")
+                        .attr("r", 6)
+                        .style("opacity", 0)
+
+                const focusX1 = focus1
+                    .append("line")
+                        .style("stroke-dasharray", "5,3")
+                        .style("stroke", "#007B82")
+                        .style("stroke-width", 1.)
+                        .style("opacity", 0)
+
+                const focusY1 = focus1
+                    .append("line")
+                        .style("stroke-dasharray", "5,3")
+                        .style("stroke", "#007B82")
+                        .style("stroke-width", 1.)
+                        .style("opacity", 0)
+
+                const focusXtext1 = focus1
+                    .append("text")
+                        .style("fill", "#007B82")
+                        .style("font-size", "11px")
+                        .style("font-family", "Roboto")
+                        .attr("text-anchor", "middle")
+                        .style("opacity", 0)
+
+                const focusYtext1 = focus1
+                    .append("text")
+                        .style("fill", "#007B82")
+                        .style("font-size", "11px")
+                        .style("font-family", "Roboto")
+                        .attr("text-anchor", "end")
+                        .style("dominant-baseline", "middle")
+                        .style("opacity", 0)
+
+                const rect1 = group1
+                    .append("rect")
+                        .style("fill", "none")
+                        .style("pointer-events", "all")
+                        .attr("width", width)
+                        .attr("height", height)
+                        .on("mouseover", mouseover)
+                        .on("mousemove", mousemove)
+                        .on("mouseout", mouseout)
 
                 // SECOND LINE PLOT
                 const xAxis2 = group2
@@ -376,7 +575,7 @@ export const object = {
                 const circleBid2 = group2
                     .append("circle")
                         .style("fill", "#3a4245")
-                        .attr("r", 5)
+                        .attr("r", 6)
                         .attr("cx", xScale(dataBidYes[0].bid_to_dat))
                         .attr("cy", yScale2(dataBidYes[0].margin_dollars))
 
@@ -404,7 +603,7 @@ export const object = {
                     .append("text")
                         .text(d3.format(",.0%")(dataBidYes[0].bid_to_dat))
                         .attr("x", xScale(dataBidYes[0].bid_to_dat))
-                        .attr("y", yScale2(yScale2.domain()[0]) + 15)
+                        .attr("y", yScale2(yScale2.domain()[0]) + 17)
                         .attr("text-anchor", "middle")
                         .style("fill", "#3a4245")
                         .style("font-size", "11px")
@@ -412,23 +611,76 @@ export const object = {
     
                 const yBidText2 = group2
                     .append("text")
-                        .text(d3.format("$,.1s")(dataBidYes[0].margin_dollars))
+                        .text(d3.format("$,.0f")(dataBidYes[0].margin_dollars))
                         .attr("x", xScale(xScale.domain()[0]) - 8)
                         .attr("y", yScale2(dataBidYes[0].margin_dollars))
                         .attr("text-anchor", "end")
                         .style("fill", "#3a4245")
                         .style("font-size", "11px")
                         .style("font-family", "Roboto")
+                        .style("dominant-baseline", "middle")
 
                 const yAxisText2 = group2
                     .append("text")
                         .text("Margin")
-                        .attr("y", yScale2(yScale2.domain()[1]) - 40)
+                        .attr("y", yScale2(yScale2.domain()[1]) - 70)
                         .attr("text-anchor", "end")
                         .style("fill", "#3a4245")
                         .style("font-size", "12px")
                         .style("font-family", "Roboto")
                         .attr("transform", `rotate(-90)`) 
+
+                // interactions
+                const focus2 = group2
+                    .append("g")
+
+                const focusCircle2= focus2
+                    .append("circle")
+                        .style("fill", "#007B82")
+                        .attr("stroke", "none")
+                        .attr("r", 6)
+                        .style("opacity", 0)
+
+                const focusX2 = focus2
+                    .append("line")
+                        .style("stroke-dasharray", "5,3")
+                        .style("stroke", "#007B82")
+                        .style("stroke-width", 1.)
+                        .style("opacity", 0)
+
+                const focusY2 = focus2
+                    .append("line")
+                        .style("stroke-dasharray", "5,3")
+                        .style("stroke", "#007B82")
+                        .style("stroke-width", 1.)
+                        .style("opacity", 0)
+
+                const focusXtext2 = focus2
+                    .append("text")
+                        .style("fill", "#007B82")
+                        .style("font-size", "11px")
+                        .style("font-family", "Roboto")
+                        .attr("text-anchor", "middle")
+                        .style("opacity", 0)
+
+                const focusYtext2 = focus2
+                    .append("text")
+                        .style("fill", "#007B82")
+                        .style("font-size", "11px")
+                        .style("font-family", "Roboto")
+                        .attr("text-anchor", "end")
+                        .style("dominant-baseline", "middle")
+                        .style("opacity", 0)
+
+                const rect2 = group2
+                    .append("rect")
+                        .style("fill", "none")
+                        .style("pointer-events", "all")
+                        .attr("width", width)
+                        .attr("height", height)
+                        .on("mouseover", mouseover)
+                        .on("mousemove", mousemove)
+                        .on("mouseout", mouseout)
 
                 // THIRD LINE PLOT
                 const xAxis3 = group3
@@ -469,7 +721,7 @@ export const object = {
                 const circleBid3 = group3
                     .append("circle")
                         .style("fill", "#3a4245")
-                        .attr("r", 5)
+                        .attr("r", 6)
                         .attr("cx", xScale(dataBidYes[0].bid_to_dat))
                         .attr("cy", yScale3(dataBidYes[0].expected_margin_dollars))
 
@@ -497,7 +749,7 @@ export const object = {
                     .append("text")
                         .text(d3.format(",.0%")(dataBidYes[0].bid_to_dat))
                         .attr("x", xScale(dataBidYes[0].bid_to_dat))
-                        .attr("y", yScale3(yScale3.domain()[0]) + 15)
+                        .attr("y", yScale3(yScale3.domain()[0]) + 17)
                         .attr("text-anchor", "middle")
                         .style("fill", "#3a4245")
                         .style("font-size", "11px")
@@ -505,23 +757,76 @@ export const object = {
     
                 const yBidText3 = group3
                     .append("text")
-                        .text(d3.format("$,.1s")(dataBidYes[0].expected_margin_dollars))
+                        .text(d3.format("$,.0f")(dataBidYes[0].expected_margin_dollars))
                         .attr("x", xScale(xScale.domain()[0]) - 8)
                         .attr("y", yScale3(dataBidYes[0].expected_margin_dollars))
                         .attr("text-anchor", "end")
                         .style("fill", "#3a4245")
                         .style("font-size", "11px")
                         .style("font-family", "Roboto")
+                        .style("dominant-baseline", "middle")
 
                 const yAxisText3 = group3
                     .append("text")
                         .text("Expected Margin")
-                        .attr("y", yScale3(yScale3.domain()[1]) - 40)
+                        .attr("y", yScale3(yScale3.domain()[1]) - 70)
                         .attr("text-anchor", "end")
                         .style("fill", "#3a4245")
                         .style("font-size", "12px")
                         .style("font-family", "Roboto")
                         .attr("transform", `rotate(-90)`) 
+
+                // interactions
+                const focus3 = group3
+                    .append("g")
+
+                const focusCircle3 = focus3
+                    .append("circle")
+                        .style("fill", "#007B82")
+                        .attr("stroke", "none")
+                        .attr("r", 6)
+                        .style("opacity", 0)
+
+                const focusX3 = focus3
+                    .append("line")
+                        .style("stroke-dasharray", "5,3")
+                        .style("stroke", "#007B82")
+                        .style("stroke-width", 1.)
+                        .style("opacity", 0)
+
+                const focusY3 = focus3
+                    .append("line")
+                        .style("stroke-dasharray", "5,3")
+                        .style("stroke", "#007B82")
+                        .style("stroke-width", 1.)
+                        .style("opacity", 0)
+
+                const focusXtext3 = focus3
+                    .append("text")
+                        .style("fill", "#007B82")
+                        .style("font-size", "11px")
+                        .style("font-family", "Roboto")
+                        .attr("text-anchor", "middle")
+                        .style("opacity", 0)
+
+                const focusYtext3 = focus3
+                    .append("text")
+                        .style("fill", "#007B82")
+                        .style("font-size", "11px")
+                        .style("font-family", "Roboto")
+                        .attr("text-anchor", "end")
+                        .style("dominant-baseline", "middle")
+                        .style("opacity", 0)
+
+                const rect3 = group3
+                    .append("rect")
+                        .style("fill", "none")
+                        .style("pointer-events", "all")
+                        .attr("width", width)
+                        .attr("height", height)
+                        .on("mouseover", mouseover)
+                        .on("mousemove", mousemove)
+                        .on("mouseout", mouseout)
                 
                 // FORMATTING ALL AXES
                 const xlines = d3.selectAll(".x-axis .domain")
@@ -535,9 +840,45 @@ export const object = {
                     .style("stroke-width", 1.)
 
 
-                // INTERACTIONS
+                // --------------------------------------------------------
+                // TOOLTIPS
+                const tooltipBid = d3.select(".tooltip1")
+                    .style("position", "absolute")
+                    .style("display", "block")
+                    .style("background-color", "#ffffff")
+                    .attr("pointer-events", "none")
+                    .style("color", "#3a4245")
+                    .style("font-size", "10px")
+
+                tooltipBid.html(`<div id="tt-body"></div>`)
+                const tooltipBidBody = tooltipBid.select("#tt-body")
+                tooltipBidBody.html(
+                    `<span style="float:left;"><b>Optimal Bid</b></span><br>` + 
+                    `<span style="float:left;">Ratio to DAT:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(dataBidYes[0].bid_to_dat)}</span><br>` + 
+                    `<span style="float:left;">Win Probability:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(dataBidYes[0].pwin)}</span><br>` + 
+                    `<span style="float:left;">Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(dataBidYes[0].margin_dollars)}</span><br>` + 
+                    `<span style="float:left;">Expected Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(dataBidYes[0].expected_margin_dollars)}</span>` 
+                )
+
+                tooltipBid.style("left", width - 150 + "px")
+                tooltipBid.style("top", 5 + "px")
 
 
+                const tooltipFocus = d3.select(".tooltip2")
+                    .style("position", "absolute")
+                    .style("display", "block")
+                    .style("background-color", "#ffffff")
+                    .attr("pointer-events", "none")
+                    .style("color", "#007B82")
+                    .style("font-size", "10px")
+                    .style("opacity", 0)
+
+                tooltipFocus.html(`<div id="tt-body"></div>`)
+                const tooltipFocusBody = tooltipFocus.select("#tt-body")
+                tooltipFocus.style("left", width - 30 + "px")
+                tooltipFocus.style("top", 5 + "px")
+
+                
             }
 
             drawASP()
