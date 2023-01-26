@@ -3,7 +3,7 @@ import * as $ from 'jquery'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
 
-export const object = {
+looker.plugins.visualizations.add({
     id: "contract-win-rate",
     label: "ZDev Contract Win Rate",
     options: {
@@ -21,13 +21,120 @@ export const object = {
         // Insert a <style> tag with some styles we'll use later
         element.innerHTML = `
             <style>
-              body {
-                  font-family: Arial;
-                  font-size: 12px;
-              }
-            </style>
-            <svg>
-            </svg>`;
+                @font-face {
+                    font-family: Roboto;
+                    font-weight: 300;
+                    font-style: normal;
+                    src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');
+                }
+                
+                @font-face { font-family: Roboto; font-weight: 400; font-style: normal;
+                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');
+                }
+
+                    @font-face { font-family: Roboto; font-weight: 500; font-style: normal;
+                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');
+                }
+
+                @font-face { font-family: Roboto; font-weight: 700; font-style: normal;
+                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');
+                }
+
+                body {
+                    font-family: Arial;
+                    font-size: 12px;
+                }
+
+            .axis-label {
+                fill: #3a4245;
+                font-size: 12px;
+                font-family: 'Open Sans', 'Helvetica', 'sans-serif';
+                text-anchor: middle;
+            }
+
+            .y-axis, .x-axis {
+                font-family: 'Open Sans', 'Helvetica', 'sans-serif';
+            }
+
+            .zero-line {
+                stroke: #ccd6eb;
+                stroke-width: 1.0;
+            }
+
+            .x-axis .domain {
+                stroke: #ccd6eb;
+                stroke-width: 1;
+            }
+
+            .y-axis .domain {
+                stroke: none;
+            }
+
+            .x-axis text, .y-axis text {
+                font-size: 12px;
+                color: #3a4245;
+                visibility: visible;
+            }
+
+            .x-axis text .hide, .y-axis text .hide {
+                visibility: hidden;
+            }
+
+            .x-axis line, .y-axis line {
+                stroke: #e6e6e6;
+                stroke-width: 1;
+                opacity: 1;
+            }
+
+            .x-axis line .hide, .y-axis line .hide {
+                opacity: 0;
+            }
+
+            .tooltip {
+                box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;
+                font-size: 12px;
+                pointer-events: none;
+            }
+
+            .tooltip #tt-header {
+                font-size: 12px;
+                font-weight: 600;
+                color: #9d9d9d;
+                text-transform: uppercase;
+            }
+
+            .tooltip h1 {
+                font-size: 11px;
+                color: #9d9d9d;
+                text-transform: uppercase;
+            }
+
+            hr { 
+                margin-top: 1px; 
+                margin-bottom: 1px 
+            }
+
+            .tooltip1 .tooltip2 {
+                font-size: 11px;
+            }
+
+            #tt-body {
+                margin-top: 5px;
+            }
+
+            .dropdown-title {
+                display: inline-block;
+            }
+
+            #vis-options {
+                display: inline-block;
+            }
+        </style>
+        <div id="vis-options-container"><p class="dropdown-title"></p>
+            <select name="vis-options" id="vis-options"></select>
+        </div>
+        <svg></svg>
+        <div id="tooltip-div"></div>`;
         element.style.fontFamily = `"Open Sans", "Helvetica", sans-serif`
     },
 
@@ -35,9 +142,9 @@ export const object = {
     updateAsync: function(data, element, config, queryResponse, details, done, environment = "prod") {
             if (environment == "prod") {
                 if (!handleErrors(this, queryResponse, {
-                    min_pivots: 0, max_pivots: 0,
+                    min_pivots: 1, max_pivots: 1,
                     min_dimensions: 0, max_dimensions: 22,
-                    min_measures: 0, max_measures: 22
+                    min_measures: 1, max_measures: 22
                 })) return 
             }
     try {
@@ -101,19 +208,28 @@ export const object = {
         // DROPDOWN -----------------------------------------------------------
         const lanes = [...new Set(data_ready.map(laneAccessor))].sort()
 
-        d3.select(".dropdown-title")
-            .text("Lane ID: ")
+        console.log("lanes", lanes)
+
+        let dropdown = d3.select("#vis-options-container")
+        console.log("dropdown", dropdown.html())
+
+        let dropdownTitle = $(`.dropdown-title`)
+        dropdownTitle.text(`Lane ID: `)
+        console.log("dropdownTitle text", dropdownTitle.html())
+        console.log("dropdownTitle", d3.select(".dropdown-title"))
 
         let listDropdown = $(`#vis-options`);
         listDropdown.empty()
 
         lanes.forEach((d, i) => {
             if (i == 0) {
-                listDropdown.append($(`<option></option>`).attr(`value`, d).text(d).attr("selected", "selected"))
+                listDropdown.append($(`<option></option>`).attr(`value`, +d).text(d.toString()).attr("selected","selected"))
             } else {
-                listDropdown.append($(`<option></option>`).attr(`value`, d).text(d))
+                listDropdown.append($(`<option></option>`).attr(`value`, +d).text(d.toString()))
             }
         })
+
+        console.log("listDropdown 2", listDropdown)
 
         listDropdown.on("change", function() {
             redraw()
@@ -124,9 +240,11 @@ export const object = {
                 .html("")
                 .attr("width", "100%")
                 .attr("height", height - 20 + "px")
-        )        
+        )
 
-            
+        console.log("svg", svg)
+
+        
         // DRAWING FUNCTION -----------------------------------------------------------
         function redraw() {
             let lan = $(`#vis-options option:selected`).val()
@@ -139,13 +257,13 @@ export const object = {
             console.log("LANE DATA", data_lane)
 
             svg.html("")
-
+    
             const group = svg.append("g")
                 .attr("transform", `translate(${margin.left}, ${margin.top})`)
                 .attr("width", "100%")
                 .attr("height", (boundedHeight + 'px'))
                 .classed("group", true)
-
+            
             // Get ranges of values -----------------------------------------------------------
 
             // let ratio_keys = Object.keys(data_lane[0].winrate)
@@ -225,7 +343,7 @@ export const object = {
             const color_list = ["#27566b", "#339f7b", "#ee9a5a", "#f1cc56", "#339f7b"]
 
             let color_map = {}
-
+            
             data_lane.forEach((d, i) => {
                 color_map[d.model] = color_list[i]
 
@@ -246,7 +364,7 @@ export const object = {
                 .enter()
                 .append("g")
                     .attr("class", "legend")
-                    .attr("transform", function(d, i) { return `translate(${boundedWidth * .75},${2 + (i * 12)})`})
+                    .attr("transform", function(d, i) { return `translate(${boundedWidth * .75},${2 + (i * 15)})`})
 
             legend.append("rect")
                 .attr("x", 2)
@@ -259,19 +377,29 @@ export const object = {
 
             legend.append("text")
                 .attr("x", 15)
-                .attr("y", 3)
+                .attr("y", 4)
                 .attr("dy", ".35em")
                 .style("text-anchor", "start")
-                .style("font-size", 10)
+                .style("font-size", 11)
                 .text((d) => {
                     console.log("d text", d)
                     return d.model
                 })
 
             // TOOLTIPS -----------------------------------------------------------
-            const tooltip = d3.select(element)
-                .append("div")
-                .attr("id", "tooltip")
+            d3.selectAll("circle").remove();
+
+            // const tooltip = d3.select(element)
+
+            const tooltip = d3.select("#tooltip-div")
+
+            // const tooltip = group.append("g")
+
+            // tooltip.empty()
+
+            // tooltip 
+                // .append("div")
+                // .attr("id", "tooltip")
                 .style("position", "absolute")
                 .style("padding", "5px")
                 .style("background-color", "white")
@@ -288,11 +416,12 @@ export const object = {
                 .classed("tooltip", true)
 
             const tt_box = group.append("rect")
+                .attr("class", "tooltip-area-rect")
                 .attr("width", boundedWidth)
                 .attr("height", boundedHeight)
                 .attr("opacity", 0)
                 .on("mousemove", mousemove)
-                .on("mouseleave", mouseout)
+                .on("mouseout", mouseout)
 
             const tt_line = tt_group.append("line")
                 .attr("stroke", "#a6a6a6")
@@ -313,15 +442,15 @@ export const object = {
             function mousemove() {
                 let tt_x = xScale.invert(d3.mouse(tt_box.node())[0])
                 tt_x = tt_x.toFixed(2)
-    
-                // console.log("tt_x", tt_x)
+
+                console.log("tt_x", tt_x)
 
                 const tt_data = []
                 data_lane.forEach((d) => {
                     const this_rate = d.winrates.filter((dd) => {
                         return +dd.ratio == +tt_x
                     })
-    
+
                     if (this_rate.length > 0) {
                         tt_data.push({"name": d.model, "info": this_rate})
                     }
@@ -355,7 +484,7 @@ export const object = {
                     .attr("x1", xScale(tt_x))
                     .attr("x2", xScale(tt_x))
                     .style("opacity", 1)
-        
+
                 tt_circles.selectAll("circle").remove();
                 tt_circles.selectAll("circle")
                     .data(tt_data)
@@ -369,19 +498,22 @@ export const object = {
                     .style("fill", "#323232")
                     .style("opacity", 1)
             }
-    
+
             function mouseout() {
-                // console.log("MOUSEOUT")
+                console.log("MOUSEOUT")
+
                 tooltip
                     .transition()
                     .duration(0)
                     .style("opacity", 0)
-    
+
                 tt_line
                     .style("opacity", 0)
-    
+
                 tt_circles.selectAll("circle").remove();
+                console.log("removed circles")
             }
+
         }
 
         redraw()
@@ -401,4 +533,4 @@ export const object = {
     done()
     }
     }
-}
+})

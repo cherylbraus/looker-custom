@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 26);
+/******/ 	return __webpack_require__(__webpack_require__.s = 66);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -9559,7 +9559,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 /***/ }),
 
-/***/ 26:
+/***/ 66:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -20883,6 +20883,7 @@ var conwinrate_object = {
     }
 
     try {
+      // DRAWING FUNCTION -----------------------------------------------------------
       var redraw = function redraw() {
         var lan = jquery("#vis-options option:selected").val();
         console.log("LANE CHOSEN", lan);
@@ -20890,7 +20891,7 @@ var conwinrate_object = {
           return +d.lane === +lan;
         });
         console.log("LANE DATA", data_lane);
-        var svg = src_select(element).select("svg").html("").attr("width", "100%").attr("height", height - 20 + "px");
+        svg.html("");
         var group = svg.append("g").attr("transform", "translate(".concat(margin.left, ", ").concat(margin.top, ")")).attr("width", "100%").attr("height", boundedHeight + 'px').classed("group", true); // Get ranges of values -----------------------------------------------------------
         // let ratio_keys = Object.keys(data_lane[0].winrate)
 
@@ -20915,8 +20916,10 @@ var conwinrate_object = {
         var xAxisGenerator = axisBottom().scale(xScale).tickPadding(10).tickSize(0).tickFormat(defaultLocale_format(",.0%"));
         var xAxis = group.append("g").call(xAxisGenerator).style("transform", "translateY(".concat(boundedHeight, "px)")).attr("class", "x-axis");
         var xAxisLabel = xAxis.append("text").attr("class", "axis-label").attr("x", boundedWidth / 2).attr("y", 42).attr("text-anchor", "middle").text("Price DAT Ratio");
-        var yScale = linear_linear().domain([rate_min, rate_max]).range([boundedHeight, 0]);
-        var yAxisGenerator = axisLeft().scale(yScale).tickPadding(10).tickSize(0).tickFormat(defaultLocale_format(",.0%"));
+        var yScale = linear_linear() // .domain([rate_min, rate_max])
+        .domain([0, 1.05]).range([boundedHeight, 0]);
+        var yAxisGenerator = axisLeft().scale(yScale).tickPadding(10) // .tickSize(0)
+        .tickFormat(defaultLocale_format(",.0%")).tickSize(-boundedWidth);
         var yAxis = group.append("g").call(yAxisGenerator).attr("class", "y-axis");
         var yAxisLabel = yAxis.append("text").attr("class", "axis-label").attr("x", -boundedHeight / 2).attr("y", -margin.left + 12).style("transform", "rotate(-90deg)").text("Avg. Win Rate Estimate"); // DRAW DATA -----------------------------------------------------------
 
@@ -20927,20 +20930,76 @@ var conwinrate_object = {
         }).y(function (d) {
           return yScale(d["value"]);
         });
-        var color_list = ["#27566b", "#8cbb61", "#007b82", "#f1cc56", "#339f7b"];
+        var color_list = ["#27566b", "#339f7b", "#ee9a5a", "#f1cc56", "#339f7b"];
+        var color_map = {};
         data_lane.forEach(function (d, i) {
+          color_map[d.model] = color_list[i];
           group.append("path").data([d.winrates]).attr("class", d.model).attr("d", line).attr("fill", "none").attr("stroke", color_list[i]).attr("stroke-width", "2.5px");
-        }); // const globalLineData = data_lane.filter(d => {
-        //     return (d.model === "Global-superior")
-        // })
-        // console.log("globalLineData", globalLineData)
-        // const globalLine = group.append("path")
-        //     .data([globalLineData[0].winrates])
-        //     .attr("class", "line")
-        //     .attr("d", line)
-        //     .attr("fill", "none")
-        //     .attr("stroke", "#27566b")
-        //     .attr("stroke-width", "2.5px")
+        });
+        console.log("color_map", color_map); // LEGEND -------------------------------------------------------------
+
+        var legend = group.selectAll(".legend").data(data_lane).enter().append("g").attr("class", "legend").attr("transform", function (d, i) {
+          return "translate(".concat(boundedWidth * .75, ",").concat(2 + i * 12, ")");
+        });
+        legend.append("rect").attr("x", 2).attr("y", 2).attr("width", 8).attr("height", 5).style("fill", function (d, i) {
+          return color_list[i];
+        });
+        legend.append("text").attr("x", 15).attr("y", 3).attr("dy", ".35em").style("text-anchor", "start").style("font-size", 10).text(function (d) {
+          console.log("d text", d);
+          return d.model;
+        }); // TOOLTIPS -----------------------------------------------------------
+
+        var tooltip = src_select(element).append("div").attr("id", "tooltip").style("position", "absolute").style("padding", "5px").style("background-color", "white").style("opacity", 0).style("border-radius", "4px").style("display", "block").style("border", "solid").style("border-color", "lightgrey").style("border-width", ".5px").attr("pointer-events", "none").classed("tooltip", true);
+        var tt_group = group.append("g").classed("tooltip", true);
+        var tt_box = group.append("rect").attr("width", boundedWidth).attr("height", boundedHeight).attr("opacity", 0).on("mousemove", mousemove).on("mouseleave", mouseout);
+        var tt_line = tt_group.append("line").attr("stroke", "#a6a6a6").attr("y1", 0).attr("y2", boundedHeight).attr("stroke-dasharray", "5,3").attr("stroke-width", 2).style("opacity", 0);
+        var tt_circles = tt_group.append("g").classed("tt_circles", true);
+        tooltip.html('<div id="tt-header"></div><p id="tt-body"></p>');
+        var tooltipHeader = tooltip.select("#tt-header");
+        var tooltipBody = tooltip.select("#tt-body");
+
+        function mousemove() {
+          var tt_x = xScale.invert(mouse(tt_box.node())[0]);
+          tt_x = tt_x.toFixed(2); // console.log("tt_x", tt_x)
+
+          var tt_data = [];
+          data_lane.forEach(function (d) {
+            var this_rate = d.winrates.filter(function (dd) {
+              return +dd.ratio == +tt_x;
+            });
+
+            if (this_rate.length > 0) {
+              tt_data.push({
+                "name": d.model,
+                "info": this_rate
+              });
+            }
+          });
+          tt_data.sort(function (a, b) {
+            return b.info[0].value - a.info[0].value;
+          });
+          console.log("tt_data sorted", tt_data);
+          tooltipHeader.html("Ratio to DAT: ".concat(defaultLocale_format(",.0%")(tt_x), "<hr>")).style("color", "#323232");
+          tooltipBody.html("");
+          tooltipBody.selectAll().data(tt_data).enter().append("div").html(function (d, i) {
+            return "<span style=\"float:left;color:".concat(color_map[d.name], "\"><b>") + d.name + ':&nbsp' + '</b></span>' + '<span style="float:right;">' + defaultLocale_format(",.0%")(d.info[0].value) + '</span>';
+          });
+          tooltip.transition().duration(0).style("opacity", 0.95).style("left", on_event.pageX < boundedWidth * 0.6 ? on_event.pageX + 15 + "px" : on_event.pageX - 200 + "px").style("top", on_event.pageY < boundedHeight * 0.5 ? on_event.pageY + 10 + "px" : on_event.pageY - 100 + "px");
+          tt_line.attr("x1", xScale(tt_x)).attr("x2", xScale(tt_x)).style("opacity", 1);
+          tt_circles.selectAll("circle").remove();
+          tt_circles.selectAll("circle").data(tt_data).enter().append("circle").attr("r", 4).attr("cx", function (d) {
+            return xScale(d.info[0].ratio);
+          }).attr("cy", function (d) {
+            return yScale(d.info[0].value);
+          }).style("fill", "#323232").style("opacity", 1);
+        }
+
+        function mouseout() {
+          // console.log("MOUSEOUT")
+          tooltip.transition().duration(0).style("opacity", 0);
+          tt_line.style("opacity", 0);
+          tt_circles.selectAll("circle").remove();
+        }
       };
 
       var margin = {
@@ -21001,9 +21060,9 @@ var conwinrate_object = {
 
       var lanes = _toConsumableArray(new Set(data_ready.map(laneAccessor))).sort();
 
+      src_select(".dropdown-title").text("Lane ID: ");
       var listDropdown = jquery("#vis-options");
       listDropdown.empty();
-      src_select(".dropdown-title").text("Lane ID: ");
       lanes.forEach(function (d, i) {
         if (i == 0) {
           listDropdown.append(jquery("<option></option>").attr("value", d).text(d).attr("selected", "selected"));
@@ -21014,6 +21073,7 @@ var conwinrate_object = {
       listDropdown.on("change", function () {
         redraw();
       });
+      var svg = src_select(element).select("svg").html("").attr("width", "100%").attr("height", height - 20 + "px");
       redraw();
     } catch (error) {
       if (environment == "prod") {
@@ -21037,7 +21097,7 @@ var conwinrate_object = {
 
 
 
- //'./sparklinesNew' ./hexmap
+ //'./sparklinesNew' ./hexmap conwinrate
 
  // Query the element
 
@@ -21122,8 +21182,8 @@ template_keys.forEach(function (entry, i) {
     });
   }
 });
-json("http://localhost:3001/dataConWinRate2").then(function (data) {
-  //dataMCSmap2 dataSankey2 dataSparklineWorks dataSparklineIH
+json("http://localhost:3001/dataConWinRate3").then(function (data) {
+  //dataConWinRate2 dataMCSmap2 dataSankey2 dataSparklineWorks dataSparklineIH
   var todays_options = {};
   jquery('input:radio:checked').each(function () {
     todays_options[this.attributes.internal_cat.value] = this.attributes.internal_value.value;

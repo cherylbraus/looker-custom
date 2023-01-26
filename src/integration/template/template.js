@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
-import { object } from './conwinrate' //'./sparklinesNew' ./hexmap
+import { object } from './conwinrate' //'./sparklinesNew' ./hexmap conwinrate
 import * as $ from 'jquery'
 
 // Query the element
@@ -100,7 +100,7 @@ keys.forEach(function(entry, i) {
 })
 
 
-d3.json("http://localhost:3001/dataConWinRate2").then(function(data) { //dataMCSmap2 dataSankey2 dataSparklineWorks dataSparklineIH
+d3.json("http://localhost:3001/dataConWinRate3").then(function(data) { //dataConWinRate2 dataMCSmap2 dataSankey2 dataSparklineWorks dataSparklineIH
 	let todays_options = {}
 
 	$('input:radio:checked').each(function() {

@@ -249,7 +249,7 @@ export const object = {
                                 sourceCount[source]["targets"].forEach((t, ti) => {
                                     if (t != dd && targetCount[t]["count"] == 1) {
                                         sank_map["links"].push({"source": source, "target": parseInt(dd), 
-                                        "value": data_sank[measures[source].name].value - data_sank[measures[parseInt(t)].name].value})
+                                        "value": data_sank[measures[sourceVal].name].value - data_sank[measures[parseInt(t)].name].value})
                                     }
                                 })
                             }
