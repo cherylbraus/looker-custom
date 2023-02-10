@@ -159,47 +159,97 @@ export const object = {
                     left: 90
                 }
 
+                const showTwoBid = config.metric === "twobid";
+                const showDists = config.metric === "avgdist";
+                const showCostReduc = config.metric === "costreduc";
+
+                let height_perc;
+                let height_perc_string;
+                let bar_height_perc = 0.10
+                let bar_height_perc_string = "12%";
+
+                if (!showDists) {
+                    height_perc = 0.30
+                    height_perc_string = "33%"
+                } else if (showDists) {
+                    height_perc = 0.22
+                    height_perc_string = "25%"
+                }
+
                 const width = element.clientWidth - margin.left - margin.right;
-                const height = (element.clientHeight * .30) - margin.top - margin.bottom;
+                const height = (element.clientHeight * height_perc) - margin.top - margin.bottom;
+                console.log("HEIGHT", height, height_perc_string)
 
                 const svg1 = (
                     d3.select(element).select("svg#first")
                         .html('')
                         .attr("width", "100%")
-                        .attr("height", "30%")
+                        .attr("height", height_perc_string)
                 )
+
+                console.log("svg1", svg1)
 
                 const group1 = svg1.append("g")
                     .attr("transform", `translate(${margin.left}, ${margin.top})`)
-                    .attr("width", "100%")
-                    .attr("height", (height + 'px'))
+                    // .attr("width", "100%")
+                    // .attr("height", (height + 'px'))
                     .classed("group", true)
 
                 const svg2 = (
                     d3.select(element).select("svg#second")
                         .html('')
                         .attr("width", "100%")
-                        .attr("height", "30%")
+                        .attr("height", height_perc_string)
                 )
 
                 const group2 = svg2.append("g")
-                    .attr("transform", `translate(${margin.left}, ${margin.top + (height * 0.05)})`)
-                    .attr("width", "100%")
-                    .attr("height", (height + 'px'))
+                    .attr("transform", `translate(${margin.left}, ${margin.top})`) // + (height * 0.05)
+                    // .attr("width", "100%")
+                    // .attr("height", (height + 'px'))
                     .classed("group", true)
 
                 const svg3 = (
                     d3.select(element).select("svg#third")
                         .html('')
                         .attr("width", "100%")
-                        .attr("height", "30%")
+                        .attr("height", height_perc_string)
                 )
 
                 const group3 = svg3.append("g")
-                    .attr("transform", `translate(${margin.left}, ${margin.top + (height * 0.10)})`)
-                    .attr("width", "100%")
-                    .attr("height", (height + 'px'))
+                    .attr("transform", `translate(${margin.left}, ${margin.top})`) // + (height * 0.10)
+                    // .attr("width", "100%")
+                    // .attr("height", (height + 'px'))
                     .classed("group", true)
+
+                let svg4;
+                let group4;
+                let svg5;
+                let group5;
+                if (showDists) {
+                    svg4 = (
+                        d3.select(element).select("svg#fourth")
+                            .html('')
+                            .attr("width", "100%")
+                            .attr("height", bar_height_perc_string)
+                    )
+
+                    group4 = svg4.append("g")
+                        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+                        .attr("width", "100%")
+                        .attr("height", (element.clientHeight * bar_height_perc) - margin.top - margin.bottom + 'px')
+
+                    svg5 = (
+                        d3.select(element).select("svg#fifth")
+                            .html('')
+                            .attr("width", "100%")
+                            .attr("height", bar_height_perc_string)
+                    )
+
+                    group5 = svg5.append("g")
+                        .attr("transform", `translate(${margin.left}, ${margin.top})`)
+                        .attr("width", "100%")
+                        .attr("height", (element.clientHeight * bar_height_perc) - margin.top - margin.bottom + 'px')
+                }
 
                 // DATA SETUP -------------------------------------------------------------------
                 let data_ready = []
@@ -218,6 +268,7 @@ export const object = {
                     entry["margin_dollars_with_appetite"] = +d["margin_dollars_with_appetite"]
                     entry["pwin"] = +d["pwin"]
                     entry["cost"] = (+d["bid_to_dat"] * +d["dat_rate"]) - +d["margin_dollars"]
+                    entry["cost_to_dat"] = +entry["cost"] / +d["dat_rate"]
 
                     data_ready.push(entry)
                 })
@@ -234,10 +285,20 @@ export const object = {
                 const marginappAccessor = d => d.margin_dollars_with_appetite;
                 const pwinAccessor = d => d.pwin;
                 const costAccessor = d => d.cost;
+                const costtodatAccessor = d => d.cost_to_dat;
 
                 // DATA FILTERING
-                const xmin = config.x_min == null ? d3.min(dataBid, d => bidtodatAccessor(d)) : config.x_min;
-                const xmax = config.x_max == null ? d3.max(dataBid, d => bidtodatAccessor(d)) : config.x_max;
+                let xmin;
+                let xmax;
+                if (!showDists) {
+                    xmin = config.x_min == null ? d3.min(dataBid, d => bidtodatAccessor(d)) : config.x_min;
+                    xmax = config.x_max == null ? d3.max(dataBid, d => bidtodatAccessor(d)) : config.x_max;
+                } else if (showDists) {
+                    xmin = config.x_min == null ? Math.min(d3.min(dataBid, d => bidtodatAccessor(d)), d3.min(dataBid, d => costtodatAccessor(d))) : config.x_min;
+                    xmax = config.x_max == null ? Math.max(d3.max(dataBid, d => bidtodatAccessor(d)), d3.max(dataBid, d => costtodatAccessor(d))) : config.x_max;
+                }
+                
+                console.log("X min/max: ", xmin, xmax)
 
                 const dataBid = data_ready.filter(function(d) {
                     return (d.event_price_request_id == config.pr_id && +d.bid_to_dat >= +xmin && +d.bid_to_dat <= +xmax)
@@ -247,9 +308,11 @@ export const object = {
                 let expmarginAdjAccessor;
                 let dataBidYesCR;
 
-                if (config.metric === "costreduc" && config.cost_reduce_amt != null) {
+                // if "costreduc" is chosen, and the cost adjustment is not null...
+                if (showCostReduc && config.cost_reduce_amt != null) {
                     const reduce_amt = parseInt(config.cost_reduce_amt)
 
+                    // calculate new values at each bid to dat ratio for cost adjustment
                     dataBid.forEach((d, i) => {
                         d["margin_dollars_adj"] = d.margin_dollars + reduce_amt
                         d["expected_margin_dollars_adj"] = d.margin_dollars_adj * d.pwin
@@ -258,10 +321,12 @@ export const object = {
                     marginAdjAccessor = d => d.margin_dollars_adj;
                     expmarginAdjAccessor = d => d.expected_margin_dollars_adj
 
+                    // find the bid to dat ratio with the highest expected margin dollars on cost adjusted line
                     let maxValue = dataBid.reduce((acc, value) => {
                         return (acc = acc > value.expected_margin_dollars_adj ? acc : value.expected_margin_dollars_adj)
                     })
 
+                    // equivalent of dataBidYes, but for cost reduction piece
                     dataBidYesCR = dataBid.filter(function(d) {
                         return (d.event_price_request_id == config.pr_id && d.expected_margin_dollars_adj == +maxValue)
                     })
@@ -284,12 +349,12 @@ export const object = {
                 const ycol_map = {
                     "twobid": ["margin_dollars", "expected_margin_dollars"],
                     "costreduc": ["margin_dollars_adj", "expected_margin_dollars_adj"]
+                    // "avgdist": []
                 }
 
                 // COMMON X-AXIS
                 const xScale = d3.scaleLinear()
                     .domain([xmin, xmax])
-                    // .domain(d3.extent(dataBid, d => bidtodatAccessor(d)))
                     .range([0, width])
 
                 const xAxisGenerator = d3.axisBottom() 
@@ -309,6 +374,8 @@ export const object = {
                 const yScale1 = d3.scaleLinear()
                     .domain(d3.extent(dataBid, d => pwinAccessor(d)))
                     .range([height, 0])
+
+                console.log("yScale1 domain", yScale1.domain())
                 
                 const yAxisGenerator1 = d3.axisLeft()
                     .scale(yScale1)
@@ -321,6 +388,16 @@ export const object = {
                     .append("g")
                     .call(yAxisGenerator1)
                         .attr("class", "y-axis")
+
+                const yAxisText1 = group1
+                    .append("text")
+                        .text("Win Probability")
+                        .attr("y", yScale1(yScale1.domain()[1]) - 70)
+                        .attr("text-anchor", "end")
+                        .style("fill", "#3a4245")
+                        .style("font-size", "12px")
+                        .style("font-family", "Roboto")
+                        .attr("transform", `rotate(-90)`)
 
                 const lineGenerator1 = d3.line()
                     .curve(d3.curveNatural)
@@ -349,18 +426,10 @@ export const object = {
                         .style("stroke-width", 1.)
                         .attr("x1", xScale(dataBidYes[0].bid_to_dat))
                         .attr("x2", xScale(dataBidYes[0].bid_to_dat))
-                        .attr("y1", yScale1(dataBidYes[0].pwin))
+                        .attr("y1", !showDists ? yScale1(dataBidYes[0].pwin) : yScale1(yScale1.domain()[1]) + 18)
                         .attr("y2", yScale1(yScale1.domain()[0]))
 
-                const yBidLine1 = group1
-                    .append("line")
-                        .style("stroke-dasharray", "5,3")
-                        .style("stroke", "#3a4245")
-                        .style("stroke-width", 1.)
-                        .attr("x1", xScale(xScale.domain()[0]))
-                        .attr("x2", xScale(dataBidYes[0].bid_to_dat))
-                        .attr("y1", yScale1(dataBidYes[0].pwin))
-                        .attr("y2", yScale1(dataBidYes[0].pwin))
+                console.log("yScale1 domain point", yScale1(yScale1.domain()[1]))
 
                 const xBidText1 = group1
                     .append("text")
@@ -372,28 +441,75 @@ export const object = {
                         .style("font-size", "11px")
                         .style("font-family", "Roboto")
 
-                const yBidText1 = group1
-                    .append("text")
-                        .text(d3.format(",.0%")(dataBidYes[0].pwin))
-                        .attr("x", xScale(xScale.domain()[0]) - 8)
-                        .attr("y", yScale1(dataBidYes[0].pwin))
-                        .attr("text-anchor", "end")
-                        .style("fill", "#3a4245")
-                        .style("font-size", "11px")
-                        .style("font-family", "Roboto")
-                        .style("dominant-baseline", "middle")
+                if (!showDists) {
+                    const yBidLine1 = group1
+                        .append("line")
+                            .style("stroke-dasharray", "5,3")
+                            .style("stroke", "#3a4245")
+                            .style("stroke-width", 1.)
+                            .attr("x1", xScale(xScale.domain()[0]))
+                            .attr("x2", xScale(dataBidYes[0].bid_to_dat))
+                            .attr("y1", yScale1(dataBidYes[0].pwin))
+                            .attr("y2", yScale1(dataBidYes[0].pwin))
 
-                const yAxisText1 = group1
-                    .append("text")
-                        .text("Win Probability")
-                        .attr("y", yScale1(yScale1.domain()[1]) - 70)
-                        .attr("text-anchor", "end")
-                        .style("fill", "#3a4245")
-                        .style("font-size", "12px")
-                        .style("font-family", "Roboto")
-                        .attr("transform", `rotate(-90)`)
+                    const yBidText1 = group1
+                        .append("text")
+                            .text(d3.format(",.0%")(dataBidYes[0].pwin))
+                            .attr("x", xScale(xScale.domain()[0]) - 8)
+                            .attr("y", yScale1(dataBidYes[0].pwin))
+                            .attr("text-anchor", "end")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "11px")
+                            .style("font-family", "Roboto")
+                            .style("dominant-baseline", "middle")
+                } 
 
-                if (config.metric === "costreduc") {
+                if (showDists) {
+                    const xCostLine1 = group1
+                        .append("line")
+                            .style("stroke-dasharray", "5,3")
+                            .style("stroke", "#3a4245")
+                            .style("stroke-width", 1.)
+                            .attr("x1", xScale(dataBidYes[0].cost_to_dat))
+                            .attr("x2", xScale(dataBidYes[0].cost_to_dat))
+                            .attr("y1", yScale1(yScale1.domain()[1]) + 18)
+                            .attr("y2", yScale1(yScale1.domain()[0]))
+
+                    const xCostText1 = group1
+                        .append("text")
+                            .text(d3.format(",.0%")(dataBidYes[0].cost_to_dat))
+                            .attr("x", xScale(dataBidYes[0].cost_to_dat))
+                            .attr("y", yScale1(yScale1.domain()[0]) + 17)
+                            .attr("text-anchor", "middle")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "11px")
+                            .style("font-family", "Roboto")
+
+                    const xBidLineLabel1 = group1
+                        .append("text")
+                            .text("Bid")
+                            .attr("x", yScale1(yScale1.domain()[1]) - 15)
+                            .attr("y", xScale(dataBidYes[0].bid_to_dat) + 3)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "10px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+
+                    
+                    const xCostLineLabel1 = group1
+                        .append("text")
+                            .text("Cost")
+                            .attr("x", yScale1(yScale1.domain()[1]) - 15)
+                            .attr("y", xScale(dataBidYes[0].cost_to_dat) + 3)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "10px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+                }
+
+                if (showCostReduc) {
                     const circleBid1 = group1
                         .append("circle")
                             .style("fill", "#007B82")
@@ -492,7 +608,7 @@ export const object = {
                         .attr("width", width)
                         .attr("height", height)
                 
-                if (config.metric === "twobid") {
+                if (showTwoBid) {
                     rect1
                         .on("mouseover", mouseover)
                         .on("mousemove", mousemove)
@@ -511,7 +627,7 @@ export const object = {
                     yScale2 = d3.scaleLinear()
                         .domain(d3.extent(dataBid, d => marginAccessor(d)))
                         .range([height, 0])
-                } else if (config.metric === "costreduc") {
+                } else if (showCostReduc) {
                     console.log("yScale2 costreduc")
 
                     let ymin = Math.min(d3.min(dataBid, d => marginAccessor(d)), d3.min(dataBid, d => marginAdjAccessor(d)))
@@ -540,7 +656,7 @@ export const object = {
                     .y(d => yScale2(marginAccessor(d)))
 
                 let lineGenerator2costreduc;
-                if (config.metric === "costreduc") {
+                if (showCostReduc) {
                     lineGenerator2costreduc = d3.line()
                         .curve(d3.curveNatural)
                         .x(d => xScale(bidtodatAccessor(d)))
@@ -615,7 +731,7 @@ export const object = {
                         .style("font-family", "Roboto")
                         .attr("transform", `rotate(-90)`) 
 
-                if (config.metric === "costreduc") {
+                if (showCostReduc) {
                     const marginLineCR = group2
                         .append("path")
                             .attr("fill", "none")
@@ -722,7 +838,7 @@ export const object = {
                         .attr("width", width)
                         .attr("height", height)
                 
-                if (config.metric === "twobid") {
+                if (showTwoBid) {
                     rect2
                         .on("mouseover", mouseover)
                         .on("mousemove", mousemove)
@@ -741,7 +857,7 @@ export const object = {
                     yScale3 = d3.scaleLinear()
                         .domain(d3.extent(dataBid, d => expmarginAccessor(d)))
                         .range([height, 0])
-                } else if (config.metric === "costreduc") {
+                } else if (showCostReduc) {
                     let ymin = Math.min(d3.min(dataBid, d => expmarginAccessor(d)), d3.min(dataBid, d => expmarginAdjAccessor(d)))
                     let ymax = Math.max(d3.max(dataBid, d => expmarginAccessor(d)), d3.max(dataBid, d => expmarginAdjAccessor(d)))
 
@@ -769,7 +885,7 @@ export const object = {
                     .y(d => yScale3(expmarginAccessor(d)))
 
                 let lineGenerator3costreduc;
-                if (config.metric === "costreduc") {
+                if (showCostReduc) {
                     lineGenerator3costreduc = d3.line()
                         .curve(d3.curveNatural)
                         .x(d => xScale(bidtodatAccessor(d)))
@@ -851,7 +967,7 @@ export const object = {
                         .style("font-family", "Roboto")
                         .attr("transform", `rotate(-90)`) 
 
-                if (config.metric === "costreduc") {
+                if (showCostReduc) {
                     const expMarginLineCR = group3
                         .append("path")
                             .attr("fill", "none")
@@ -967,7 +1083,7 @@ export const object = {
                         .attr("width", width)
                         .attr("height", height)
 
-                if (config.metric === "twobid") {
+                if (showTwoBid) {
                     rect3
                         .on("mouseover", mouseover)
                         .on("mousemove", mousemove)
@@ -1012,7 +1128,7 @@ export const object = {
 
                 let tooltipFocus;
                 let tooltipFocusBody;
-                if (config.metric === "twobid") {
+                if (showTwoBid) {
                     tooltipFocus = d3.select(".tooltip2")
                         .style("position", "absolute")
                         .style("display", "block")
@@ -1029,7 +1145,7 @@ export const object = {
                 }
 
                 let tooltipCR;
-                if (config.metric === "costreduc") {
+                if (showCostReduc) {
                     tooltipCR = d3.select(".tooltip2")
                         .style("position", "absolute")
                         .style("display", "block")
@@ -1055,7 +1171,7 @@ export const object = {
 
                 let tooltipComp;
                 let tooltipCompBody;
-                if (config.metric === "twobid") {
+                if (showTwoBid) {
                     tooltipComp = d3.select(".tooltip3")
                         .style("position", "absolute")
                         .style("display", "block")
@@ -1068,7 +1184,7 @@ export const object = {
                     tooltipCompBody = tooltipComp.select("#tt-body")
                     tooltipComp.style("left", width - 110 + "px")
                     tooltipComp.style("top", 100 + "px")
-                } else if (config.metric === "costreduc") {
+                } else if (showCostReduc) {
                     tooltipComp = d3.select(".tooltip3")
                         .style("position", "absolute")
                         .style("display", "block")
@@ -1224,11 +1340,11 @@ export const object = {
                         .attr("y", yScale3(selectedData[ycol_map[config.metric][1]]))
 
                     let focusTitle;
-                    if (config.metric === "twobid") {
+                    if (showTwoBid) {
                         focusTitle = "Possible Bid"
-                    } else if (config.metric === "costreduc") {
+                    } else if (showCostReduc) {
                         focusTitle = "Cost Adjusted Bid"
-                    } else if (config.metric === "avgdist") {
+                    } else if (showDist) {
                         focusTitle = "Average Bid"
                     }
 

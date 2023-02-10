@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
-import { object } from './conwinrateSimple' //'./sparklinesNew' ./hexmap conwinrate
+import { object } from './asp' //'./sparklinesNew' ./hexmap conwinrate
 import * as $ from 'jquery'
 
 // Query the element
