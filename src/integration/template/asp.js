@@ -53,7 +53,7 @@ export const object = {
                 {"Cost Reduction Comparison": "costreduc"},
                 {"Averages & Distributions": "avgdist"}
             ],
-            default: "twobid"
+            default: "avgdist"
         },
         cost_reduce_amt: {
             section: "Setup",
@@ -62,6 +62,30 @@ export const object = {
             display: "text",
             label: "Reduce Cost By (in dollars)",
             default: "40"
+        },
+        avg_shipper_id: {
+            section: "Setup",
+            order: 6,
+            type: "string",
+            display: "text",
+            label: "Avg/Dist: Shipper ID",
+            default: ""
+        },
+        avg_start_date: {
+            section: "Setup",
+            order: 7,
+            type: "string",
+            display: "text",
+            label: "Avg/Dist: Start Dt",
+            placeholder: "MM/DD/YYYY"
+        },
+        avg_end_date: {
+            section: "Setup",
+            order: 8,
+            type: "string",
+            display: "text",
+            label: "Avg/Dist: End Dt",
+            placeholder: "MM/DD/YYYY"
         },
         x_min: {
             section: "Axes",
@@ -77,7 +101,7 @@ export const object = {
             type: "string",
             display: "text",
             label: "X Max %",
-            default: "1.05"
+            default: "1.1"
         },
     },
 
@@ -152,28 +176,28 @@ export const object = {
 
             function useData(data) {
                 // PLOT AREA SETUP
+                const showTwoBid = config.metric === "twobid";
+                const showDists = config.metric === "avgdist";
+                const showCostReduc = config.metric === "costreduc";
+
                 let margin = {
-                    top: 10, 
+                    top: !showDists ? 10 : 30, 
                     right: 70,
                     bottom: 40, 
                     left: 90
                 }
 
-                const showTwoBid = config.metric === "twobid";
-                const showDists = config.metric === "avgdist";
-                const showCostReduc = config.metric === "costreduc";
-
                 let height_perc;
                 let height_perc_string;
-                let bar_height_perc = 0.10
-                let bar_height_perc_string = "12%";
+                let bar_height_perc = 0.15
+                let bar_height_perc_string = "18%";
 
                 if (!showDists) {
                     height_perc = 0.30
                     height_perc_string = "33%"
                 } else if (showDists) {
-                    height_perc = 0.22
-                    height_perc_string = "25%"
+                    height_perc = 0.18
+                    height_perc_string = "21%"
                 }
 
                 const width = element.clientWidth - margin.left - margin.right;
@@ -191,8 +215,6 @@ export const object = {
 
                 const group1 = svg1.append("g")
                     .attr("transform", `translate(${margin.left}, ${margin.top})`)
-                    // .attr("width", "100%")
-                    // .attr("height", (height + 'px'))
                     .classed("group", true)
 
                 const svg2 = (
@@ -204,8 +226,6 @@ export const object = {
 
                 const group2 = svg2.append("g")
                     .attr("transform", `translate(${margin.left}, ${margin.top})`) // + (height * 0.05)
-                    // .attr("width", "100%")
-                    // .attr("height", (height + 'px'))
                     .classed("group", true)
 
                 const svg3 = (
@@ -217,14 +237,13 @@ export const object = {
 
                 const group3 = svg3.append("g")
                     .attr("transform", `translate(${margin.left}, ${margin.top})`) // + (height * 0.10)
-                    // .attr("width", "100%")
-                    // .attr("height", (height + 'px'))
                     .classed("group", true)
 
                 let svg4;
                 let group4;
                 let svg5;
                 let group5;
+                let heightDist = (element.clientHeight * bar_height_perc) - margin.top - margin.bottom;
                 if (showDists) {
                     svg4 = (
                         d3.select(element).select("svg#fourth")
@@ -235,8 +254,7 @@ export const object = {
 
                     group4 = svg4.append("g")
                         .attr("transform", `translate(${margin.left}, ${margin.top})`)
-                        .attr("width", "100%")
-                        .attr("height", (element.clientHeight * bar_height_perc) - margin.top - margin.bottom + 'px')
+                        .attr("group", true)
 
                     svg5 = (
                         d3.select(element).select("svg#fifth")
@@ -247,8 +265,13 @@ export const object = {
 
                     group5 = svg5.append("g")
                         .attr("transform", `translate(${margin.left}, ${margin.top})`)
-                        .attr("width", "100%")
-                        .attr("height", (element.clientHeight * bar_height_perc) - margin.top - margin.bottom + 'px')
+                        .attr("group", true)
+                } else if (!showDists) {
+                    d3.select(element).select("svg#fourth")
+                        .html('')
+                    
+                    d3.select(element).select("svg#fifth")
+                        .html('')
                 }
 
                 // DATA SETUP -------------------------------------------------------------------
@@ -348,8 +371,8 @@ export const object = {
                 // COLUMN MAPPING -------------------------------------------------
                 const ycol_map = {
                     "twobid": ["margin_dollars", "expected_margin_dollars"],
-                    "costreduc": ["margin_dollars_adj", "expected_margin_dollars_adj"]
-                    // "avgdist": []
+                    "costreduc": ["margin_dollars_adj", "expected_margin_dollars_adj"],
+                    "avgdist": ["margin_dollars", "expected_margin_dollars"]
                 }
 
                 // COMMON X-AXIS
@@ -426,7 +449,7 @@ export const object = {
                         .style("stroke-width", 1.)
                         .attr("x1", xScale(dataBidYes[0].bid_to_dat))
                         .attr("x2", xScale(dataBidYes[0].bid_to_dat))
-                        .attr("y1", !showDists ? yScale1(dataBidYes[0].pwin) : yScale1(yScale1.domain()[1]) + 18)
+                        .attr("y1", !showDists ? yScale1(dataBidYes[0].pwin) : yScale1(yScale1.domain()[1]) - 5)
                         .attr("y2", yScale1(yScale1.domain()[0]))
 
                 console.log("yScale1 domain point", yScale1(yScale1.domain()[1]))
@@ -455,7 +478,7 @@ export const object = {
                     const yBidText1 = group1
                         .append("text")
                             .text(d3.format(",.0%")(dataBidYes[0].pwin))
-                            .attr("x", xScale(xScale.domain()[0]) - 8)
+                            .attr("x", xScale(xScale.domain()[0]) - 8) 
                             .attr("y", yScale1(dataBidYes[0].pwin))
                             .attr("text-anchor", "end")
                             .style("fill", "#3a4245")
@@ -472,7 +495,7 @@ export const object = {
                             .style("stroke-width", 1.)
                             .attr("x1", xScale(dataBidYes[0].cost_to_dat))
                             .attr("x2", xScale(dataBidYes[0].cost_to_dat))
-                            .attr("y1", yScale1(yScale1.domain()[1]) + 18)
+                            .attr("y1", yScale1(yScale1.domain()[1]) - 5)
                             .attr("y2", yScale1(yScale1.domain()[0]))
 
                     const xCostText1 = group1
@@ -488,19 +511,18 @@ export const object = {
                     const xBidLineLabel1 = group1
                         .append("text")
                             .text("Bid")
-                            .attr("x", yScale1(yScale1.domain()[1]) - 15)
+                            .attr("x", yScale1(yScale1.domain()[1]) + 8)
                             .attr("y", xScale(dataBidYes[0].bid_to_dat) + 3)
                             .attr("text-anchor", "start")
                             .style("fill", "#3a4245")
                             .style("font-size", "10px")
                             .style("font-family", "Roboto")
                             .attr("transform", `rotate(-90)`)
-
                     
                     const xCostLineLabel1 = group1
                         .append("text")
                             .text("Cost")
-                            .attr("x", yScale1(yScale1.domain()[1]) - 15)
+                            .attr("x", yScale1(yScale1.domain()[1]) + 8)
                             .attr("y", xScale(dataBidYes[0].cost_to_dat) + 3)
                             .attr("text-anchor", "start")
                             .style("fill", "#3a4245")
@@ -623,7 +645,7 @@ export const object = {
                         .attr("class", "x-axis")
 
                 let yScale2;
-                if (config.metric == "twobid") {
+                if (!showCostReduc) {
                     yScale2 = d3.scaleLinear()
                         .domain(d3.extent(dataBid, d => marginAccessor(d)))
                         .range([height, 0])
@@ -650,6 +672,16 @@ export const object = {
                     .call(yAxisGenerator2)
                         .attr("class", "y-axis")
 
+                const yAxisText2 = group2
+                    .append("text")
+                        .text("Margin")
+                        .attr("y", yScale2(yScale2.domain()[1]) - 70)
+                        .attr("text-anchor", "end")
+                        .style("fill", "#3a4245")
+                        .style("font-size", "12px")
+                        .style("font-family", "Roboto")
+                        .attr("transform", `rotate(-90)`) 
+
                 const lineGenerator2 = d3.line()
                     .curve(d3.curveNatural)
                     .x(d => xScale(bidtodatAccessor(d)))
@@ -662,8 +694,6 @@ export const object = {
                         .x(d => xScale(bidtodatAccessor(d)))
                         .y(d => yScale2(marginAdjAccessor(d)))
                 }
-
-                console.log("plot2 y: ", ycol_map[config.metric][0])
 
                 const marginLine = group2
                     .append("path")
@@ -687,18 +717,8 @@ export const object = {
                         .style("stroke-width", 1.)
                         .attr("x1", xScale(dataBidYes[0].bid_to_dat))
                         .attr("x2", xScale(dataBidYes[0].bid_to_dat))
-                        .attr("y1", yScale2(dataBidYes[0].margin_dollars))
+                        .attr("y1", !showDists ? yScale2(dataBidYes[0].margin_dollars) : yScale2(yScale2.domain()[1]) - 5)
                         .attr("y2", yScale2(yScale2.domain()[0]))
-
-                const yaxisLine2 = group2
-                    .append("line")
-                        .style("stroke-dasharray", "5,3")
-                        .style("stroke", "#3a4245")
-                        .style("stroke-width", 1.)
-                        .attr("x1", xScale(xScale.domain()[0]))
-                        .attr("x2", xScale(dataBidYes[0].bid_to_dat))
-                        .attr("y1", yScale2(dataBidYes[0].margin_dollars))
-                        .attr("y2", yScale2(dataBidYes[0].margin_dollars))
 
                 const xBidText2 = group2
                     .append("text")
@@ -709,27 +729,73 @@ export const object = {
                         .style("fill", "#3a4245")
                         .style("font-size", "11px")
                         .style("font-family", "Roboto")
-    
-                const yBidText2 = group2
-                    .append("text")
-                        .text(d3.format("$,.0f")(dataBidYes[0].margin_dollars))
-                        .attr("x", xScale(xScale.domain()[0]) - 8)
-                        .attr("y", yScale2(dataBidYes[0].margin_dollars))
-                        .attr("text-anchor", "end")
-                        .style("fill", "#3a4245")
-                        .style("font-size", "11px")
-                        .style("font-family", "Roboto")
-                        .style("dominant-baseline", "middle")
 
-                const yAxisText2 = group2
-                    .append("text")
-                        .text("Margin")
-                        .attr("y", yScale2(yScale2.domain()[1]) - 70)
-                        .attr("text-anchor", "end")
-                        .style("fill", "#3a4245")
-                        .style("font-size", "12px")
-                        .style("font-family", "Roboto")
-                        .attr("transform", `rotate(-90)`) 
+                if (!showDists) {
+                    const yBidLine2 = group2
+                        .append("line")
+                            .style("stroke-dasharray", "5,3")
+                            .style("stroke", "#3a4245")
+                            .style("stroke-width", 1.)
+                            .attr("x1", xScale(xScale.domain()[0]))
+                            .attr("x2", xScale(dataBidYes[0].bid_to_dat))
+                            .attr("y1", yScale2(dataBidYes[0].margin_dollars))
+                            .attr("y2", yScale2(dataBidYes[0].margin_dollars))
+
+                    const yBidText2 = group2
+                        .append("text")
+                            .text(d3.format("$,.0f")(dataBidYes[0].margin_dollars))
+                            .attr("x", xScale(xScale.domain()[0]) - 8)
+                            .attr("y", yScale2(dataBidYes[0].margin_dollars))
+                            .attr("text-anchor", "end")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "11px")
+                            .style("font-family", "Roboto")
+                            .style("dominant-baseline", "middle")
+                }
+
+                if (showDists) {
+                    const xCostLine2 = group2
+                        .append("line")
+                            .style("stroke-dasharray", "5,3")
+                            .style("stroke", "#3a4245")
+                            .style("stroke-width", 1.)
+                            .attr("x1", xScale(dataBidYes[0].cost_to_dat))
+                            .attr("x2", xScale(dataBidYes[0].cost_to_dat))
+                            .attr("y1", yScale2(yScale2.domain()[1]) - 5)
+                            .attr("y2", yScale2(yScale2.domain()[0]))
+
+                    const xCostText2 = group2
+                        .append("text")
+                            .text(d3.format(",.0%")(dataBidYes[0].cost_to_dat))
+                            .attr("x", xScale(dataBidYes[0].cost_to_dat))
+                            .attr("y", yScale2(yScale2.domain()[0]) + 17)
+                            .attr("text-anchor", "middle")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "11px")
+                            .style("font-family", "Roboto")
+
+                    const xBidLineLabel2 = group2
+                        .append("text")
+                            .text("Bid")
+                            .attr("x", yScale2(yScale2.domain()[1]) + 8)
+                            .attr("y", xScale(dataBidYes[0].bid_to_dat) + 3)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "10px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+                    
+                    const xCostLineLabel2 = group2
+                        .append("text")
+                            .text("Cost")
+                            .attr("x", yScale2(yScale2.domain()[1]) + 8)
+                            .attr("y", xScale(dataBidYes[0].cost_to_dat) + 3)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "10px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+                }
 
                 if (showCostReduc) {
                     const marginLineCR = group2
@@ -853,11 +919,13 @@ export const object = {
                         .attr("class", "x-axis")
 
                 let yScale3;
-                if (config.metric == "twobid") {
+                if (!showCostReduc) {
                     yScale3 = d3.scaleLinear()
                         .domain(d3.extent(dataBid, d => expmarginAccessor(d)))
                         .range([height, 0])
                 } else if (showCostReduc) {
+                    console.log("yScale3 costreduc")
+
                     let ymin = Math.min(d3.min(dataBid, d => expmarginAccessor(d)), d3.min(dataBid, d => expmarginAdjAccessor(d)))
                     let ymax = Math.max(d3.max(dataBid, d => expmarginAccessor(d)), d3.max(dataBid, d => expmarginAdjAccessor(d)))
 
@@ -878,6 +946,16 @@ export const object = {
                     .append("g")
                     .call(yAxisGenerator3)
                         .attr("class", "y-axis")
+
+                const yAxisText3 = group3
+                    .append("text")
+                        .text("Expected Margin")
+                        .attr("y", yScale3(yScale3.domain()[1]) - 70)
+                        .attr("text-anchor", "end")
+                        .style("fill", "#3a4245")
+                        .style("font-size", "12px")
+                        .style("font-family", "Roboto")
+                        .attr("transform", `rotate(-90)`) 
 
                 const lineGenerator3 = d3.line()
                     .curve(d3.curveNatural)
@@ -914,18 +992,8 @@ export const object = {
                         .style("stroke-width", 1.)
                         .attr("x1", xScale(dataBidYes[0].bid_to_dat))
                         .attr("x2", xScale(dataBidYes[0].bid_to_dat))
-                        .attr("y1", yScale3(dataBidYes[0].expected_margin_dollars))
+                        .attr("y1", !showDists ? yScale3(dataBidYes[0].expected_margin_dollars) : yScale3(yScale3.domain()[1]) - 5)
                         .attr("y2", yScale3(yScale3.domain()[0]))
-
-                const yaxisLine3 = group3
-                    .append("line")
-                        .style("stroke-dasharray", "5,3")
-                        .style("stroke", "#3a4245")
-                        .style("stroke-width", 1.)
-                        .attr("x1", xScale(xScale.domain()[0]))
-                        .attr("x2", xScale(dataBidYes[0].bid_to_dat))
-                        .attr("y1", yScale3(dataBidYes[0].expected_margin_dollars))
-                        .attr("y2", yScale3(dataBidYes[0].expected_margin_dollars))
 
                 const xBidText3 = group3
                     .append("text")
@@ -939,33 +1007,79 @@ export const object = {
 
                 const xAxisText3 = group3
                     .append("text")
-                        .text("Bid to DAT Ratio")
+                        .text(!showDists ? "Bid to DAT Ratio" : "Bid/Cost to DAT Ratio")
                         .attr("y", yScale3(yScale3.domain()[0]) + 40)
                         .attr("text-anchor", "start")
                         .style("fill", "#3a4245")
                         .style("font-size", "12px")
                         .style("font-family", "Roboto")
-    
-                const yBidText3 = group3
-                    .append("text")
-                        .text(d3.format("$,.0f")(dataBidYes[0].expected_margin_dollars))
-                        .attr("x", xScale(xScale.domain()[0]) - 8)
-                        .attr("y", yScale3(dataBidYes[0].expected_margin_dollars))
-                        .attr("text-anchor", "end")
-                        .style("fill", "#3a4245")
-                        .style("font-size", "11px")
-                        .style("font-family", "Roboto")
-                        .style("dominant-baseline", "middle")
 
-                const yAxisText3 = group3
-                    .append("text")
-                        .text("Expected Margin")
-                        .attr("y", yScale3(yScale3.domain()[1]) - 70)
-                        .attr("text-anchor", "end")
-                        .style("fill", "#3a4245")
-                        .style("font-size", "12px")
-                        .style("font-family", "Roboto")
-                        .attr("transform", `rotate(-90)`) 
+                if (!showDists) {
+                    const yBidLine3 = group3
+                        .append("line")
+                            .style("stroke-dasharray", "5,3")
+                            .style("stroke", "#3a4245")
+                            .style("stroke-width", 1.)
+                            .attr("x1", xScale(xScale.domain()[0]))
+                            .attr("x2", xScale(dataBidYes[0].bid_to_dat))
+                            .attr("y1", yScale3(dataBidYes[0].expected_margin_dollars))
+                            .attr("y2", yScale3(dataBidYes[0].expected_margin_dollars))
+
+                    const yBidText3 = group3
+                        .append("text")
+                            .text(d3.format("$,.0f")(dataBidYes[0].expected_margin_dollars))
+                            .attr("x", xScale(xScale.domain()[0]) - 8)
+                            .attr("y", yScale3(dataBidYes[0].expected_margin_dollars))
+                            .attr("text-anchor", "end")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "11px")
+                            .style("font-family", "Roboto")
+                            .style("dominant-baseline", "middle")
+                }
+
+                if (showDists) {
+                    const xCostLine3 = group3
+                        .append("line")
+                            .style("stroke-dasharray", "5,3")
+                            .style("stroke", "#3a4245")
+                            .style("stroke-width", 1.)
+                            .attr("x1", xScale(dataBidYes[0].cost_to_dat))
+                            .attr("x2", xScale(dataBidYes[0].cost_to_dat))
+                            .attr("y1", yScale3(yScale3.domain()[1]) - 5)
+                            .attr("y2", yScale3(yScale3.domain()[0]))
+
+                    const xCostText3 = group3
+                        .append("text")
+                            .text(d3.format(",.0%")(dataBidYes[0].cost_to_dat))
+                            .attr("x", xScale(dataBidYes[0].cost_to_dat))
+                            .attr("y", yScale3(yScale3.domain()[0]) + 17)
+                            .attr("text-anchor", "middle")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "11px")
+                            .style("font-family", "Roboto")
+
+                    const xBidLineLabel3 = group3
+                        .append("text")
+                            .text("Bid")
+                            .attr("x", yScale3(yScale3.domain()[1]) + 8)
+                            .attr("y", xScale(dataBidYes[0].bid_to_dat) + 3)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "10px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+                    
+                    const xCostLineLabel3 = group3
+                        .append("text")
+                            .text("Cost")
+                            .attr("x", yScale3(yScale3.domain()[1]) + 8)
+                            .attr("y", xScale(dataBidYes[0].cost_to_dat) + 3)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "10px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+                }
 
                 if (showCostReduc) {
                     const expMarginLineCR = group3
@@ -1011,15 +1125,6 @@ export const object = {
                             .attr("text-anchor", "middle")
                             .style("fill", "#007B82")
                             .style("font-size", "11px")
-                            .style("font-family", "Roboto")
-
-                    const xAxisText3CR = group3
-                        .append("text")
-                            .text("Bid to DAT Ratio")
-                            .attr("y", yScale3(yScale3.domain()[0]) + 40)
-                            .attr("text-anchor", "start")
-                            .style("fill", "#007B82")
-                            .style("font-size", "12px")
                             .style("font-family", "Roboto")
         
                     const yBidText3CR = group3
@@ -1089,19 +1194,6 @@ export const object = {
                         .on("mousemove", mousemove)
                         .on("mouseout", mouseout)
                 }
-                    
-                
-                // FORMATTING ALL AXES
-                const xlines = d3.selectAll(".x-axis .domain")
-                xlines
-                    .style("stroke", "#c1c1c1")
-                    .style("stroke-width", 1.)
-
-                const ylines = d3.selectAll(".y-axis .domain")
-                ylines
-                    .style("stroke", "#c1c1c1")
-                    .style("stroke-width", 1.)
-
 
                 // --------------------------------------------------------
                 // TOOLTIPS
@@ -1222,6 +1314,367 @@ export const object = {
                     tooltipComp.style("left", width - 110 + "px")
                     tooltipComp.style("top", 100 + "px")
                 }
+
+                // ----------------------------------------------------------------
+                // DISTRIBUTION BAR CHARTS #1/2
+                if (showDists) {
+                    // setup the data
+                    const dataDist = data_ready.filter(function(d) {
+                        return (d.event_price_request_id != config.pr_id && +d.bid_to_dat >= +xmin && d.bid_to_dat <= +xmax && d.bid_made_at_this_level == "True")
+                    })
+
+                    dataDist.forEach((d, i) => {
+                        d["bidtodatCat"] = Math.floor(d.bid_to_dat * 10) / 10
+                        d["costtodatCat"] = Math.floor(d.cost_to_dat * 10) / 10
+                    })
+
+                    console.log("dataDist", dataDist)
+
+                    // FIRST HISTOGRAM
+                    const bidHist = d3.histogram()
+                        .value(function(d) { return d.bid_to_dat})
+                        .domain(xScale.domain())
+                        .thresholds(xScale.ticks(5))
+                        // .thresholds(10)
+
+                    console.log("xticks", xScale.ticks(10))
+
+                    const binsBid = bidHist(dataDist)
+
+                    //Axes
+                    const xAxisGeneratorDist = d3.axisBottom() 
+                        .scale(xScale)
+                        .tickFormat(d3.format(",.0%"))
+                        .tickPadding(10)
+                        .tickSize(0)
+                        // .ticks(10)
+
+                    const xAxis4 = group4
+                        .append("g")
+                        .call(xAxisGeneratorDist)
+                            .style("transform", `translateY(${heightDist}px)`)
+                            .attr("class", "x-axis")
+
+                    const yScale4 = d3.scaleLinear()
+                        .range([heightDist, 0])
+                        .domain([0, d3.max(binsBid, function(d) {
+                            return d.length;
+                        })])
+
+                    const yAxisGenerator4 = d3.axisLeft()
+                        .scale(yScale4)
+                        .tickFormat(d3.format(",.1f"))
+                        .tickSize(0)
+                        .tickPadding(10)
+                        .ticks(3)
+
+                    const yAxis4 = group4   
+                        .append("g")
+                        .call(yAxisGenerator4)
+                            .attr("class", "y-axis")
+
+                    const xAxisText4 = group4
+                        .append("text")
+                            .text("Bid to DAT Ratio")
+                            .attr("y", yScale4(yScale4.domain()[0]) + 40)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "12px")
+                            .style("font-family", "Roboto")
+
+                    const yAxisText4 = group4
+                        .append("text")
+                            .text("# Shipments")
+                            .attr("y", yScale4(yScale4.domain()[1]) - 70)
+                            .attr("text-anchor", "end")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "12px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+
+                    const bidHistChart = group4.selectAll("rect")
+                        .data(binsBid)
+                        .enter()
+                        .append("rect")
+                            .attr("x", 1)
+                            .attr("transform", function(d) { return `translate(${xScale(d.x0)},${yScale4(d.length)})`})
+                            .attr("width", function(d) { 
+                                return d.x1 - d.x0 > 0 ? xScale(d.x1) - xScale(d.x0) - 1 : xScale(d.x1) - xScale(d.x0)})
+                            .attr("height", function(d) { return heightDist - yScale4(d.length)})
+                            .style("fill", "#007B82")
+
+                    // add average bid lines to first three charts
+                    const avgBid = dataDist.reduce((a, { bid_to_dat }) => a + bid_to_dat, 0) / dataDist.length;
+                    console.log("avgBid", avgBid)
+
+                    const xBidLine41 = group1
+                        .append("line")
+                            .style("stroke-dasharray", "5,3")
+                            .style("stroke", "#007B82")
+                            .style("stroke-width", 1.)
+                            .attr("x1", xScale(avgBid))
+                            .attr("x2", xScale(avgBid))
+                            .attr("y1", yScale1(yScale1.domain()[1]) - 5)
+                            .attr("y2", yScale1(yScale1.domain()[0]))
+
+                    const xBidText41 = group1
+                        .append("text")
+                            .text(d3.format(",.0%")(avgBid))
+                            .attr("x", xScale(avgBid))
+                            .attr("y", yScale1(yScale1.domain()[0]) + 17)
+                            .attr("text-anchor", "middle")
+                            .style("fill", "#007B82")
+                            .style("font-size", "11px")
+                            .style("font-family", "Roboto")
+
+                    const xBidLineLabel41 = group1
+                        .append("text")
+                            .text("Bid")
+                            .attr("x", yScale1(yScale1.domain()[1]) + 8)
+                            .attr("y", xScale(avgBid) + 3)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#007B82")
+                            .style("font-size", "10px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+
+                    const xBidLine42 = group2
+                        .append("line")
+                            .style("stroke-dasharray", "5,3")
+                            .style("stroke", "#007B82")
+                            .style("stroke-width", 1.)
+                            .attr("x1", xScale(avgBid))
+                            .attr("x2", xScale(avgBid))
+                            .attr("y1", yScale2(yScale2.domain()[1]) - 5)
+                            .attr("y2", yScale2(yScale2.domain()[0]))
+
+                    const xBidText42 = group2
+                        .append("text")
+                            .text(d3.format(",.0%")(avgBid))
+                            .attr("x", xScale(avgBid))
+                            .attr("y", yScale2(yScale2.domain()[0]) + 17)
+                            .attr("text-anchor", "middle")
+                            .style("fill", "#007B82")
+                            .style("font-size", "11px")
+                            .style("font-family", "Roboto")
+
+                    const xBidLineLabel42 = group2
+                        .append("text")
+                            .text("Bid")
+                            .attr("x", yScale2(yScale2.domain()[1]) + 8)
+                            .attr("y", xScale(avgBid) + 3)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#007B82")
+                            .style("font-size", "10px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+
+                    const xBidLine43 = group3
+                        .append("line")
+                            .style("stroke-dasharray", "5,3")
+                            .style("stroke", "#007B82")
+                            .style("stroke-width", 1.)
+                            .attr("x1", xScale(avgBid))
+                            .attr("x2", xScale(avgBid))
+                            .attr("y1", yScale3(yScale3.domain()[1]) - 5)
+                            .attr("y2", yScale3(yScale3.domain()[0]))
+
+                    const xBidText43 = group3
+                        .append("text")
+                            .text(d3.format(",.0%")(avgBid))
+                            .attr("x", xScale(avgBid))
+                            .attr("y", yScale3(yScale3.domain()[0]) + 17)
+                            .attr("text-anchor", "middle")
+                            .style("fill", "#007B82")
+                            .style("font-size", "11px")
+                            .style("font-family", "Roboto")
+
+                    const xBidLineLabel43 = group3
+                        .append("text")
+                            .text("Bid")
+                            .attr("x", yScale3(yScale3.domain()[1]) + 8)
+                            .attr("y", xScale(avgBid) + 3)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#007B82")
+                            .style("font-size", "10px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+
+                    // ---------------------------------------
+                    // SECOND HISTOGRAM
+                    const costHist = d3.histogram()
+                        .value(function(d) { return d.cost_to_dat})
+                        .domain(xScale.domain())
+                        .thresholds(xScale.ticks(5))
+                        // .thresholds(10)
+
+                    const binsCost = costHist(dataDist)
+
+                    //Axes
+                    const xAxis5 = group5
+                        .append("g")
+                        .call(xAxisGeneratorDist)
+                            .style("transform", `translateY(${heightDist}px)`)
+                            .attr("class", "x-axis")
+
+                    const yScale5 = d3.scaleLinear()
+                        .range([heightDist, 0])
+                        .domain([0, d3.max(binsCost, function(d) {
+                            return d.length;
+                        })])
+
+                    const yAxisGenerator5 = d3.axisLeft()
+                        .scale(yScale5)
+                        .tickFormat(d3.format(",.1f"))
+                        .tickSize(0)
+                        .tickPadding(10)
+                        .ticks(3)
+
+                    const yAxis5 = group5
+                        .append("g")
+                        .call(yAxisGenerator5)
+                            .attr("class", "y-axis")
+
+                    const xAxisText5 = group5
+                        .append("text")
+                            .text("Cost to DAT Ratio")
+                            .attr("y", yScale5(yScale5.domain()[0]) + 40)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "12px")
+                            .style("font-family", "Roboto")
+
+                    const yAxisText5 = group5
+                        .append("text")
+                            .text("# Shipments")
+                            .attr("y", yScale5(yScale5.domain()[1]) - 70)
+                            .attr("text-anchor", "end")
+                            .style("fill", "#3a4245")
+                            .style("font-size", "12px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+
+                    const costHistChart = group5.selectAll("rect")
+                        .data(binsCost)
+                        .enter()
+                        .append("rect")
+                            .attr("x", 1)
+                            .attr("transform", function(d) { return `translate(${xScale(d.x0)},${yScale5(d.length)})`})
+                            .attr("width", function(d) { 
+                                return d.x1 - d.x0 > 0 ? xScale(d.x1) - xScale(d.x0) - 1 : xScale(d.x1) - xScale(d.x0)})
+                            .attr("height", function(d) { return heightDist - yScale5(d.length)})
+                            .style("fill", "#007B82")
+
+                    // add average bid lines to first three charts
+                    const avgCost = dataDist.reduce((a, { cost_to_dat }) => a + cost_to_dat, 0) / dataDist.length;
+                    console.log("avgCost", avgCost)
+
+                    const xCostLine41 = group1
+                        .append("line")
+                            .style("stroke-dasharray", "5,3")
+                            .style("stroke", "#007B82")
+                            .style("stroke-width", 1.)
+                            .attr("x1", xScale(avgCost))
+                            .attr("x2", xScale(avgCost))
+                            .attr("y1", yScale1(yScale1.domain()[1]) - 5)
+                            .attr("y2", yScale1(yScale1.domain()[0]))
+
+                    const xCostText41 = group1
+                        .append("text")
+                            .text(d3.format(",.0%")(avgCost))
+                            .attr("x", xScale(avgCost))
+                            .attr("y", yScale1(yScale1.domain()[0]) + 17)
+                            .attr("text-anchor", "middle")
+                            .style("fill", "#007B82")
+                            .style("font-size", "11px")
+                            .style("font-family", "Roboto")
+
+                    const xCostLineLabel41 = group1
+                        .append("text")
+                            .text("Cost")
+                            .attr("x", yScale1(yScale1.domain()[1]) + 8)
+                            .attr("y", xScale(avgCost) + 3)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#007B82")
+                            .style("font-size", "10px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+
+                    const xCostLine42 = group2
+                        .append("line")
+                            .style("stroke-dasharray", "5,3")
+                            .style("stroke", "#007B82")
+                            .style("stroke-width", 1.)
+                            .attr("x1", xScale(avgCost))
+                            .attr("x2", xScale(avgCost))
+                            .attr("y1", yScale2(yScale2.domain()[1]) - 5)
+                            .attr("y2", yScale2(yScale2.domain()[0]))
+
+                    const xCostText42 = group2
+                        .append("text")
+                            .text(d3.format(",.0%")(avgCost))
+                            .attr("x", xScale(avgCost))
+                            .attr("y", yScale2(yScale2.domain()[0]) + 17)
+                            .attr("text-anchor", "middle")
+                            .style("fill", "#007B82")
+                            .style("font-size", "11px")
+                            .style("font-family", "Roboto")
+
+                    const xCostLineLabel42 = group2
+                        .append("text")
+                            .text("Cost")
+                            .attr("x", yScale2(yScale2.domain()[1]) + 8)
+                            .attr("y", xScale(avgCost) + 3)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#007B82")
+                            .style("font-size", "10px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+
+                    const xCostLine43 = group3
+                        .append("line")
+                            .style("stroke-dasharray", "5,3")
+                            .style("stroke", "#007B82")
+                            .style("stroke-width", 1.)
+                            .attr("x1", xScale(avgCost))
+                            .attr("x2", xScale(avgCost))
+                            .attr("y1", yScale3(yScale3.domain()[1]) - 5)
+                            .attr("y2", yScale3(yScale3.domain()[0]))
+
+                    const xCostText43 = group3
+                        .append("text")
+                            .text(d3.format(",.0%")(avgCost))
+                            .attr("x", xScale(avgCost))
+                            .attr("y", yScale3(yScale3.domain()[0]) + 17)
+                            .attr("text-anchor", "middle")
+                            .style("fill", "#007B82")
+                            .style("font-size", "11px")
+                            .style("font-family", "Roboto")
+
+                    const xCostLineLabel43 = group3
+                        .append("text")
+                            .text("Cost")
+                            .attr("x", yScale3(yScale3.domain()[1]) + 8)
+                            .attr("y", xScale(avgCost) + 3)
+                            .attr("text-anchor", "start")
+                            .style("fill", "#007B82")
+                            .style("font-size", "10px")
+                            .style("font-family", "Roboto")
+                            .attr("transform", `rotate(-90)`)
+
+                }
+
+                // ----------------------------------------------------------------
+                // FORMATTING ALL AXES
+                const xlines = d3.selectAll(".x-axis .domain")
+                xlines
+                    .style("stroke", "#c1c1c1")
+                    .style("stroke-width", 1.)
+
+                const ylines = d3.selectAll(".y-axis .domain")
+                ylines
+                    .style("stroke", "#c1c1c1")
+                    .style("stroke-width", 1.)
 
                 // ----------------------------------------------------------------
                 // INTERACTIONS
