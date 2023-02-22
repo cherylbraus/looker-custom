@@ -212,6 +212,7 @@ export const object = {
 
         console.log("dimensions", dimensions)
         console.log("measures", measures)
+        console.log("queryResponse", queryResponse)
 
         let data_ready = []
 
