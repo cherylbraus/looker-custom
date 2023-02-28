@@ -3,7 +3,7 @@ import * as $ from 'jquery'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
 
-export const object = {
+looker.plugins.visualizations.add({
     id: "contract-win-rate",
     label: "ZDev Contract Win Rate",
     options: {
@@ -399,4 +399,4 @@ export const object = {
     done()
     }
     }
-}
+})

@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 13);
+/******/ 	return __webpack_require__(__webpack_require__.s = 30);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -9559,7 +9559,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 /***/ }),
 
-/***/ 13:
+/***/ 30:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14508,11 +14508,11 @@ function setMap(map, key, value) {
 // CONCATENATED MODULE: ./node_modules/d3-collection/src/set.js
 
 
-function Set() {}
+function set_Set() {}
 
 var proto = src_map.prototype;
-Set.prototype = set_set.prototype = {
-  constructor: Set,
+set_Set.prototype = set_set.prototype = {
+  constructor: set_Set,
   has: proto.has,
   add: function (value) {
     value += "";
@@ -14528,9 +14528,9 @@ Set.prototype = set_set.prototype = {
 };
 
 function set_set(object, f) {
-  var set = new Set(); // Copy constructor.
+  var set = new set_Set(); // Copy constructor.
 
-  if (object instanceof Set) object.each(function (value) {
+  if (object instanceof set_Set) object.each(function (value) {
     set.add(value);
   }); // Otherwise, assume it’s an array.
   else if (object) {
@@ -18946,6 +18946,11 @@ function divergingSqrt() {
 
 
 
+// CONCATENATED MODULE: ./node_modules/d3-selection/src/selectAll.js
+
+/* harmony default export */ var src_selectAll = (function (selector) {
+  return typeof selector === "string" ? new Selection([document.querySelectorAll(selector)], [document.documentElement]) : new Selection([selector == null ? [] : selector], selection_root);
+});
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/index.js
 
 
@@ -19074,6 +19079,82 @@ function point_y(p) {
 
   return line;
 });
+// CONCATENATED MODULE: ./node_modules/d3-shape/src/curve/natural.js
+function Natural(context) {
+  this._context = context;
+}
+
+Natural.prototype = {
+  areaStart: function () {
+    this._line = 0;
+  },
+  areaEnd: function () {
+    this._line = NaN;
+  },
+  lineStart: function () {
+    this._x = [];
+    this._y = [];
+  },
+  lineEnd: function () {
+    var x = this._x,
+        y = this._y,
+        n = x.length;
+
+    if (n) {
+      this._line ? this._context.lineTo(x[0], y[0]) : this._context.moveTo(x[0], y[0]);
+
+      if (n === 2) {
+        this._context.lineTo(x[1], y[1]);
+      } else {
+        var px = controlPoints(x),
+            py = controlPoints(y);
+
+        for (var i0 = 0, i1 = 1; i1 < n; ++i0, ++i1) {
+          this._context.bezierCurveTo(px[0][i0], py[0][i0], px[1][i0], py[1][i0], x[i1], y[i1]);
+        }
+      }
+    }
+
+    if (this._line || this._line !== 0 && n === 1) this._context.closePath();
+    this._line = 1 - this._line;
+    this._x = this._y = null;
+  },
+  point: function (x, y) {
+    this._x.push(+x);
+
+    this._y.push(+y);
+  }
+}; // See https://www.particleincell.com/2012/bezier-splines/ for derivation.
+
+function controlPoints(x) {
+  var i,
+      n = x.length - 1,
+      m,
+      a = new Array(n),
+      b = new Array(n),
+      r = new Array(n);
+  a[0] = 0, b[0] = 2, r[0] = x[0] + 2 * x[1];
+
+  for (i = 1; i < n - 1; ++i) a[i] = 1, b[i] = 4, r[i] = 4 * x[i] + 2 * x[i + 1];
+
+  a[n - 1] = 2, b[n - 1] = 7, r[n - 1] = 8 * x[n - 1] + x[n];
+
+  for (i = 1; i < n; ++i) m = a[i] / b[i - 1], b[i] -= m, r[i] -= m * r[i - 1];
+
+  a[n - 1] = r[n - 1] / b[n - 1];
+
+  for (i = n - 2; i >= 0; --i) a[i] = (r[i] - a[i + 1]) / b[i];
+
+  b[n - 1] = (x[n] + a[n - 1]) / 2;
+
+  for (i = 0; i < n - 1; ++i) b[i] = 2 * x[i + 1] - a[i + 1];
+
+  return [a, b];
+}
+
+/* harmony default export */ var natural = (function (context) {
+  return new Natural(context);
+});
 // CONCATENATED MODULE: ./node_modules/d3-shape/src/index.js
 
 
@@ -19116,11 +19197,6 @@ function point_y(p) {
 
 
 
-
-
-
-
-// CONCATENATED MODULE: ./node_modules/d3-time-format/src/index.js
 
 
 
@@ -20758,28 +20834,62 @@ var handleErrors = function (vis, res, options) {
         && check('mes-req', 'Measure', measures.length, options.min_measures, options.max_measures));
 };
 
-// CONCATENATED MODULE: ./src/integration/template/line_test.js
+// EXTERNAL MODULE: ./node_modules/jquery/dist/jquery.js
+var jquery = __webpack_require__(0);
+
+// CONCATENATED MODULE: ./src/integration/template/cycle.js
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 
 
-var line_test_object = {
-  id: "week-day-bar",
-  label: "ZDev Week & Day Bars",
+
+
+var cycle_object = {
+  id: "contract-win-rate",
+  label: "ZDev Contract Win Rate",
   options: {
-    show_legend: {
-      type: "boolean",
-      label: "Show Legend",
-      "default": "true",
+    metric_format: {
+      type: "string",
+      label: "Metric Value Format",
+      display: "text",
+      "default": ",.0f",
       section: "General",
       order: 1
+    },
+    xinner_ticksize: {
+      type: "string",
+      label: "X Tick Font Size (Inner)",
+      display: "text",
+      "default": "9",
+      section: "Axes",
+      order: 1
+    },
+    y_label: {
+      type: "string",
+      label: "Y Axis Label",
+      display: "text",
+      "default": "",
+      section: "Axes",
+      order: 2
     }
   },
   // Set up the initial state of the visualization
   create: function create(element, config) {
     // Insert a <style> tag with some styles we'll use later
-    element.innerHTML = "\n        <style>\n            @font-face {\n                font-family: Roboto;\n                font-weight: 300;\n                font-style: normal;\n                src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');\n            }\n            @font-face { font-family: Roboto; font-weight: 400; font-style: normal;\n                src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');\n            }\n                @font-face { font-family: Roboto; font-weight: 500; font-style: normal;\n                src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');\n            }\n            @font-face { font-family: Roboto; font-weight: 700; font-style: normal;\n                src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');\n            }\n\n            body {\n                font-family: 'Roboto';\n                font-size: 12px;\n            }\n\n            #viz-container {\n                z-index: 9;\n                position: relative;\n                background-color: none;\n                border: 1px solid #d3d3d3;\n                text-align: center;\n                width: 600px;\n                height: 360px;\n            }\n    \n            #vis {\n                font-family: 'Open Sans', 'Helvetica', 'sans-serif;';\n                cursor: move;\n                z-index: 10;\n                background-color: none;\n                color: #fff;\n                height: 100%;\n                width: 100%;\n                fill: black;\n                color: black;\n            }\n\n        </style>\n        <svg>\n        </svg>";
+    element.innerHTML = "\n            <style>\n              body {\n                  font-family: Arial;\n                  font-size: 12px;\n              }\n            </style>\n            <svg>\n            </svg>";
     element.style.fontFamily = "\"Open Sans\", \"Helvetica\", sans-serif";
   },
+  // Render in response to the data or settings changing
   updateAsync: function updateAsync(data, element, config, queryResponse, details, done) {
     var environment = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : "prod";
 
@@ -20787,80 +20897,232 @@ var line_test_object = {
       if (!handleErrors(this, queryResponse, {
         min_pivots: 0,
         max_pivots: 0,
-        min_dimensions: 1,
-        max_dimensions: 10,
-        min_measures: 1,
-        max_measures: 10
+        min_dimensions: 0,
+        max_dimensions: 22,
+        min_measures: 0,
+        max_measures: 22
       })) return;
     }
 
     try {
-      // set dimensions
+      var mousemove = function mousemove(d) {
+        tooltip.transition().duration(0).style("opacity", 0.95);
+        var eachBand = xScale.step();
+        var xIndex = Math.floor(mouse(this)[0] / eachBand);
+        var tt_x1 = xScale.domain()[xIndex];
+        xInnerScale.range(xInnerScaleRanges[xIndex]);
+        var tt_x2 = Math.round(xInnerScale.invert(mouse(this)[0])); // console.log("tt_xs", `${tt_x1} - ${tt_x2}`)
+
+        var tt_data = data_array.filter(function (d) {
+          return d.monthname == tt_x1 && +d.year == +tt_x2;
+        }); // console.log("tt_data", tt_data)
+
+        var measureVal;
+        var rankVal;
+
+        if (tt_data[0]) {
+          measureVal = defaultLocale_format(config.metric_format)(tt_data[0].measure);
+          rankVal = "".concat(tt_data[0].rank, " month");
+        } else {
+          measureVal = "N/A";
+          rankVal = "N/A";
+        }
+
+        tooltipHeader.html("".concat(tt_x1, "<hr>"));
+        tooltipBody.html("<span style=\"float:left;\">".concat(tt_x2, ":&nbsp&nbsp</span>") + "<span style=\"float:right;\">".concat(measureVal, "</span><br>") + "<span style=\"float:left;\">Rank:&nbsp&nbsp</span>" + "<span style=\"float:right;\">#".concat(rankVal, "</span>"));
+
+        if (on_event.pageY < boundedHeight * 0.7) {
+          tooltip.style("top", on_event.pageY - 50 + "px");
+        } else {
+          tooltip.style("top", on_event.pageY - 140 + "px");
+        }
+
+        if (on_event.pageX < boundedWidth * 0.7) {
+          tooltip.style("left", on_event.pageX + 10 + "px");
+        } else {
+          tooltip.style("left", on_event.pageX - 120 + "px");
+        }
+      };
+
+      var mouseout = function mouseout() {
+        tooltip.transition().duration(0).style("opacity", 0);
+      };
+
+      var dimensions = queryResponse.fields.dimension_like;
+      var measures = queryResponse.fields.measure_like;
+      console.log("queryResponse", queryResponse);
+      console.log("dimension", dimensions);
+      console.log("measure", measures); // console.log('data', data)
+
       var margin = {
-        top: 10,
-        right: 10,
-        bottom: 60,
-        left: 60
+        top: 20,
+        right: 20,
+        bottom: 50,
+        left: 80
       };
       var width = element.clientWidth;
       var height = element.clientHeight;
       var boundedWidth = width - margin.left - margin.right;
       var boundedHeight = height - margin.top - margin.bottom;
-      var svg = src_select(element).select("svg").html("").attr("width", "100%").attr("height", "100%");
-      var group = svg.append("g").attr("transform", "translate(".concat(margin.left, ", ").concat(margin.top, ")")).attr("width", "100%").attr("height", boundedHeight + "px").classed("group", true); // LOAD DATA
+      var svg = src_select(element).select("svg").html('').attr('width', '100%').attr('height', '100%');
+      var group = svg.append('g').attr("transform", "translate(".concat(margin.left, ",").concat(margin.top, ")")).attr("width", "100%").attr("height", boundedHeight + "px").classed("group", true); // format data -----------------------------------------
 
-      var dimensions = queryResponse.fields.dimension_like;
-      var measures = queryResponse.fields.measure_like;
-      console.log("dimension", dimensions);
-      console.log("measure", measures);
-      console.log('data', data);
       var data_ready = [];
       data.forEach(function (d) {
         var entry = {};
-        entry['month'] = new Date(d[dimensions[0].name].value + 'T00:00');
-        entry['count'] = d[measures[0].name].value;
+        entry['month'] = d[dimensions[0].name].value;
+        var date = new Date();
+        date.setMonth(+parseInt(entry['month'].split("-")[1] - 1));
+        entry['monthname'] = date.toLocaleString("en-US", {
+          month: 'short'
+        });
+        entry['year'] = d[dimensions[1].name].value;
+        entry['cat'] = d[dimensions[2].name].value;
+        entry['measure'] = d[measures[0].name].value;
+        entry['date'] = new Date(entry['year'], +entry['month'].split("-")[1] - 1);
         data_ready.push(entry);
       });
-      console.log("data_ready", data_ready);
 
       var monthAccessor = function monthAccessor(d) {
         return d.month;
       };
 
-      var countAccessor = function countAccessor(d) {
-        return d.count;
+      var yearAccessor = function yearAccessor(d) {
+        return d.year;
       };
 
-      console.log("here");
-      var xScale = src_time().domain(src_extent(data_ready, function (d) {
-        return monthAccessor(d);
-      })).range([0, boundedWidth]);
-      var formatDate = timeFormat("%b'%-y");
+      var catAccessor = function catAccessor(d) {
+        return d.cat;
+      };
+
+      var measureAccessor = function measureAccessor(d) {
+        return d.measure;
+      };
+
+      var dateAccessor = function dateAccessor(d) {
+        return d.date;
+      };
+
+      console.log("data_ready", data_ready); // JUST FILTER TO ONE CATEGORY AND FEWER YEARS FOR NOW!!!!! -------------------------
+
+      data_ready = data_ready.filter(function (entry) {
+        return catAccessor(entry) === "No" && yearAccessor(entry) > 2017;
+      }); // data manipulation ----------------------------------------------
+
+      var uniqueYears = _toConsumableArray(new Set(data_ready.map(function (obj) {
+        return +obj.year;
+      }))).sort();
+
+      console.log("uniqueYears", uniqueYears); // get a month ranking by year
+
+      var data_array = [];
+      uniqueYears.forEach(function (y, i) {
+        var tmp = data_ready.filter(function (entry) {
+          return yearAccessor(entry) === +y;
+        });
+        tmp.sort(function (a, b) {
+          return b.measure - a.measure;
+        });
+        var rank = 1;
+
+        for (var i = 0; i < tmp.length; i++) {
+          if (i > 0 && tmp[i].measure < tmp[i - 1].measure) {
+            rank++;
+          }
+
+          tmp[i].rank = rank;
+        }
+
+        tmp.forEach(function (d) {
+          data_array.push(d);
+        });
+      });
+      data_array.sort(function (a, b) {
+        return a.date - b.date;
+      });
+      console.log("data_array", data_array); // scales ----------------------------------------------
+
+      var outerDomain = _toConsumableArray(new Set(data_array.map(function (obj) {
+        return +parseInt(obj.month.split("-")[1] - 1);
+      })));
+
+      outerDomain.sort(function (a, b) {
+        return a - b;
+      });
+      outerDomain = _toConsumableArray(new Set(outerDomain.map(function (obj) {
+        var date = new Date();
+        date.setMonth(obj);
+        return date.toLocaleString('en-US', {
+          month: 'short'
+        });
+      })));
+      console.log("outerDomain finished", outerDomain);
+      var xScale = band().domain(outerDomain).range([0, boundedWidth]).padding(0.2);
       var xAxisGenerator = axisBottom().scale(xScale).tickPadding(25).tickSize(0).tickFormat(function (d) {
-        return formatDate(d);
+        return "".concat(d);
       });
       var xAxis = group.append("g").call(xAxisGenerator).style("transform", "translateY(".concat(boundedHeight, "px)")).attr("class", "x-axis");
-      console.log("here1"); // Y-AXIS
-
-      var yScale = linear_linear().domain(src_extent(data_ready, function (d) {
-        return countAccessor(d);
+      var yScale = linear_linear().domain(src_extent(data_array, function (d) {
+        return measureAccessor(d);
       })).range([boundedHeight, 0]);
-      var yAxisGenerator = axisLeft().scale(yScale).tickPadding(10);
-      var yAxis = group.append("g").call(yAxisGenerator).attr("class", "y-axis"); // DRAW DATA
+      var yAxisGenerator = axisLeft().scale(yScale).tickPadding(10).tickFormat(function (d) {
+        return defaultLocale_format(config.metric_format)(d);
+      }); // .ticks(9)
 
-      var line = src_line().x(function (d) {
-        return xScale(d.month);
-      }).y(function (d) {
-        return yScale(d.count);
+      var yAxis = group.append("g").call(yAxisGenerator).attr("class", "y-axis");
+      var yAxisLabel = yAxis.append("text").attr("class", "axis-label").attr("x", -boundedHeight / 2).attr("y", -margin.left + 13).style("transform", "rotate(-90deg)").text(config.y_label ? config.y_label : measures[0].label_short.split(" ")[0]);
+      var xInnerScale = linear_linear().domain([Math.min.apply(Math, _toConsumableArray(uniqueYears)), Math.max.apply(Math, _toConsumableArray(uniqueYears))]);
+      var xInnerTicks = xInnerScale.ticks().filter(function (tick) {
+        return Number.isInteger(tick);
       });
-      console.log("made line", line);
-      var currentLine = group.append("path").datum(data_ready).attr("d", line).attr("fill", "none").attr("stroke", "#323232").attr("stroke-width", "2.5px");
+      var xInnerAxisGenerator = axisBottom().scale(xInnerScale).tickPadding(10).tickSize(0).tickValues(xInnerTicks).tickFormat(function (d) {
+        return "'".concat(d.toString().slice(2));
+      }); // Draw the plot ---------------------------------------
+
+      var outerGroups = group.append("g").attr("class", "outer-groups").selectAll("g").data(outerDomain).enter().append("g").attr("class", function (d) {
+        return "singleperiod ".concat(d);
+      }); // draw rects for shading
+
+      var shadedBars = outerGroups.append("rect").attr("x", function (d) {
+        return xScale(d);
+      }).attr("y", 0).attr("width", xScale.bandwidth()).attr("height", boundedHeight).attr("fill", "#eaeaea").attr("fill-opacity", 0.4).on("mousemove", mousemove).on("mouseout", mouseout).classed("tooltip-area-rect", true); // draw each category's circles/lines -----------------------------
+
+      var xInnerScaleRanges = [];
+      src_selectAll(".singleperiod").each(function (e, i) {
+        xInnerScale.range([xScale(e), xScale(e) + xScale.bandwidth()]);
+        xInnerScaleRanges.push(xInnerScale.range());
+        var innerData = data_array.filter(function (obj) {
+          return obj.monthname === e;
+        });
+        src_select(this).selectAll("circle").data(innerData).enter().append("circle").attr("cx", function (f) {
+          return xInnerScale(f.year);
+        }).attr("cy", function (f) {
+          return yScale(f.measure);
+        }).attr("r", 3).style("fill", "#025187").classed("circle", "true");
+        var line = src_line().defined(function (f) {
+          return f.measure != null;
+        }).curve(natural).x(function (f) {
+          return xInnerScale(f.year);
+        }).y(function (f) {
+          return yScale(f.measure);
+        });
+        src_select(this).append("path").data([innerData]).attr("d", line).attr("fill", "none").attr("stroke", "#025187").attr("stroke-width", ".5px");
+        src_select(this).append("g").call(xInnerAxisGenerator).style("transform", "translateY(".concat(boundedHeight, "px)")).classed("inner-x-axis", true);
+      });
+      src_selectAll(".inner-x-axis text").style("font-size", "".concat(config.xinner_ticksize, "px")); // TOOLTIPS ---------------------------------------------------
+
+      var tooltip = src_select(".tooltip").style("position", "absolute").style("padding", "5px").style("background-color", "white").style("opacity", 0).style("border-radius", "4px").style("display", "block").style("border", "solid").style("border-color", "lightgrey").style("border-width", ".5px").attr("pointer-events", "none").classed("tooltip", true);
+      var tt_group = group.append("g").classed("tooltip", true);
+      var tt_line = tt_group.append("line").attr("stroke", "#a6a6a6").attr("y1", 0).attr("y2", boundedHeight).attr("stroke-dasharray", "5,3").attr("stroke-width", 2).style("opacity", 0);
+      tooltip.html("<div id=\"tt-header\"></div><p id=\"tt-body\"></p>");
+      var tooltipHeader = tooltip.select("#tt-header");
+      var tooltipBody = tooltip.select("#tt-body");
     } catch (error) {
       if (environment == "prod") {
-        if (queryResponse.fields.dimensions.length < 3) {
+        if (queryResponse.fields.dimensions.length != queryResponse.fields.measures.length) {
           this.addError({
-            title: "Not Enough Measures",
-            message: "This chart requires at least 3 measures."
+            title: "Data mismatch",
+            message: "This chart requires dimension/measure pairs."
           });
           return;
         }
@@ -20873,9 +21135,6 @@ var line_test_object = {
     }
   }
 };
-// EXTERNAL MODULE: ./node_modules/jquery/dist/jquery.js
-var jquery = __webpack_require__(0);
-
 // CONCATENATED MODULE: ./src/integration/template/template.js
 
 
@@ -20899,24 +21158,24 @@ var template_done = function done() {
 
 var menuOptions = "<div id='menu'><h1><strong>Menu</strong></h1><div id='menu-options'></div></div></div>";
 jquery("body").append(menuOptions);
-var template_keys = Object.keys(line_test_object.options);
-console.log("object.options", line_test_object.options);
-console.log("Object", Object.keys(line_test_object.options));
+var template_keys = Object.keys(cycle_object.options);
+console.log("object.options", cycle_object.options);
+console.log("Object", Object.keys(cycle_object.options));
 console.log("keys", template_keys);
 template_keys.forEach(function (entry, i) {
-  var array_name = line_test_object.options[entry].label;
+  var array_name = cycle_object.options[entry].label;
   jquery("#menu-options").append("<p>" + array_name + "</p>");
   var form = jquery('<form>', {
     id: 'id-1',
     "class": 'menu-options-entry'
   }).appendTo('#menu-options'); // console.log("display", object.options[entry].display, ["radio","select"].includes(object.options[entry].display))
 
-  if (["radio", "select"].includes(line_test_object.options[entry].display)) {
-    var array_values = line_test_object.options[entry].values;
+  if (["radio", "select"].includes(cycle_object.options[entry].display)) {
+    var array_values = cycle_object.options[entry].values;
     array_values.forEach(function (ent) {
       var str;
 
-      if (ent[Object.keys(ent)[0]] == line_test_object.options[entry]["default"]) {
+      if (ent[Object.keys(ent)[0]] == cycle_object.options[entry]["default"]) {
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent[Object.keys(ent)] + "' id='" + Object.keys(ent)[0] + "' name='" + array_name + "' value='" + Object.keys(ent)[0] + "' checked></input><label class='form-label' for='" + Object.keys(ent)[0] + "'>" + Object.keys(ent)[0] + "</label>";
       } else {
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent[Object.keys(ent)] + "' id='" + Object.keys(ent)[0] + "' name='" + array_name + "' value='" + Object.keys(ent)[0] + "'></input><label class='form-label' for='" + Object.keys(ent)[0] + "'>" + Object.keys(ent)[0] + "</label>";
@@ -20924,22 +21183,22 @@ template_keys.forEach(function (entry, i) {
 
       form.append(str);
     });
-  } else if (line_test_object.options[entry].display == "number") {
+  } else if (cycle_object.options[entry].display == "number") {
     var str;
-    str = "<input type='number' internal_cat='" + template_keys[i] + "' internal_value='" + line_test_object.options[entry]["default"] + "' id='" + template_keys[i] + "' min='0' name='" + line_test_object.options[entry]["label"] + "' value='" + line_test_object.options[entry]["default"] + "'></input><label class='form-label' for='" + line_test_object.options[entry]["label"] + "'>" + line_test_object.options[entry]["label"] + "</label>";
+    str = "<input type='number' internal_cat='" + template_keys[i] + "' internal_value='" + cycle_object.options[entry]["default"] + "' id='" + template_keys[i] + "' min='0' name='" + cycle_object.options[entry]["label"] + "' value='" + cycle_object.options[entry]["default"] + "'></input><label class='form-label' for='" + cycle_object.options[entry]["label"] + "'>" + cycle_object.options[entry]["label"] + "</label>";
     form.append(str);
-  } else if (line_test_object.options[entry].display == "text") {
+  } else if (cycle_object.options[entry].display == "text") {
     var _str;
 
-    _str = "<input type='text' internal_cat='" + template_keys[i] + "' internal_value='" + line_test_object.options[entry]["default"] + "' id='" + template_keys[i] + "' name='" + line_test_object.options[entry]["label"] + "' value='" + line_test_object.options[entry]["default"] + "'></input><label class='form-label' for='" + line_test_object.options[entry]["label"] + "'>" + line_test_object.options[entry]["label"] + "</label>";
+    _str = "<input type='text' internal_cat='" + template_keys[i] + "' internal_value='" + cycle_object.options[entry]["default"] + "' id='" + template_keys[i] + "' name='" + cycle_object.options[entry]["label"] + "' value='" + cycle_object.options[entry]["default"] + "'></input><label class='form-label' for='" + cycle_object.options[entry]["label"] + "'>" + cycle_object.options[entry]["label"] + "</label>";
     form.append(_str);
-  } else if (line_test_object.options[entry].type == "boolean") {
+  } else if (cycle_object.options[entry].type == "boolean") {
     var _array_values = ["true", "false"];
 
     _array_values.forEach(function (ent) {
       var str;
 
-      if (ent == line_test_object.options[entry]["default"]) {
+      if (ent == cycle_object.options[entry]["default"]) {
         // console.log("adding default")
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent + "' id='" + template_keys[i] + "' name='" + array_name + "' value='" + ent + "' checked></input><label class='form-label' for ='" + ent + "'>" + ent + "</label>";
       } else {
@@ -20949,8 +21208,8 @@ template_keys.forEach(function (entry, i) {
 
       form.append(str);
     });
-  } else if (line_test_object.options[entry].type == "array") {
-    var _array_values2 = line_test_object.options[entry]["default"]; // console.log("array_values", array_values)
+  } else if (cycle_object.options[entry].type == "array") {
+    var _array_values2 = cycle_object.options[entry]["default"]; // console.log("array_values", array_values)
 
     _array_values2.forEach(function (ent) {
       var str; // console.log("ent", ent)
@@ -20965,7 +21224,7 @@ template_keys.forEach(function (entry, i) {
     });
   }
 });
-json("http://localhost:3001/dataLineTest").then(function (data) {
+json("http://localhost:3001/dataCycleChart").then(function (data) {
   //dataCycleChart dataConWinRate3 dataMCSmap2 dataSankey2 dataSparklineWorks dataSparklineIH
   var todays_options = {};
   jquery('input:radio:checked').each(function () {
@@ -20985,26 +21244,26 @@ json("http://localhost:3001/dataLineTest").then(function (data) {
 
   var details = ""; // Fire first instance of chart
 
-  line_test_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment); // On change to options, loop through selections and then redraw chart
+  cycle_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment); // On change to options, loop through selections and then redraw chart
 
   jquery('input:radio').on("click", function () {
     jquery('input:radio:checked').each(function () {
       todays_options[this.attributes.internal_cat.value] = this.attributes.internal_value.value;
     });
-    line_test_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    cycle_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
   });
   jquery('input[type=number]').on("input", function () {
     // const id = $('input[type=number]').attr("id")
     var id = this.attributes.id.value;
     var num = jquery("#" + id).val();
     todays_options[this.attributes.internal_cat.value] = num;
-    line_test_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    cycle_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
   });
   jquery('input[type=text]').on("input", function () {
     var id = this.attributes.id.value;
     var str = jquery("#" + id).val();
     todays_options[this.attributes.internal_cat.value] = str;
-    line_test_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    cycle_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
   }); // Handle the mousedown event
   // that's triggered when user drags the resizer
 
@@ -21034,7 +21293,7 @@ json("http://localhost:3001/dataLineTest").then(function (data) {
     // Remove the handlers of `mousemove` and `mouseup`
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
-    line_test_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    cycle_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
   }; // Query all resizers
 
 
