@@ -106,7 +106,7 @@ looker.plugins.visualizations.add({
             entry['monthname'] = date.toLocaleString("en-US", { month: 'short' })
 
             entry['year'] = d[dimensions[1].name].value
-            entry['cat'] = d[dimensions[2].name].value
+            // entry['cat'] = d[dimensions[2].name].value
             entry['measure'] = d[measures[0].name].value
             entry['date'] = new Date(entry['year'], +entry['month'].split("-")[1]-1)
             data_ready.push(entry)
@@ -114,16 +114,16 @@ looker.plugins.visualizations.add({
 
         const monthAccessor = d => d.month;
         const yearAccessor = d => d.year;
-        const catAccessor = d => d.cat;
+        // const catAccessor = d => d.cat;
         const measureAccessor = d => d.measure;
         const dateAccessor = d => d.date;
 
         console.log("data_ready", data_ready)
 
         // JUST FILTER TO ONE CATEGORY AND FEWER YEARS FOR NOW!!!!! -------------------------
-        data_ready = data_ready.filter(entry => {
-            return (catAccessor(entry) === "No" && yearAccessor(entry) > 2017)
-        })
+        // data_ready = data_ready.filter(entry => {
+        //     return (catAccessor(entry) === "No" && yearAccessor(entry) > 2017)
+        // })
 
         // data manipulation ----------------------------------------------
         const uniqueYears = [... new Set(data_ready.map(obj => +obj.year))].sort()
