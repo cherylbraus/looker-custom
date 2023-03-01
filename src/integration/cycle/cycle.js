@@ -15,6 +15,25 @@ looker.plugins.visualizations.add({
             section: "General",
             order: 1
         },  
+        show_avglines: {
+            type: "boolean",
+            label: "Show average lines",
+            default: false,
+            section: "General",
+            order: 2
+        },
+        line_shape: {
+            type: "string",
+            label: "Line Shape",
+            display: "radio",
+            values: [
+                {"Straight": "straight"},
+                {"Curved": "curve"}
+            ],
+            default: "curve",
+            section: "General",
+            order: 3
+        },
         xinner_ticksize: {
             type: "string",
             label: "X Tick Font Size (Inner)",
@@ -38,13 +57,171 @@ looker.plugins.visualizations.add({
         // Insert a <style> tag with some styles we'll use later
         element.innerHTML = `
             <style>
-              body {
-                  font-family: Arial;
-                  font-size: 12px;
-              }
+                @font-face {
+                    font-family: Roboto;
+                    font-weight: 300;
+                    font-style: normal;
+                    src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');
+                }
+                @font-face { font-family: Roboto; font-weight: 400; font-style: normal;
+                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');
+                }
+                    @font-face { font-family: Roboto; font-weight: 500; font-style: normal;
+                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');
+                }
+                @font-face { font-family: Roboto; font-weight: 700; font-style: normal;
+                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');
+                }
+                tr:first-child {
+                font-weight:500
+                }
+                body {
+                    font-family: 'Roboto';
+                }
+                text {
+                font-family: 'Roboto';
+                }
+                /* .domain {
+                display: none;
+                } */
+                .gridline {
+                stroke: rgb(230, 230, 230);
+                shape-rendering: crispEdges;
+                stroke-opacity: .1;
+                }
+                .gridline2 {
+                stroke: white;
+                shape-rendering: crispEdges;
+                stroke-opacity: 1;
+                }
+                #viz-container {
+                z-index: 9;
+                position: relative;
+                background-color: none;
+                border: 1px solid #d3d3d3;
+                text-align: center;
+                width: 600px;
+                height: 360px;
+                }
+                #dimension-header {
+                font-size: 12px;
+                }
+                .value-headers {
+                font-size: 12px;
+                }
+                .value-headers-body {
+                font-weight: 500;
+                }
+                #vis {
+                font-family: 'Open Sans', 'Helvetica', 'sans-serif';
+                cursor: move;
+                z-index: 10;
+                background-color: none;
+                color: #fff;
+                height: 100%;
+                width: 100%;
+                fill: black;
+                color: black;
+                }
+                .line {
+                fill: none;
+                stroke-width: 2px;
+                }
+
+                /* ---Cheryl's Stuff: Start--- */
+
+                .axis-label {
+                fill: #3a4245;
+                font-size: 12px;
+                font-family: 'Open Sans', 'Helvetica', 'sans-serif';
+                text-anchor: middle;
+                }
+
+                .y-axis, .x-axis {
+                font-family: 'Open Sans', 'Helvetica', 'sans-serif';
+                }
+
+                .zero-line {
+                stroke: #ccd6eb;
+                stroke-width: 1.0;
+                }
+
+                .x-axis .domain {
+                stroke: #ccd6eb;
+                stroke-width: 1;
+                }
+
+                .y-axis .domain {
+                stroke: none;
+                }
+
+                .x-axis text, .y-axis text {
+                font-size: 12px;
+                color: #3a4245;
+                visibility: visible;
+                }
+
+                .inner-x-axis text {
+                font-size: 9px;
+                color: #3a4245;
+                visibility: visible;
+                }
+
+                .x-axis text .hide, .y-axis text .hide {
+                visibility: hidden;
+                }
+
+                .x-axis line, .y-axis line {
+                stroke: #e6e6e6;
+                stroke-width: 1;
+                opacity: 1;
+                }
+
+                .x-axis line .hide, .y-axis line .hide {
+                opacity: 0;
+                }
+
+                .tooltip {
+                    box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;
+                    font-size: 12px;
+                    pointer-events: none;
+                }
+
+                .tooltip #tt-header {
+                    font-size: 12px;
+                    font-weight: 600;
+                    color: #9d9d9d;
+                    text-transform: uppercase;
+                }
+
+                .tooltip h1 {
+                    font-size: 11px;
+                    color: #9d9d9d;
+                    text-transform: uppercase;
+                }
+
+                hr { 
+                    margin-top: 1px; 
+                    margin-bottom: 1px 
+                }
+
+                .tooltip1 .tooltip2 {
+                font-size: 11px;
+                }
+
+                #tt-body {
+                margin-top: 5px;
+                }
+
+                /* ---Cheryl's Stuff: End--- */
+
+                .axis text {
+                /* fill: green;  */
+                font-size: 12px;
+                }
             </style>
-            <svg>
-            </svg>`;
+            <svg></svg>
+            <div class="tooltip"></div>`;
         element.style.fontFamily = `"Open Sans", "Helvetica", sans-serif`
     },
 
@@ -105,8 +282,9 @@ looker.plugins.visualizations.add({
 
             entry['monthname'] = date.toLocaleString("en-US", { month: 'short' })
 
-            entry['year'] = d[dimensions[1].name].value
+            // entry['year'] = d[dimensions[1].name].value
             // entry['cat'] = d[dimensions[2].name].value
+            entry['year'] = +entry['month'].split("-")[0]
             entry['measure'] = d[measures[0].name].value
             entry['date'] = new Date(entry['year'], +entry['month'].split("-")[1]-1)
             data_ready.push(entry)
@@ -158,6 +336,12 @@ looker.plugins.visualizations.add({
             return a.date - b.date
         })
 
+        data_array.forEach((d) => {
+            if (!parseInt(d.measure)) {
+                d.rank = undefined;
+            }
+        })
+
         console.log("data_array", data_array)
 
         // scales ----------------------------------------------
@@ -180,7 +364,7 @@ looker.plugins.visualizations.add({
 
         const xAxisGenerator = d3.axisBottom()
             .scale(xScale)
-            .tickPadding(25)
+            .tickPadding(30)
             .tickSize(0)
             .tickFormat((d) => `${d}`)
 
@@ -261,6 +445,20 @@ looker.plugins.visualizations.add({
                 return (obj.monthname === e)
             })
 
+            const average = d3.mean(innerData, d => measureAccessor(d))
+
+            if (config.show_avglines == true) {
+                d3.select(this)
+                    .append("line")
+                    .style("stroke", "#a1a1a1")
+                    .style("stroke-dasharray", "5,3")
+                    .style("stroke-width", 1)
+                    .attr("x1", xScale(e))
+                    .attr("x2", xScale(e) + xScale.bandwidth())
+                    .attr("y1", yScale(average))
+                    .attr("y2", yScale(average))
+            }
+
             d3.select(this)
                 .selectAll("circle")
                 .data(innerData)
@@ -268,15 +466,18 @@ looker.plugins.visualizations.add({
                 .append("circle")
                     .attr("cx", f => xInnerScale(f.year))
                     .attr("cy", f => yScale(f.measure))
-                    .attr("r", 3)
+                    .attr("r", f => f.measure ? 3 : 0)
                     .style("fill", "#025187")
                     .classed(`circle`, "true")
 
-            const line = d3.line()
+            let line = d3.line()
                 .defined(function(f) { return f.measure != null })
-                .curve(d3.curveNatural)
                 .x(function(f) { return xInnerScale(f.year) })
                 .y(function(f) { return yScale(f.measure) })
+
+            if (config.line_shape == "curve") {
+                line.curve(d3.curveNatural)
+            }
 
             d3.select(this)
                 .append("path")
@@ -294,6 +495,30 @@ looker.plugins.visualizations.add({
 
         d3.selectAll(".inner-x-axis text")
             .style("font-size", `${config.xinner_ticksize}px`)
+
+        // LEGEND ---------------------------------------------------
+        if (config.show_avglines == true) {
+            const legend = group.append("g")
+                .attr("transform", "translate(0,-15)")
+                .classed("legend", true)
+
+            legend.append("line")
+                .style("stroke", "#a1a1a1")
+                .style("stroke-dasharray", "5,3")
+                .style("stroke-width", 1)
+                .attr("x1", 10)
+                .attr("x2", 40)
+                .attr("y1", 0)
+                .attr("y2", 0)
+                
+            legend.append("text")
+                .attr("x", 47)
+                .attr("y", 0)
+                .style("text-anchor", "start")
+                .style("dominant-baseline", "middle")
+                .style("font-size", 11)
+                .text(`Average`)
+        }
 
         // TOOLTIPS ---------------------------------------------------
         const tooltip = d3.select(".tooltip")
@@ -347,9 +572,9 @@ looker.plugins.visualizations.add({
 
             let measureVal;
             let rankVal;
-            if (tt_data[0]) {
+            if (parseInt(tt_data[0].measure)) {
                 measureVal = d3.format(config.metric_format)(tt_data[0].measure)
-                rankVal = `${tt_data[0].rank} month`
+                rankVal = `#${tt_data[0].rank} month in year`
             } else {
                 measureVal = "N/A"
                 rankVal = "N/A"
@@ -360,19 +585,19 @@ looker.plugins.visualizations.add({
                 `<span style="float:left;">${tt_x2}:&nbsp&nbsp</span>` + 
                 `<span style="float:right;">${measureVal}</span><br>` + 
                 `<span style="float:left;">Rank:&nbsp&nbsp</span>` + 
-                `<span style="float:right;">#${rankVal}</span>` 
+                `<span style="float:right;">${rankVal}</span>` 
             )
 
             if (d3.event.pageY < boundedHeight * 0.7) {
-                tooltip.style("top", d3.event.pageY - 50 + "px")
+                tooltip.style("top", d3.event.pageY + 10 + "px")
             } else {
-                tooltip.style("top", d3.event.pageY - 140 + "px")
+                tooltip.style("top", d3.event.pageY - 100 + "px")
             }
 
             if (d3.event.pageX < boundedWidth * 0.7) {
-                tooltip.style("left", d3.event.pageX + 10 + "px")
+                tooltip.style("left", d3.event.pageX + 20 + "px")
             } else {
-                tooltip.style("left", d3.event.pageX - 120 + "px")
+                tooltip.style("left", d3.event.pageX - 150 + "px")
             }
         }
 

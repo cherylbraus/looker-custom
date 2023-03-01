@@ -15,6 +15,25 @@ export const object = {
             section: "General",
             order: 1
         },  
+        show_avglines: {
+            type: "boolean",
+            label: "Show average lines",
+            default: "false",
+            section: "General",
+            order: 2
+        },
+        line_shape: {
+            type: "string",
+            label: "Line Shape",
+            display: "radio",
+            values: [
+                {"Straight": "straight"},
+                {"Curved": "curve"}
+            ],
+            default: "curve",
+            section: "General",
+            order: 3
+        },
         xinner_ticksize: {
             type: "string",
             label: "X Tick Font Size (Inner)",
@@ -68,7 +87,7 @@ export const object = {
         // console.log('data', data)
 
         let margin = {
-            top: 20,
+            top: 30,
             right: 20,
             bottom: 50,
             left: 80
@@ -105,7 +124,7 @@ export const object = {
 
             entry['monthname'] = date.toLocaleString("en-US", { month: 'short' })
 
-            entry['year'] = d[dimensions[1].name].value
+            entry['year'] = +entry['month'].split("-")[0]
             entry['cat'] = d[dimensions[2].name].value
             entry['measure'] = d[measures[0].name].value
             entry['date'] = new Date(entry['year'], +entry['month'].split("-")[1]-1)
@@ -180,7 +199,7 @@ export const object = {
 
         const xAxisGenerator = d3.axisBottom()
             .scale(xScale)
-            .tickPadding(25)
+            .tickPadding(30)
             .tickSize(0)
             .tickFormat((d) => `${d}`)
 
@@ -261,6 +280,23 @@ export const object = {
                 return (obj.monthname === e)
             })
 
+            const average = d3.mean(innerData, d => measureAccessor(d))
+
+            // console.log("innerData", innerData)
+            // console.log("average", average)
+
+            if (config.show_avglines == "true") {
+                d3.select(this)
+                    .append("line")
+                    .style("stroke", "#a1a1a1")
+                    .style("stroke-dasharray", "5,3")
+                    .style("stroke-width", 1)
+                    .attr("x1", xScale(e))
+                    .attr("x2", xScale(e) + xScale.bandwidth())
+                    .attr("y1", yScale(average))
+                    .attr("y2", yScale(average))
+            }
+
             d3.select(this)
                 .selectAll("circle")
                 .data(innerData)
@@ -268,15 +304,18 @@ export const object = {
                 .append("circle")
                     .attr("cx", f => xInnerScale(f.year))
                     .attr("cy", f => yScale(f.measure))
-                    .attr("r", 3)
+                    .attr("r", f => f.measure ? 3 : 0)
                     .style("fill", "#025187")
                     .classed(`circle`, "true")
 
-            const line = d3.line()
+            let line = d3.line()
                 .defined(function(f) { return f.measure != null })
-                .curve(d3.curveNatural)
                 .x(function(f) { return xInnerScale(f.year) })
                 .y(function(f) { return yScale(f.measure) })
+
+            if (config.line_shape == "curve") {
+                line.curve(d3.curveNatural)
+            }
 
             d3.select(this)
                 .append("path")
@@ -294,6 +333,30 @@ export const object = {
 
         d3.selectAll(".inner-x-axis text")
             .style("font-size", `${config.xinner_ticksize}px`)
+
+        // LEGEND ---------------------------------------------------
+        if (config.show_avglines == "true") {
+            const legend = group.append("g")
+                .attr("transform", "translate(0,-15)")
+                .classed("legend", true)
+
+            legend.append("line")
+                .style("stroke", "#a1a1a1")
+                .style("stroke-dasharray", "5,3")
+                .style("stroke-width", 1)
+                .attr("x1", 10)
+                .attr("x2", 40)
+                .attr("y1", 0)
+                .attr("y2", 0)
+                
+            legend.append("text")
+                .attr("x", 47)
+                .attr("y", 0)
+                .style("text-anchor", "start")
+                .style("dominant-baseline", "middle")
+                .style("font-size", 11)
+                .text(`Average`)
+        }
 
         // TOOLTIPS ---------------------------------------------------
         const tooltip = d3.select(".tooltip")
@@ -349,7 +412,7 @@ export const object = {
             let rankVal;
             if (tt_data[0]) {
                 measureVal = d3.format(config.metric_format)(tt_data[0].measure)
-                rankVal = `${tt_data[0].rank} month`
+                rankVal = `#${tt_data[0].rank} month in year`
             } else {
                 measureVal = "N/A"
                 rankVal = "N/A"
@@ -360,7 +423,7 @@ export const object = {
                 `<span style="float:left;">${tt_x2}:&nbsp&nbsp</span>` + 
                 `<span style="float:right;">${measureVal}</span><br>` + 
                 `<span style="float:left;">Rank:&nbsp&nbsp</span>` + 
-                `<span style="float:right;">#${rankVal}</span>` 
+                `<span style="float:right;">${rankVal}</span>` 
             )
 
             if (d3.event.pageY < boundedHeight * 0.7) {

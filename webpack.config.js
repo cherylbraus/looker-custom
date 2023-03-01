@@ -43,6 +43,7 @@ var webpackConfig = {
     // conwinrate: './src/integration/contractWinRate/conwinrate.js',
     // conwinrateSimple: './src/integration/contractWinRate/conwinrateSimple.js',
     cycle: './src/integration/cycle/cycle.js',
+    // linetest: './src/integration/line/line_test.js',
     // template: './src/integration/template/template.js',
   },
   output: {

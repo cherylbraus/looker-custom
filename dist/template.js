@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 30);
+/******/ 	return __webpack_require__(__webpack_require__.s = 65);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -9559,7 +9559,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 /***/ }),
 
-/***/ 30:
+/***/ 65:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -20866,6 +20866,26 @@ var cycle_object = {
       section: "General",
       order: 1
     },
+    show_avglines: {
+      type: "boolean",
+      label: "Show average lines",
+      "default": "false",
+      section: "General",
+      order: 2
+    },
+    line_shape: {
+      type: "string",
+      label: "Line Shape",
+      display: "radio",
+      values: [{
+        "Straight": "straight"
+      }, {
+        "Curved": "curve"
+      }],
+      "default": "curve",
+      section: "General",
+      order: 3
+    },
     xinner_ticksize: {
       type: "string",
       label: "X Tick Font Size (Inner)",
@@ -20922,14 +20942,14 @@ var cycle_object = {
 
         if (tt_data[0]) {
           measureVal = defaultLocale_format(config.metric_format)(tt_data[0].measure);
-          rankVal = "".concat(tt_data[0].rank, " month");
+          rankVal = "#".concat(tt_data[0].rank, " month in year");
         } else {
           measureVal = "N/A";
           rankVal = "N/A";
         }
 
         tooltipHeader.html("".concat(tt_x1, "<hr>"));
-        tooltipBody.html("<span style=\"float:left;\">".concat(tt_x2, ":&nbsp&nbsp</span>") + "<span style=\"float:right;\">".concat(measureVal, "</span><br>") + "<span style=\"float:left;\">Rank:&nbsp&nbsp</span>" + "<span style=\"float:right;\">#".concat(rankVal, "</span>"));
+        tooltipBody.html("<span style=\"float:left;\">".concat(tt_x2, ":&nbsp&nbsp</span>") + "<span style=\"float:right;\">".concat(measureVal, "</span><br>") + "<span style=\"float:left;\">Rank:&nbsp&nbsp</span>" + "<span style=\"float:right;\">".concat(rankVal, "</span>"));
 
         if (on_event.pageY < boundedHeight * 0.7) {
           tooltip.style("top", on_event.pageY - 50 + "px");
@@ -20955,7 +20975,7 @@ var cycle_object = {
       console.log("measure", measures); // console.log('data', data)
 
       var margin = {
-        top: 20,
+        top: 30,
         right: 20,
         bottom: 50,
         left: 80
@@ -20976,7 +20996,7 @@ var cycle_object = {
         entry['monthname'] = date.toLocaleString("en-US", {
           month: 'short'
         });
-        entry['year'] = d[dimensions[1].name].value;
+        entry['year'] = +entry['month'].split("-")[0];
         entry['cat'] = d[dimensions[2].name].value;
         entry['measure'] = d[measures[0].name].value;
         entry['date'] = new Date(entry['year'], +entry['month'].split("-")[1] - 1);
@@ -21058,7 +21078,7 @@ var cycle_object = {
       })));
       console.log("outerDomain finished", outerDomain);
       var xScale = band().domain(outerDomain).range([0, boundedWidth]).padding(0.2);
-      var xAxisGenerator = axisBottom().scale(xScale).tickPadding(25).tickSize(0).tickFormat(function (d) {
+      var xAxisGenerator = axisBottom().scale(xScale).tickPadding(30).tickSize(0).tickFormat(function (d) {
         return "".concat(d);
       });
       var xAxis = group.append("g").call(xAxisGenerator).style("transform", "translateY(".concat(boundedHeight, "px)")).attr("class", "x-axis");
@@ -21094,22 +21114,45 @@ var cycle_object = {
         var innerData = data_array.filter(function (obj) {
           return obj.monthname === e;
         });
+        var average = src_mean(innerData, function (d) {
+          return measureAccessor(d);
+        }); // console.log("innerData", innerData)
+        // console.log("average", average)
+
+        if (config.show_avglines == "true") {
+          src_select(this).append("line").style("stroke", "#a1a1a1").style("stroke-dasharray", "5,3").style("stroke-width", 1).attr("x1", xScale(e)).attr("x2", xScale(e) + xScale.bandwidth()).attr("y1", yScale(average)).attr("y2", yScale(average));
+        }
+
         src_select(this).selectAll("circle").data(innerData).enter().append("circle").attr("cx", function (f) {
           return xInnerScale(f.year);
         }).attr("cy", function (f) {
           return yScale(f.measure);
-        }).attr("r", 3).style("fill", "#025187").classed("circle", "true");
+        }).attr("r", function (f) {
+          return f.measure ? 3 : 0;
+        }).style("fill", "#025187").classed("circle", "true");
         var line = src_line().defined(function (f) {
           return f.measure != null;
-        }).curve(natural).x(function (f) {
+        }).x(function (f) {
           return xInnerScale(f.year);
         }).y(function (f) {
           return yScale(f.measure);
         });
+
+        if (config.line_shape == "curve") {
+          line.curve(natural);
+        }
+
         src_select(this).append("path").data([innerData]).attr("d", line).attr("fill", "none").attr("stroke", "#025187").attr("stroke-width", ".5px");
         src_select(this).append("g").call(xInnerAxisGenerator).style("transform", "translateY(".concat(boundedHeight, "px)")).classed("inner-x-axis", true);
       });
-      src_selectAll(".inner-x-axis text").style("font-size", "".concat(config.xinner_ticksize, "px")); // TOOLTIPS ---------------------------------------------------
+      src_selectAll(".inner-x-axis text").style("font-size", "".concat(config.xinner_ticksize, "px")); // LEGEND ---------------------------------------------------
+
+      if (config.show_avglines == "true") {
+        var legend = group.append("g").attr("transform", "translate(0,-15)").classed("legend", true);
+        legend.append("line").style("stroke", "#a1a1a1").style("stroke-dasharray", "5,3").style("stroke-width", 1).attr("x1", 10).attr("x2", 40).attr("y1", 0).attr("y2", 0);
+        legend.append("text").attr("x", 47).attr("y", 0).style("text-anchor", "start").style("dominant-baseline", "middle").style("font-size", 11).text("Average");
+      } // TOOLTIPS ---------------------------------------------------
+
 
       var tooltip = src_select(".tooltip").style("position", "absolute").style("padding", "5px").style("background-color", "white").style("opacity", 0).style("border-radius", "4px").style("display", "block").style("border", "solid").style("border-color", "lightgrey").style("border-width", ".5px").attr("pointer-events", "none").classed("tooltip", true);
       var tt_group = group.append("g").classed("tooltip", true);
