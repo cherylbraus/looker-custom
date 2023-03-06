@@ -42,9 +42,10 @@ var webpackConfig = {
     // sankeyNew: './src/integration/sankey/sankey.js',
     // conwinrate: './src/integration/contractWinRate/conwinrate.js',
     // conwinrateSimple: './src/integration/contractWinRate/conwinrateSimple.js',
-    cycle: './src/integration/cycle/cycle.js',
+    // cycle: './src/integration/cycle/cycle.js',
     // linetest: './src/integration/line/line_test.js',
-    // template: './src/integration/template/template.js',
+    // asp: './src/integration/ASP/asp.js',
+    template: './src/integration/template/template.js',
   },
   output: {
     filename: "[name].js",
@@ -55,12 +56,12 @@ var webpackConfig = {
   resolve: {
     extensions: [".ts", ".js"]
   },
-  // optimization: {
-  //   minimize: false
-  // },
-  plugins: [
-    new UglifyJSPlugin()
-  ],
+  optimization: {
+    minimize: false
+  },
+  // plugins: [
+  //   new UglifyJSPlugin()
+  // ],
   module: {
     rules: [
       { test: /\.js$/, loader: "babel-loader" },

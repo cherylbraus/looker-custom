@@ -1,12 +1,9 @@
 import * as d3 from 'd3'
+import * as $ from 'jquery'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
-import { line, selectAll } from 'd3'
-import { stripComments } from 'tslint/lib/utils'
-import { textSpanContainsPosition } from 'typescript'
-import * as $ from 'jquery'
 
-export const object = {
+looker.plugins.visualizations.add({
     id: "asp",
     label: "ASP",
     options: {
@@ -53,7 +50,7 @@ export const object = {
                 {"Cost Reduction Comparison": "costreduc"},
                 {"Averages & Distributions": "avgdist"}
             ],
-            default: "avgdist"
+            default: "twobid"
         },
         cost_reduce_amt: {
             section: "Setup",
@@ -109,63 +106,195 @@ export const object = {
         this.trigger("updateConfig", [{directionality: "true", display_values:"true",freeze_header:"true"}])
           // Insert a <style> tag with some styles we'll use later
         element.innerHTML = `
-            <style>
-                @font-face { 
-                    font-family: Roboto; 
-                    font-weight: 300; 
-                    font-style: normal;
-                    src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');
-                }
-                @font-face { font-family: Roboto; font-weight: 400; font-style: normal;
-                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');
-                }
-                    @font-face { font-family: Roboto; font-weight: 500; font-style: normal;
-                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');
-                }
-                @font-face { font-family: Roboto; font-weight: 700; font-style: normal;
-                    src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');
-                }
-                body {
-                    font-family: Roboto;
-                    font-size: 12px;
-                }
-                .error-container {
-                    margin: 0;
-                    position: absolute;
-                    top: 50%;
-                    -ms-transform: translateY(-50%);
-                    transform: translateY(-50%);
-                    text-align:center;
-                    width:100%;
-                }
-                .error {
-                    font-family:Roboto;
-                    font-size:16px
-                }
-                .error-header {
-                    font-family:Roboto;
-                    font-weight:700;
-                    font-size:16px
-                }
-                </style>
-                <svg id="first"></svg>
-                <svg id="second"></svg>
-                <svg id="third"></svg>
-                <div class="tooltip1"></div>                
-                <div class="tooltip2"></div>`;
+        <style>
+            @font-face {
+                font-family: Roboto;
+                font-weight: 300;
+                font-style: normal;
+                src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');
+            }
+            @font-face { font-family: Roboto; font-weight: 400; font-style: normal;
+                src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');
+            }
+                @font-face { font-family: Roboto; font-weight: 500; font-style: normal;
+                src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');
+            }
+            @font-face { font-family: Roboto; font-weight: 700; font-style: normal;
+                src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');
+            }
+            tr:first-child {
+            font-weight:500
+            }
+            body {
+                font-family: 'Roboto';
+            }
+            text {
+            font-family: 'Roboto';
+            }
+            /* .domain {
+            display: none;
+            } */
+            .gridline {
+            stroke: rgb(230, 230, 230);
+            shape-rendering: crispEdges;
+            stroke-opacity: .1;
+            }
+            .gridline2 {
+            stroke: white;
+            shape-rendering: crispEdges;
+            stroke-opacity: 1;
+            }
+            #viz-container {
+            z-index: 9;
+            position: relative;
+            background-color: none;
+            border: 1px solid #d3d3d3;
+            text-align: center;
+            width: 600px;
+            height: 360px;
+            }
+            #dimension-header {
+            font-size: 12px;
+            }
+            .value-headers {
+            font-size: 12px;
+            }
+            .value-headers-body {
+            font-weight: 500;
+            }
+            #vis {
+            font-family: 'Open Sans', 'Helvetica', 'sans-serif';
+            cursor: move;
+            z-index: 10;
+            background-color: none;
+            color: #fff;
+            height: 100%;
+            width: 100%;
+            fill: black;
+            color: black;
+            }
+            .line {
+            fill: none;
+            stroke-width: 2px;
+            }
+
+            /* ---Cheryl's Stuff: Start--- */
+
+            .axis-label {
+            fill: #3a4245;
+            font-size: 12px;
+            font-family: 'Open Sans', 'Helvetica', 'sans-serif';
+            text-anchor: middle;
+            }
+
+            .y-axis, .x-axis {
+            font-family: 'Open Sans', 'Helvetica', 'sans-serif';
+            }
+
+            .zero-line {
+            stroke: #ccd6eb;
+            stroke-width: 1.0;
+            }
+
+            .x-axis .domain {
+            stroke: #ccd6eb;
+            stroke-width: 1;
+            }
+
+            .y-axis .domain {
+            stroke: none;
+            }
+
+            .x-axis text, .y-axis text {
+            font-size: 12px;
+            color: #3a4245;
+            visibility: visible;
+            }
+
+            .inner-x-axis text {
+            font-size: 9px;
+            color: #3a4245;
+            visibility: visible;
+            }
+
+            .x-axis text .hide, .y-axis text .hide {
+            visibility: hidden;
+            }
+
+            .x-axis line, .y-axis line {
+            stroke: #e6e6e6;
+            stroke-width: 1;
+            opacity: 1;
+            }
+
+            .x-axis line .hide, .y-axis line .hide {
+            opacity: 0;
+            }
+
+            .tooltip {
+                box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;
+                font-size: 12px;
+                pointer-events: none;
+            }
+
+            .tooltip #tt-header {
+                font-size: 12px;
+                font-weight: 600;
+                color: #9d9d9d;
+                text-transform: uppercase;
+            }
+
+            .tooltip h1 {
+                font-size: 11px;
+                color: #9d9d9d;
+                text-transform: uppercase;
+            }
+
+            hr { 
+                margin-top: 1px; 
+                margin-bottom: 1px 
+            }
+
+            .tooltip1 .tooltip2 {
+            font-size: 11px;
+            }
+
+            #tt-body {
+            margin-top: 5px;
+            }
+
+            /* ---Cheryl's Stuff: End--- */
+
+            .axis text {
+            /* fill: green;  */
+            font-size: 12px;
+            }
+        </style>
+        <svg id="first"></svg>
+        <svg id="second"></svg>
+        <svg id="third"></svg>
+        <svg id="fourth"></svg>
+        <svg id="fifth"></svg>
+        <div class="tooltip1"></div>                
+        <div class="tooltip2"></div>
+        <div class="tooltip3"></div>                
+        <div class="tooltip4"></div>
+        <div class="tooltip5"></div>`;
         element.style.fontFamily = `Roboto,"Open Sans", "Helvetica", sans-serif`
     },
 
     updateAsync: function(data, element, config, queryResponse, details, done, environment = "prod") {
         if (environment == "prod") {
               if (!handleErrors(this, queryResponse, {
-                  min_pivots: 1, max_pivots: 1,
+                  min_pivots: 0, max_pivots: 1,
                   min_dimensions: 1, max_dimensions: 40,
-                  min_measures: 1, max_measures: 40
+                  min_measures: 0, max_measures: 40
               })) return
         }
 
         try {
+
+            console.log("start", data)
 
             const dimensions = queryResponse.fields.dimension_like
             const measures = queryResponse.fields.measure_like
@@ -1858,4 +1987,7 @@ export const object = {
         }
         done()
     },
-}
+
+
+
+})

@@ -91,7 +91,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 65);
+/******/ 	return __webpack_require__(__webpack_require__.s = 27);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -9559,7 +9559,7 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 /***/ }),
 
-/***/ 65:
+/***/ 27:
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -14508,11 +14508,11 @@ function setMap(map, key, value) {
 // CONCATENATED MODULE: ./node_modules/d3-collection/src/set.js
 
 
-function set_Set() {}
+function Set() {}
 
 var proto = src_map.prototype;
-set_Set.prototype = set_set.prototype = {
-  constructor: set_Set,
+Set.prototype = set_set.prototype = {
+  constructor: Set,
   has: proto.has,
   add: function (value) {
     value += "";
@@ -14528,9 +14528,9 @@ set_Set.prototype = set_set.prototype = {
 };
 
 function set_set(object, f) {
-  var set = new set_Set(); // Copy constructor.
+  var set = new Set(); // Copy constructor.
 
-  if (object instanceof set_Set) object.each(function (value) {
+  if (object instanceof Set) object.each(function (value) {
     set.add(value);
   }); // Otherwise, assume it’s an array.
   else if (object) {
@@ -18946,243 +18946,7 @@ function divergingSqrt() {
 
 
 
-// CONCATENATED MODULE: ./node_modules/d3-selection/src/selectAll.js
-
-/* harmony default export */ var src_selectAll = (function (selector) {
-  return typeof selector === "string" ? new Selection([document.querySelectorAll(selector)], [document.documentElement]) : new Selection([selector == null ? [] : selector], selection_root);
-});
 // CONCATENATED MODULE: ./node_modules/d3-selection/src/index.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// CONCATENATED MODULE: ./node_modules/d3-shape/src/constant.js
-/* harmony default export */ var d3_shape_src_constant = (function (x) {
-  return function constant() {
-    return x;
-  };
-});
-// CONCATENATED MODULE: ./node_modules/d3-shape/src/curve/linear.js
-function Linear(context) {
-  this._context = context;
-}
-
-Linear.prototype = {
-  areaStart: function () {
-    this._line = 0;
-  },
-  areaEnd: function () {
-    this._line = NaN;
-  },
-  lineStart: function () {
-    this._point = 0;
-  },
-  lineEnd: function () {
-    if (this._line || this._line !== 0 && this._point === 1) this._context.closePath();
-    this._line = 1 - this._line;
-  },
-  point: function (x, y) {
-    x = +x, y = +y;
-
-    switch (this._point) {
-      case 0:
-        this._point = 1;
-        this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y);
-        break;
-
-      case 1:
-        this._point = 2;
-      // proceed
-
-      default:
-        this._context.lineTo(x, y);
-
-        break;
-    }
-  }
-};
-/* harmony default export */ var curve_linear = (function (context) {
-  return new Linear(context);
-});
-// CONCATENATED MODULE: ./node_modules/d3-shape/src/point.js
-function point_x(p) {
-  return p[0];
-}
-function point_y(p) {
-  return p[1];
-}
-// CONCATENATED MODULE: ./node_modules/d3-shape/src/line.js
-
-
-
-
-/* harmony default export */ var src_line = (function () {
-  var x = point_x,
-      y = point_y,
-      defined = d3_shape_src_constant(true),
-      context = null,
-      curve = curve_linear,
-      output = null;
-
-  function line(data) {
-    var i,
-        n = data.length,
-        d,
-        defined0 = false,
-        buffer;
-    if (context == null) output = curve(buffer = src_path());
-
-    for (i = 0; i <= n; ++i) {
-      if (!(i < n && defined(d = data[i], i, data)) === defined0) {
-        if (defined0 = !defined0) output.lineStart();else output.lineEnd();
-      }
-
-      if (defined0) output.point(+x(d, i, data), +y(d, i, data));
-    }
-
-    if (buffer) return output = null, buffer + "" || null;
-  }
-
-  line.x = function (_) {
-    return arguments.length ? (x = typeof _ === "function" ? _ : d3_shape_src_constant(+_), line) : x;
-  };
-
-  line.y = function (_) {
-    return arguments.length ? (y = typeof _ === "function" ? _ : d3_shape_src_constant(+_), line) : y;
-  };
-
-  line.defined = function (_) {
-    return arguments.length ? (defined = typeof _ === "function" ? _ : d3_shape_src_constant(!!_), line) : defined;
-  };
-
-  line.curve = function (_) {
-    return arguments.length ? (curve = _, context != null && (output = curve(context)), line) : curve;
-  };
-
-  line.context = function (_) {
-    return arguments.length ? (_ == null ? context = output = null : output = curve(context = _), line) : context;
-  };
-
-  return line;
-});
-// CONCATENATED MODULE: ./node_modules/d3-shape/src/curve/natural.js
-function Natural(context) {
-  this._context = context;
-}
-
-Natural.prototype = {
-  areaStart: function () {
-    this._line = 0;
-  },
-  areaEnd: function () {
-    this._line = NaN;
-  },
-  lineStart: function () {
-    this._x = [];
-    this._y = [];
-  },
-  lineEnd: function () {
-    var x = this._x,
-        y = this._y,
-        n = x.length;
-
-    if (n) {
-      this._line ? this._context.lineTo(x[0], y[0]) : this._context.moveTo(x[0], y[0]);
-
-      if (n === 2) {
-        this._context.lineTo(x[1], y[1]);
-      } else {
-        var px = controlPoints(x),
-            py = controlPoints(y);
-
-        for (var i0 = 0, i1 = 1; i1 < n; ++i0, ++i1) {
-          this._context.bezierCurveTo(px[0][i0], py[0][i0], px[1][i0], py[1][i0], x[i1], y[i1]);
-        }
-      }
-    }
-
-    if (this._line || this._line !== 0 && n === 1) this._context.closePath();
-    this._line = 1 - this._line;
-    this._x = this._y = null;
-  },
-  point: function (x, y) {
-    this._x.push(+x);
-
-    this._y.push(+y);
-  }
-}; // See https://www.particleincell.com/2012/bezier-splines/ for derivation.
-
-function controlPoints(x) {
-  var i,
-      n = x.length - 1,
-      m,
-      a = new Array(n),
-      b = new Array(n),
-      r = new Array(n);
-  a[0] = 0, b[0] = 2, r[0] = x[0] + 2 * x[1];
-
-  for (i = 1; i < n - 1; ++i) a[i] = 1, b[i] = 4, r[i] = 4 * x[i] + 2 * x[i + 1];
-
-  a[n - 1] = 2, b[n - 1] = 7, r[n - 1] = 8 * x[n - 1] + x[n];
-
-  for (i = 1; i < n; ++i) m = a[i] / b[i - 1], b[i] -= m, r[i] -= m * r[i - 1];
-
-  a[n - 1] = r[n - 1] / b[n - 1];
-
-  for (i = n - 2; i >= 0; --i) a[i] = (r[i] - a[i + 1]) / b[i];
-
-  b[n - 1] = (x[n] + a[n - 1]) / 2;
-
-  for (i = 0; i < n - 1; ++i) b[i] = 2 * x[i + 1] - a[i + 1];
-
-  return [a, b];
-}
-
-/* harmony default export */ var natural = (function (context) {
-  return new Natural(context);
-});
-// CONCATENATED MODULE: ./node_modules/d3-shape/src/index.js
-
-
-
-
- // Note: radialArea is deprecated!
-
- // Note: radialLine is deprecated!
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -19208,10 +18972,10 @@ function controlPoints(x) {
   };
 });
 // CONCATENATED MODULE: ./node_modules/d3-voronoi/src/point.js
-function src_point_x(d) {
+function point_x(d) {
   return d[0];
 }
-function src_point_y(d) {
+function point_y(d) {
   return d[1];
 }
 // CONCATENATED MODULE: ./node_modules/d3-voronoi/src/RedBlackTree.js
@@ -20143,8 +19907,8 @@ Diagram.prototype = {
 
 
 /* harmony default export */ var src_voronoi = (function () {
-  var x = src_point_x,
-      y = src_point_y,
+  var x = point_x,
+      y = point_y,
       extent = null;
 
   function voronoi(data) {
@@ -20805,7 +20569,7 @@ var utils_formatType = function (valueFormat) {
     }
     return defaultLocale_format(format);
 };
-var handleErrors = function (vis, res, options) {
+var utils_handleErrors = function (vis, res, options) {
     var check = function (group, noun, count, min, max) {
         if (!vis.addError || !vis.clearErrors)
             return false;
@@ -20834,355 +20598,354 @@ var handleErrors = function (vis, res, options) {
         && check('mes-req', 'Measure', measures.length, options.min_measures, options.max_measures));
 };
 
-// EXTERNAL MODULE: ./node_modules/jquery/dist/jquery.js
-var jquery = __webpack_require__(0);
-
-// CONCATENATED MODULE: ./src/integration/template/cycle.js
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-
-
-
-
-var cycle_object = {
-  id: "contract-win-rate",
-  label: "ZDev Contract Win Rate",
+// CONCATENATED MODULE: ./src/integration/template/divergingBar
+const divergingBar_object = {
+  // Id and Label are legacy properties that no longer have any function besides documenting
+  // what the visualization used to have. The properties are now set via the manifest
+  // form within the admin/visualizations page of Looker
+  id: "test",
+  label: "ZDev Diverging",
   options: {
-    metric_format: {
+    // color_range: {
+    //   type: 'array',
+    //   label: 'Color Range',
+    //   display: 'colors',
+    //   default: ['#27566b', '#ecd796']
+    // },
+    color_reverse: {
       type: "string",
-      label: "Metric Value Format",
-      display: "text",
-      "default": ",.0f",
-      section: "General",
-      order: 1
-    },
-    show_avglines: {
-      type: "boolean",
-      label: "Show average lines",
-      "default": "false",
-      section: "General",
-      order: 2
-    },
-    line_shape: {
-      type: "string",
-      label: "Line Shape",
+      label: "Reverse Colors?",
+      values: [
+        {"Original": "original"},
+        {"Reversed": "reversed"}
+      ],
       display: "radio",
-      values: [{
-        "Straight": "straight"
-      }, {
-        "Curved": "curve"
-      }],
-      "default": "curve",
-      section: "General",
-      order: 3
+      default: "original"
     },
-    xinner_ticksize: {
+    chart_type: {
       type: "string",
-      label: "X Tick Font Size (Inner)",
-      display: "text",
-      "default": "9",
-      section: "Axes",
-      order: 1
-    },
-    y_label: {
-      type: "string",
-      label: "Y Axis Label",
-      display: "text",
-      "default": "",
-      section: "Axes",
-      order: 2
+      label: "Interpolation",
+      values: [
+        {"Linear":"curveLinear"},
+        {"Natural": "curveNatural"},
+        {"Step": "curveStep"}
+      ],
+      display: "radio",
+      default: "curveLinear"
     }
   },
   // Set up the initial state of the visualization
-  create: function create(element, config) {
-    // Insert a <style> tag with some styles we'll use later
-    element.innerHTML = "\n            <style>\n              body {\n                  font-family: Arial;\n                  font-size: 12px;\n              }\n            </style>\n            <svg>\n            </svg>";
-    element.style.fontFamily = "\"Open Sans\", \"Helvetica\", sans-serif";
+  create: function(element, config) {
+    // Insert a <style> tag with some styles we'll use later.
+    element.innerHTML = `
+      <style>
+        @font-face { 
+            font-family: Roboto; 
+            font-weight: 300; 
+            font-style: normal;
+            src: url('https://static-a.lookercdn.com/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Light-d6f2f0b9bd.woff') format('woff');
+          }
+          @font-face { font-family: Roboto; font-weight: 400; font-style: normal;
+            src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Regular-5997dd0407.woff') format('woff');
+          }
+            @font-face { font-family: Roboto; font-weight: 500; font-style: normal;
+            src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Medium-e153a64ccc.woff') format('woff');
+          }
+          @font-face { font-family: Roboto; font-weight: 700; font-style: normal;
+            src: url('https://static-b.lookercdn.com/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff'),url('/fonts/vendor/roboto/Roboto-Bold-d919b27e93.woff') format('woff');
+          }
+          body {
+              font-family: Roboto;
+              font-size: 12px;
+          }
+          .tick {
+            font-family: Roboto;
+          }
+          .label {
+            font-size: 10px;
+          }
+            .tooltip {
+                color: white;
+                /*box-shadow: 2px 2px 5px;*/
+            }
+        .gridline {
+                stroke: rgb(230, 230, 230);
+                shape-rendering: crispEdges;
+                stroke-opacity: .1;
+            }
+        .cleveland-text-large {
+          font-size: 72px;
+        }
+        .cleveland-text-large {
+          font-size: 18px;
+        }
+        .gridline {
+          opacity:.1;
+        }
+                    .value-headers {
+                font-size: 12px;
+            }
+            .value-headers-body {
+                font-weight: 500;
+            }
+      </style>
+      <svg>
+      </svg>`;
+    element.style.fontFamily = `Roboto,"Open Sans", "Helvetica", sans-serif`
+
   },
   // Render in response to the data or settings changing
-  updateAsync: function updateAsync(data, element, config, queryResponse, details, done) {
-    var environment = arguments.length > 6 && arguments[6] !== undefined ? arguments[6] : "prod";
-
+  updateAsync: function(data, element, config, queryResponse, details, done, environment = "prod",data2, config2) {
     if (environment == "prod") {
       if (!handleErrors(this, queryResponse, {
-        min_pivots: 0,
-        max_pivots: 0,
-        min_dimensions: 0,
-        max_dimensions: 22,
-        min_measures: 0,
-        max_measures: 22
-      })) return;
+        min_pivots: 0, max_pivots: 0,
+        min_dimensions: 0, max_dimensions: undefined,
+        min_measures: 0, max_measures: 3
+      })) return
     }
+      d3.select("#vis")
+        .select("svg").html("")
 
-    try {
-      var mousemove = function mousemove(d) {
-        tooltip.transition().duration(0).style("opacity", 0.95);
-        var eachBand = xScale.step();
-        var xIndex = Math.floor(mouse(this)[0] / eachBand);
-        var tt_x1 = xScale.domain()[xIndex];
-        xInnerScale.range(xInnerScaleRanges[xIndex]);
-        var tt_x2 = Math.round(xInnerScale.invert(mouse(this)[0])); // console.log("tt_xs", `${tt_x1} - ${tt_x2}`)
+      const margin = {top: 40, right: 40, bottom: 40, left:80};
+      const getNode = d3.select("#vis");
 
-        var tt_data = data_array.filter(function (d) {
-          return d.monthname == tt_x1 && +d.year == +tt_x2;
-        }); // console.log("tt_data", tt_data)
+      console.log("getNode", getNode)
 
-        var measureVal;
-        var rankVal;
+      // Update this once we have a better idea how Looker integration will look
+      const new_node_width = getNode.select(function() { return this.parentNode; })
+      const new_node_height = getNode.select(function() { return this.parentNode; })
 
-        if (tt_data[0]) {
-          measureVal = defaultLocale_format(config.metric_format)(tt_data[0].measure);
-          rankVal = "#".concat(tt_data[0].rank, " month in year");
-        } else {
-          measureVal = "N/A";
-          rankVal = "N/A";
-        }
+      console.log("new node width", new_node_width)
+      console.log(".node", new_node_width.node())
+      console.log("bounding", new_node_width.node().getBoundingClientRect())
+      console.log("width", new_node_width.node().getBoundingClientRect().width)
+      const w = new_node_width.node().getBoundingClientRect().width;
+      const h = new_node_height.node().getBoundingClientRect().height;
 
-        tooltipHeader.html("".concat(tt_x1, "<hr>"));
-        tooltipBody.html("<span style=\"float:left;\">".concat(tt_x2, ":&nbsp&nbsp</span>") + "<span style=\"float:right;\">".concat(measureVal, "</span><br>") + "<span style=\"float:left;\">Rank:&nbsp&nbsp</span>" + "<span style=\"float:right;\">".concat(rankVal, "</span>"));
+      const width = w - margin.left - margin.right;
+      const height = h - margin.bottom - margin.top;
 
-        if (on_event.pageY < boundedHeight * 0.7) {
-          tooltip.style("top", on_event.pageY - 50 + "px");
-        } else {
-          tooltip.style("top", on_event.pageY - 140 + "px");
-        }
+       const headersNegative = ["C", "F"]
 
-        if (on_event.pageX < boundedWidth * 0.7) {
-          tooltip.style("left", on_event.pageX + 10 + "px");
-        } else {
-          tooltip.style("left", on_event.pageX - 120 + "px");
-        }
-      };
+        const headersPositive = ["A", "B"]
+            
+        let dataPositive = []
+        let dataNegative = []
+        const dimensions = queryResponse.fields.dimension_like;
+        const measures = queryResponse.fields.measure_like;
 
-      var mouseout = function mouseout() {
-        tooltip.transition().duration(0).style("opacity", 0);
-      };
+        let negPos = "carrier_scorecard_agg.carrier_grade"
+        try {   
 
-      var dimensions = queryResponse.fields.dimension_like;
-      var measures = queryResponse.fields.measure_like;
-      console.log("queryResponse", queryResponse);
-      console.log("dimension", dimensions);
-      console.log("measure", measures); // console.log('data', data)
+            let positivesVolume = []
+            let negativesVolume = []
+            let positivesUnique = []
+            let negativesUnique = []
 
-      var margin = {
-        top: 30,
-        right: 20,
-        bottom: 50,
-        left: 80
-      };
-      var width = element.clientWidth;
-      var height = element.clientHeight;
-      var boundedWidth = width - margin.left - margin.right;
-      var boundedHeight = height - margin.top - margin.bottom;
-      var svg = src_select(element).select("svg").html('').attr('width', '100%').attr('height', '100%');
-      var group = svg.append('g').attr("transform", "translate(".concat(margin.left, ",").concat(margin.top, ")")).attr("width", "100%").attr("height", boundedHeight + "px").classed("group", true); // format data -----------------------------------------
+            let data_ready = []
+            let data_keys = []
 
-      var data_ready = [];
-      data.forEach(function (d) {
-        var entry = {};
-        entry['month'] = d[dimensions[0].name].value;
-        var date = new Date();
-        date.setMonth(+parseInt(entry['month'].split("-")[1] - 1));
-        entry['monthname'] = date.toLocaleString("en-US", {
-          month: 'short'
-        });
-        entry['year'] = +entry['month'].split("-")[0];
-        entry['cat'] = d[dimensions[2].name].value;
-        entry['measure'] = d[measures[0].name].value;
-        entry['date'] = new Date(entry['year'], +entry['month'].split("-")[1] - 1);
-        data_ready.push(entry);
-      });
+            data.forEach((d) => {
+              if (data_keys.includes(d[dimensions[1].name].value)) {
+                return
+              } else if (d[dimensions[1].name].value != null) {
+                data_keys.push(d[dimensions[1].name].value)
+              }
+            })
 
-      var monthAccessor = function monthAccessor(d) {
-        return d.month;
-      };
+            data_keys.forEach((entry,i)=>{
+              let pod = {}
+              pod["group"] = entry
+              pod["A"] = 0
+              pod["B"] = 0
+              pod["total"] = 0
+              data.forEach((ent)=>{
+                if (ent[dimensions[1].name]["value"] == entry) {
+                  if (ent[dimensions[2].name]["value"] == "A") {
+                    pod["A"] += ent[measures[0].name]["value"]
+                    pod["total"] += ent[measures[0].name]["value"]
+                  } else if(ent[dimensions[2].name]["value"] == "B") {
+                    pod["B"] += ent[measures[0].name]["value"]
+                    pod["total"] += ent[measures[0].name]["value"]
+                  }
+                }
+              })
+              positivesVolume.push(pod)
+            })
 
-      var yearAccessor = function yearAccessor(d) {
-        return d.year;
-      };
+            data_keys.forEach((entry,i)=>{
+              let pod = {}
+              pod["group"] = entry
+              pod["C"] = 0
+              pod["D"] = 0
+              pod["E"] = 0
+              pod["F"] = 0
+              pod["total"] = 0
+              data.forEach((ent)=>{
+                if (ent[dimensions[1].name]["value"] == entry) {
+                  if (ent[dimensions[2].name]["value"] == "C") {
+                    pod["C"] += ent[measures[0].name]["value"]
+                    pod["total"] += ent[measures[0].name]["value"]
+                  } else if(ent[dimensions[2].name]["value"] == "D") {
+                    pod["D"] += ent[measures[0].name]["value"]
+                    pod["total"] += ent[measures[0].name]["value"]
+                  } else if (ent[dimensions[2].name]["value"] == "E") {
+                    pod["E"] += ent[measures[0].name]["value"]
+                    pod["total"] += ent[measures[0].name]["value"]
+                  } else if(ent[dimensions[2].name]["value"] == "F") {
+                    pod["F"] += ent[measures[0].name]["value"]
+                    pod["total"] += ent[measures[0].name]["value"]
+                  }
+                }
+              })
+              negativesVolume.push(pod)
+            })
 
-      var catAccessor = function catAccessor(d) {
-        return d.cat;
-      };
+            const stackedPositives = d3.stack()
+               .keys(headersPositive)(positivesVolume)
 
-      var measureAccessor = function measureAccessor(d) {
-        return d.measure;
-      };
-
-      var dateAccessor = function dateAccessor(d) {
-        return d.date;
-      };
-
-      console.log("data_ready", data_ready); // JUST FILTER TO ONE CATEGORY AND FEWER YEARS FOR NOW!!!!! -------------------------
-
-      data_ready = data_ready.filter(function (entry) {
-        return catAccessor(entry) === "No" && yearAccessor(entry) > 2017;
-      }); // data manipulation ----------------------------------------------
-
-      var uniqueYears = _toConsumableArray(new Set(data_ready.map(function (obj) {
-        return +obj.year;
-      }))).sort();
-
-      console.log("uniqueYears", uniqueYears); // get a month ranking by year
-
-      var data_array = [];
-      uniqueYears.forEach(function (y, i) {
-        var tmp = data_ready.filter(function (entry) {
-          return yearAccessor(entry) === +y;
-        });
-        tmp.sort(function (a, b) {
-          return b.measure - a.measure;
-        });
-        var rank = 1;
-
-        for (var i = 0; i < tmp.length; i++) {
-          if (i > 0 && tmp[i].measure < tmp[i - 1].measure) {
-            rank++;
-          }
-
-          tmp[i].rank = rank;
-        }
-
-        tmp.forEach(function (d) {
-          data_array.push(d);
-        });
-      });
-      data_array.sort(function (a, b) {
-        return a.date - b.date;
-      });
-      console.log("data_array", data_array); // scales ----------------------------------------------
-
-      var outerDomain = _toConsumableArray(new Set(data_array.map(function (obj) {
-        return +parseInt(obj.month.split("-")[1] - 1);
-      })));
-
-      outerDomain.sort(function (a, b) {
-        return a - b;
-      });
-      outerDomain = _toConsumableArray(new Set(outerDomain.map(function (obj) {
-        var date = new Date();
-        date.setMonth(obj);
-        return date.toLocaleString('en-US', {
-          month: 'short'
-        });
-      })));
-      console.log("outerDomain finished", outerDomain);
-      var xScale = band().domain(outerDomain).range([0, boundedWidth]).padding(0.2);
-      var xAxisGenerator = axisBottom().scale(xScale).tickPadding(30).tickSize(0).tickFormat(function (d) {
-        return "".concat(d);
-      });
-      var xAxis = group.append("g").call(xAxisGenerator).style("transform", "translateY(".concat(boundedHeight, "px)")).attr("class", "x-axis");
-      var yScale = linear_linear().domain(src_extent(data_array, function (d) {
-        return measureAccessor(d);
-      })).range([boundedHeight, 0]);
-      var yAxisGenerator = axisLeft().scale(yScale).tickPadding(10).tickFormat(function (d) {
-        return defaultLocale_format(config.metric_format)(d);
-      }); // .ticks(9)
-
-      var yAxis = group.append("g").call(yAxisGenerator).attr("class", "y-axis");
-      var yAxisLabel = yAxis.append("text").attr("class", "axis-label").attr("x", -boundedHeight / 2).attr("y", -margin.left + 13).style("transform", "rotate(-90deg)").text(config.y_label ? config.y_label : measures[0].label_short.split(" ")[0]);
-      var xInnerScale = linear_linear().domain([Math.min.apply(Math, _toConsumableArray(uniqueYears)), Math.max.apply(Math, _toConsumableArray(uniqueYears))]);
-      var xInnerTicks = xInnerScale.ticks().filter(function (tick) {
-        return Number.isInteger(tick);
-      });
-      var xInnerAxisGenerator = axisBottom().scale(xInnerScale).tickPadding(10).tickSize(0).tickValues(xInnerTicks).tickFormat(function (d) {
-        return "'".concat(d.toString().slice(2));
-      }); // Draw the plot ---------------------------------------
-
-      var outerGroups = group.append("g").attr("class", "outer-groups").selectAll("g").data(outerDomain).enter().append("g").attr("class", function (d) {
-        return "singleperiod ".concat(d);
-      }); // draw rects for shading
-
-      var shadedBars = outerGroups.append("rect").attr("x", function (d) {
-        return xScale(d);
-      }).attr("y", 0).attr("width", xScale.bandwidth()).attr("height", boundedHeight).attr("fill", "#eaeaea").attr("fill-opacity", 0.4).on("mousemove", mousemove).on("mouseout", mouseout).classed("tooltip-area-rect", true); // draw each category's circles/lines -----------------------------
-
-      var xInnerScaleRanges = [];
-      src_selectAll(".singleperiod").each(function (e, i) {
-        xInnerScale.range([xScale(e), xScale(e) + xScale.bandwidth()]);
-        xInnerScaleRanges.push(xInnerScale.range());
-        var innerData = data_array.filter(function (obj) {
-          return obj.monthname === e;
-        });
-        var average = src_mean(innerData, function (d) {
-          return measureAccessor(d);
-        }); // console.log("innerData", innerData)
-        // console.log("average", average)
-
-        if (config.show_avglines == "true") {
-          src_select(this).append("line").style("stroke", "#a1a1a1").style("stroke-dasharray", "5,3").style("stroke-width", 1).attr("x1", xScale(e)).attr("x2", xScale(e) + xScale.bandwidth()).attr("y1", yScale(average)).attr("y2", yScale(average));
-        }
-
-        src_select(this).selectAll("circle").data(innerData).enter().append("circle").attr("cx", function (f) {
-          return xInnerScale(f.year);
-        }).attr("cy", function (f) {
-          return yScale(f.measure);
-        }).attr("r", function (f) {
-          return f.measure ? 3 : 0;
-        }).style("fill", "#025187").classed("circle", "true");
-        var line = src_line().defined(function (f) {
-          return f.measure != null;
-        }).x(function (f) {
-          return xInnerScale(f.year);
-        }).y(function (f) {
-          return yScale(f.measure);
-        });
-
-        if (config.line_shape == "curve") {
-          line.curve(natural);
-        }
-
-        src_select(this).append("path").data([innerData]).attr("d", line).attr("fill", "none").attr("stroke", "#025187").attr("stroke-width", ".5px");
-        src_select(this).append("g").call(xInnerAxisGenerator).style("transform", "translateY(".concat(boundedHeight, "px)")).classed("inner-x-axis", true);
-      });
-      src_selectAll(".inner-x-axis text").style("font-size", "".concat(config.xinner_ticksize, "px")); // LEGEND ---------------------------------------------------
-
-      if (config.show_avglines == "true") {
-        var legend = group.append("g").attr("transform", "translate(0,-15)").classed("legend", true);
-        legend.append("line").style("stroke", "#a1a1a1").style("stroke-dasharray", "5,3").style("stroke-width", 1).attr("x1", 10).attr("x2", 40).attr("y1", 0).attr("y2", 0);
-        legend.append("text").attr("x", 47).attr("y", 0).style("text-anchor", "start").style("dominant-baseline", "middle").style("font-size", 11).text("Average");
-      } // TOOLTIPS ---------------------------------------------------
+            const stackedNegatives = d3.stack()
+               .keys(headersNegative)(negativesVolume)
 
 
-      var tooltip = src_select(".tooltip").style("position", "absolute").style("padding", "5px").style("background-color", "white").style("opacity", 0).style("border-radius", "4px").style("display", "block").style("border", "solid").style("border-color", "lightgrey").style("border-width", ".5px").attr("pointer-events", "none").classed("tooltip", true);
-      var tt_group = group.append("g").classed("tooltip", true);
-      var tt_line = tt_group.append("line").attr("stroke", "#a6a6a6").attr("y1", 0).attr("y2", boundedHeight).attr("stroke-dasharray", "5,3").attr("stroke-width", 2).style("opacity", 0);
-      tooltip.html("<div id=\"tt-header\"></div><p id=\"tt-body\"></p>");
-      var tooltipHeader = tooltip.select("#tt-header");
-      var tooltipBody = tooltip.select("#tt-body");
-    } catch (error) {
-      if (environment == "prod") {
-        if (queryResponse.fields.dimensions.length != queryResponse.fields.measures.length) {
-          this.addError({
-            title: "Data mismatch",
-            message: "This chart requires dimension/measure pairs."
-          });
-          return;
-        }
-      } else {
-        console.log(error);
-      } // Callback at the end of the rendering to let Looker know it's finished
+          // SCALES --------------------------------------------------------------
+          const y = d3.scaleBand().domain(data_keys.map((d)=>{
+            return d
+          })).range([height, 0]).padding(0.05)
+
+          const universalMax = d3.max([d3.max(positivesVolume,(d)=>{
+            return d.total
+          }),d3.max(negativesVolume,(d)=>{
+            return d.total
+          })])
+
+          const x = d3.scaleLinear().domain([0,universalMax]).range([0, (width/2)])
+          const xneg = d3.scaleLinear().domain([0,universalMax]).range([width/2,0])
+
+          const z = d3.scaleOrdinal().domain(["A", "B", "C", "F"]).range(["#27566b","#339f7b","#007b82","#f1cc56"])
 
 
-      done();
-    }
-  }
-};
+          // append the svg object to the body of the page
+          var svg = d3.select("#vis")
+          .select("svg")
+            .attr("width", w)
+            .attr("height", h)
+
+            const groupPos = svg.append('g')
+                .attr('transform', `translate(${(width/2) + margin.left}, ${margin.top})`)
+                .attr('width', (width/2 + "px"))
+                .attr('height', (height + "px"))
+                .attr("class","group-pos")
+
+            const groupNeg = svg.append('g')
+                .attr('transform', `translate(${margin.left}, ${margin.top})`)
+                .attr('width', (width/2 + "px"))
+                .attr('height', (height + "px"))
+                .attr("class","group-neg")
+
+            const posGroups = groupPos  
+                .selectAll(".bar-groups")
+                // Enter in the stack data = loop key per key = group per group
+                .data(stackedPositives)
+                .enter().append("g")
+                  .attr("class", "bar-groups")
+                  .attr("fill", function(d,i) { 
+                    return z(d.key)
+                    })
+
+            console.log("stackedNegatives", stackedNegatives)
+
+            const negGroups = groupNeg  
+                .selectAll(".bar-groups-neg")
+                // Enter in the stack data = loop key per key = group per group
+                .data(stackedNegatives)
+                .enter().append("g")
+                  .attr("class", "bar-groups-neg")
+                  .attr("fill", function(d,i) { 
+                    return z(d.key)
+                    })
+
+            posGroups
+                  .selectAll("rect")
+                  // enter a second time = loop subgroup per subgroup to add all rectangles
+                  .data(function(d) { return d; })
+                  .enter().append("rect")
+                    .attr("x", function(d) { 
+                      return x(d[0]); })
+                    .attr("y", function(d) { 
+                      return y(d.data.group); })
+                    .attr("height", function(d) { return y.bandwidth(); })
+                    .attr("width",function(d) { return x(d[1]) - x(d[0])})
+
+            negGroups
+                  .selectAll("rect")
+                  // enter a second time = loop subgroup per subgroup to add all rectangles
+                  .data(function(d) { return d; })
+                  .enter().append("rect")
+                    .attr("x", function(d) { 
+                      return ((width/2) - x(d[1])); })
+                      // return ((width/2) - margin.left - x(d[1])); })
+                    .attr("y", function(d) { 
+                      return y(d.data.group); })
+                    .attr("height", function(d) { return y.bandwidth(); })
+                    .attr("width",function(d) { return x(d[1]) - x(d[0])})
+
+            negGroups
+                  .selectAll("text")
+                  .data(function(d) {return d;})
+                  .enter().append('text')
+                      .text(d => d3.format(",.0f")(d[1] - d[0]))
+                      .attr("x", d => (width/2) - x(d[0] + (d[1]-d[0])/2))
+                      .attr("y", d => y(d.data.group) + y.bandwidth()/2)
+                      .style("text-anchor", "middle")
+                      .style("fill", "white")
+                      .style("font-size", "10px")
+
+
+        // AXES --------------------------------------------------------------
+        const xAxisGenerator = d3.axisTop()
+          .scale(x)
+          .tickPadding(10)
+          .tickSizeOuter(0)
+
+        const xAxisGeneratorNeg = d3.axisTop()
+          .scale(xneg)
+          .tickPadding(10)
+          .tickSizeOuter(0)
+
+        const yAxisGenerator = d3.axisLeft()
+          .scale(y)
+          .tickPadding(10)
+
+        const xAxisPos = groupPos.append("g")
+          .call(xAxisGenerator)
+          .attr("class", "x-axis")
+
+        const xAxisNeg = groupNeg.append("g")
+          .call(xAxisGeneratorNeg)
+          .attr("class", "x-axis")
+
+        const yAxis = groupNeg.append("g")
+          .call(yAxisGenerator)
+          .attr("class", "y-axis")
+
+        
+
+    done()
+  
+  } catch(error) {
+            
+        } 
+}
+}
+// EXTERNAL MODULE: ./node_modules/jquery/dist/jquery.js
+var jquery = __webpack_require__(0);
+
 // CONCATENATED MODULE: ./src/integration/template/template.js
 
 
 
- //'./sparklinesNew' ./hexmap conwinrate asp cycle
+ //asp './sparklinesNew' ./hexmap conwinrate asp cycle
 
  // Query the element
 
@@ -21195,30 +20958,30 @@ var template_w = 0;
 var h = 0;
 var this_environment = "dev";
 
-var template_done = function done() {
+var done = function done() {
   console.log("done");
 };
 
 var menuOptions = "<div id='menu'><h1><strong>Menu</strong></h1><div id='menu-options'></div></div></div>";
 jquery("body").append(menuOptions);
-var template_keys = Object.keys(cycle_object.options);
-console.log("object.options", cycle_object.options);
-console.log("Object", Object.keys(cycle_object.options));
+var template_keys = Object.keys(divergingBar_object.options);
+console.log("object.options", divergingBar_object.options);
+console.log("Object", Object.keys(divergingBar_object.options));
 console.log("keys", template_keys);
 template_keys.forEach(function (entry, i) {
-  var array_name = cycle_object.options[entry].label;
+  var array_name = divergingBar_object.options[entry].label;
   jquery("#menu-options").append("<p>" + array_name + "</p>");
   var form = jquery('<form>', {
     id: 'id-1',
     "class": 'menu-options-entry'
   }).appendTo('#menu-options'); // console.log("display", object.options[entry].display, ["radio","select"].includes(object.options[entry].display))
 
-  if (["radio", "select"].includes(cycle_object.options[entry].display)) {
-    var array_values = cycle_object.options[entry].values;
+  if (["radio", "select"].includes(divergingBar_object.options[entry].display)) {
+    var array_values = divergingBar_object.options[entry].values;
     array_values.forEach(function (ent) {
       var str;
 
-      if (ent[Object.keys(ent)[0]] == cycle_object.options[entry]["default"]) {
+      if (ent[Object.keys(ent)[0]] == divergingBar_object.options[entry]["default"]) {
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent[Object.keys(ent)] + "' id='" + Object.keys(ent)[0] + "' name='" + array_name + "' value='" + Object.keys(ent)[0] + "' checked></input><label class='form-label' for='" + Object.keys(ent)[0] + "'>" + Object.keys(ent)[0] + "</label>";
       } else {
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent[Object.keys(ent)] + "' id='" + Object.keys(ent)[0] + "' name='" + array_name + "' value='" + Object.keys(ent)[0] + "'></input><label class='form-label' for='" + Object.keys(ent)[0] + "'>" + Object.keys(ent)[0] + "</label>";
@@ -21226,22 +20989,22 @@ template_keys.forEach(function (entry, i) {
 
       form.append(str);
     });
-  } else if (cycle_object.options[entry].display == "number") {
+  } else if (divergingBar_object.options[entry].display == "number") {
     var str;
-    str = "<input type='number' internal_cat='" + template_keys[i] + "' internal_value='" + cycle_object.options[entry]["default"] + "' id='" + template_keys[i] + "' min='0' name='" + cycle_object.options[entry]["label"] + "' value='" + cycle_object.options[entry]["default"] + "'></input><label class='form-label' for='" + cycle_object.options[entry]["label"] + "'>" + cycle_object.options[entry]["label"] + "</label>";
+    str = "<input type='number' internal_cat='" + template_keys[i] + "' internal_value='" + divergingBar_object.options[entry]["default"] + "' id='" + template_keys[i] + "' min='0' name='" + divergingBar_object.options[entry]["label"] + "' value='" + divergingBar_object.options[entry]["default"] + "'></input><label class='form-label' for='" + divergingBar_object.options[entry]["label"] + "'>" + divergingBar_object.options[entry]["label"] + "</label>";
     form.append(str);
-  } else if (cycle_object.options[entry].display == "text") {
+  } else if (divergingBar_object.options[entry].display == "text") {
     var _str;
 
-    _str = "<input type='text' internal_cat='" + template_keys[i] + "' internal_value='" + cycle_object.options[entry]["default"] + "' id='" + template_keys[i] + "' name='" + cycle_object.options[entry]["label"] + "' value='" + cycle_object.options[entry]["default"] + "'></input><label class='form-label' for='" + cycle_object.options[entry]["label"] + "'>" + cycle_object.options[entry]["label"] + "</label>";
+    _str = "<input type='text' internal_cat='" + template_keys[i] + "' internal_value='" + divergingBar_object.options[entry]["default"] + "' id='" + template_keys[i] + "' name='" + divergingBar_object.options[entry]["label"] + "' value='" + divergingBar_object.options[entry]["default"] + "'></input><label class='form-label' for='" + divergingBar_object.options[entry]["label"] + "'>" + divergingBar_object.options[entry]["label"] + "</label>";
     form.append(_str);
-  } else if (cycle_object.options[entry].type == "boolean") {
+  } else if (divergingBar_object.options[entry].type == "boolean") {
     var _array_values = ["true", "false"];
 
     _array_values.forEach(function (ent) {
       var str;
 
-      if (ent == cycle_object.options[entry]["default"]) {
+      if (ent == divergingBar_object.options[entry]["default"]) {
         // console.log("adding default")
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent + "' id='" + template_keys[i] + "' name='" + array_name + "' value='" + ent + "' checked></input><label class='form-label' for ='" + ent + "'>" + ent + "</label>";
       } else {
@@ -21251,8 +21014,8 @@ template_keys.forEach(function (entry, i) {
 
       form.append(str);
     });
-  } else if (cycle_object.options[entry].type == "array") {
-    var _array_values2 = cycle_object.options[entry]["default"]; // console.log("array_values", array_values)
+  } else if (divergingBar_object.options[entry].type == "array") {
+    var _array_values2 = divergingBar_object.options[entry]["default"]; // console.log("array_values", array_values)
 
     _array_values2.forEach(function (ent) {
       var str; // console.log("ent", ent)
@@ -21267,8 +21030,8 @@ template_keys.forEach(function (entry, i) {
     });
   }
 });
-json("http://localhost:3001/dataCycleChart").then(function (data) {
-  //dataCycleChart dataConWinRate3 dataMCSmap2 dataSankey2 dataSparklineWorks dataSparklineIH
+json("http://localhost:3001/dataDivergingSimple").then(function (data) {
+  //dataASP dataDivergingSimple dataCycleChart dataConWinRate3 dataMCSmap2 dataSankey2 dataSparklineWorks dataSparklineIH
   var todays_options = {};
   jquery('input:radio:checked').each(function () {
     todays_options[this.attributes.internal_cat.value] = this.attributes.internal_value.value;
@@ -21287,26 +21050,26 @@ json("http://localhost:3001/dataCycleChart").then(function (data) {
 
   var details = ""; // Fire first instance of chart
 
-  cycle_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment); // On change to options, loop through selections and then redraw chart
+  divergingBar_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment); // On change to options, loop through selections and then redraw chart
 
   jquery('input:radio').on("click", function () {
     jquery('input:radio:checked').each(function () {
       todays_options[this.attributes.internal_cat.value] = this.attributes.internal_value.value;
     });
-    cycle_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    divergingBar_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
   });
   jquery('input[type=number]').on("input", function () {
     // const id = $('input[type=number]').attr("id")
     var id = this.attributes.id.value;
     var num = jquery("#" + id).val();
     todays_options[this.attributes.internal_cat.value] = num;
-    cycle_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    divergingBar_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
   });
   jquery('input[type=text]').on("input", function () {
     var id = this.attributes.id.value;
     var str = jquery("#" + id).val();
     todays_options[this.attributes.internal_cat.value] = str;
-    cycle_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    divergingBar_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
   }); // Handle the mousedown event
   // that's triggered when user drags the resizer
 
@@ -21336,7 +21099,7 @@ json("http://localhost:3001/dataCycleChart").then(function (data) {
     // Remove the handlers of `mousemove` and `mouseup`
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
-    cycle_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, template_done, this_environment);
+    divergingBar_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
   }; // Query all resizers
 
 
