@@ -100,7 +100,7 @@ keys.forEach(function(entry, i) {
 })
 
 
-d3.json("http://localhost:3001/dataDivergingSimple").then(function(data) { //dataASP dataDivergingSimple dataCycleChart dataConWinRate3 dataMCSmap2 dataSankey2 dataSparklineWorks dataSparklineIH
+d3.json("http://localhost:3001/dataStackedDiverging").then(function(data) { //dataASP dataDivergingSimple dataCycleChart dataConWinRate3 dataMCSmap2 dataSankey2 dataSparklineWorks dataSparklineIH
 	let todays_options = {}
 
 	$('input:radio:checked').each(function() {

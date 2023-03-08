@@ -3,7 +3,7 @@ import * as $ from 'jquery'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
 
-export const object = {
+looker.plugins.visualizations.add({
     id: "contract-win-rate",
     label: "ZDev Contract Win Rate",
     options: {
@@ -20,13 +20,13 @@ export const object = {
             label: "Left Measure Indices",
             display: "text",
             default: "",
-            section: "Setup ",
+            section: "Setup",
             order: 2
         },  
         left_negative: {
             type: "boolean",
-            label: "Are Left Values Negative",
-            default: "false",
+            label: "Left Values Are Negative",
+            default: false,
             section: "Setup",
             order: 3
         },
@@ -37,29 +37,22 @@ export const object = {
             default: "",
             section: "Axes",
             order: 1
-        },  
-        y_format: {
-            type: "string",
-            label: "Y Value Format",
-            display: "text",
-            default: ",.0f",
-            section: "Axes",
-            order: 2
-        },
+        },          
         left_margin: {
             type: "string",
             label: "Left Margin Width",
             display: "text",
             default: "120",
             section: "Axes",
-            order: 3
+            order: 2
         },
-        show_xlabel: {
-            type: "boolean",
-            label: "Show X Axis Label",
-            default: "false",
+        x_format: {
+            type: "string",
+            label: "X Value Format",
+            display: "text",
+            default: ",.0f",
             section: "Axes",
-            order: 4
+            order: 3
         },
         x_label: {
             type: "string",
@@ -67,7 +60,7 @@ export const object = {
             display: "text",
             default: "",
             section: "Axes",
-            order: 5
+            order: 4
         }
     },
 
@@ -328,7 +321,7 @@ export const object = {
 
         let data_left = []
         let leftSubgroups = []
-        let leftSign = config.left_negative == "true" ? 1 : -1
+        let leftSign = config.left_negative == true ? 1 : -1
 
         data.forEach((d) => {
             let entry = {}
@@ -425,7 +418,7 @@ export const object = {
             // .tickSizeInner(5)
             .tickSizeInner(-boundedHeight)
 
-        if (config.left_negative == "false") {
+        if (config.left_negative == false) {
             xAxisGenerator
                 .tickFormat(d => d3.format(",.2s")(Math.abs(d)))
         } else {
@@ -536,13 +529,11 @@ export const object = {
             .style("transform", "rotate(-90deg)")
             .text(config.y_label ? config.y_label : dimensions[0].label)
 
-        if (config.show_xlabel == "true"){
-            const xAxisLabel = xAxis.append("text")
-                .attr("class", "axis-label")
-                .attr("x", width/2)
-                .attr("y", (margin.bottom - 8))
-                .text(config.x_label)
-        }        
+        const xAxisLabel = xAxis.append("text")
+            .attr("class", "axis-label")
+            .attr("x", width/2)
+            .attr("y", (margin.bottom - 8))
+            .text(config.x_label)   
 
         // LEGEND --------------------------------------------------
         const colors = left_colors.reverse().concat(right_colors)
@@ -601,25 +592,6 @@ export const object = {
                 .text(measures[cols[i]].label_short)
         })
 
-        // legend.append("rect")
-        //     .attr("x", 0)
-        //     .attr("y", -5)
-        //     .attr("width", 8)
-        //     .attr("height", 8)
-        //     .attr("fill", colors[0])
-        //     .attr("fill-opacity", 1.0)
-
-        // legend.append("text")
-        //     .attr("x", 12)
-        //     .attr("y", 0)
-        //     .style("text-anchor", "start")
-        //     .style("dominant-baseline", "middle")
-        //     .style("font-size", 11)
-        //     .text(measures[cols[0]].label_short)
-    
-
-        
-
         // TOOLTIPS ---------------------------------------------------
         const tooltip = d3.select(".tooltip")
             .style("position", "absolute")
@@ -652,7 +624,7 @@ export const object = {
             const measureName = measures[measureIndex].label_short
 
             let valueSign;
-            if (measureSide == "left" && config.left_negative == "false") {
+            if (measureSide == "left" && config.left_negative == false) {
                 valueSign = -1;
             } else {
                 valueSign = 1;
@@ -670,7 +642,7 @@ export const object = {
             tooltipHeader.html(`${d.data.label}<hr>`)
             tooltipBody.html(
                 `<span style="float:left;">${measureName}:&nbsp&nbsp</span>` + 
-                `<span style="float:right;">${d3.format(config.y_format)(subgroupValue * valueSign)}</span><br>` + 
+                `<span style="float:right;">${d3.format(config.x_format)(subgroupValue * valueSign)}</span><br>` + 
                 `<span style="float:left;">% of Total:&nbsp&nbsp</span>` + 
                 `<span style="float:right;">${d3.format(",.1%")(subgroupValue / d.data[totalKey])}</span>`
             )
@@ -711,4 +683,4 @@ export const object = {
     done()
     }
     }
-}
+})

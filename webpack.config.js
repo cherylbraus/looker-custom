@@ -45,6 +45,7 @@ var webpackConfig = {
     // cycle: './src/integration/cycle/cycle.js',
     // linetest: './src/integration/line/line_test.js',
     // asp: './src/integration/ASP/asp.js',
+    divergingBar: './src/integration/divergingBar/divergingBar.js',
     template: './src/integration/template/template.js',
   },
   output: {
@@ -56,12 +57,12 @@ var webpackConfig = {
   resolve: {
     extensions: [".ts", ".js"]
   },
-  optimization: {
-    minimize: false
-  },
-  // plugins: [
-  //   new UglifyJSPlugin()
-  // ],
+  // optimization: {
+  //   minimize: false
+  // },
+  plugins: [
+    new UglifyJSPlugin()
+  ],
   module: {
     rules: [
       { test: /\.js$/, loader: "babel-loader" },
