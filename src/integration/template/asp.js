@@ -40,7 +40,7 @@ export const object = {
             type: "string",
             display: "text",
             label: "Price Request ID",
-            default: "80215373"
+            default: "80293709" //"80215373"
         },
         metric: {
             section: "Setup",
@@ -53,7 +53,7 @@ export const object = {
                 {"Cost Reduction Comparison": "costreduc"},
                 {"Averages & Distributions": "avgdist"}
             ],
-            default: "avgdist"
+            default: "twobid"
         },
         cost_reduce_amt: {
             section: "Setup",
@@ -190,13 +190,16 @@ export const object = {
             let bar_height_perc = 0.15
             let bar_height_perc_string = "18%";
 
-            if (!showDists) {
-                height_perc = 0.30
-                height_perc_string = "33%"
-            } else if (showDists) {
-                height_perc = 0.18
-                height_perc_string = "21%"
-            }
+            height_perc = 0.30
+            height_perc_string = "33%"
+
+            // if (!showDists) {
+            //     height_perc = 0.30
+            //     height_perc_string = "33%"
+            // } else if (showDists) {
+            //     height_perc = 0.18
+            //     height_perc_string = "21%"
+            // }
 
             const width = element.clientWidth - margin.left - margin.right;
             const height = (element.clientHeight * height_perc) - margin.top - margin.bottom;
@@ -237,40 +240,40 @@ export const object = {
                 .attr("transform", `translate(${margin.left}, ${margin.top})`) // + (height * 0.10)
                 .classed("group", true)
 
-            let svg4;
-            let group4;
-            let svg5;
-            let group5;
-            let heightDist = (element.clientHeight * bar_height_perc) - margin.top - margin.bottom;
-            if (showDists) {
-                svg4 = (
-                    d3.select(element).select("svg#fourth")
-                        .html('')
-                        .attr("width", "100%")
-                        .attr("height", bar_height_perc_string)
-                )
+            // let svg4;
+            // let group4;
+            // let svg5;
+            // let group5;
+            // let heightDist = (element.clientHeight * bar_height_perc) - margin.top - margin.bottom;
+            // if (showDists) {
+            //     svg4 = (
+            //         d3.select(element).select("svg#fourth")
+            //             .html('')
+            //             .attr("width", "100%")
+            //             .attr("height", bar_height_perc_string)
+            //     )
 
-                group4 = svg4.append("g")
-                    .attr("transform", `translate(${margin.left}, ${margin.top})`)
-                    .attr("group", true)
+            //     group4 = svg4.append("g")
+            //         .attr("transform", `translate(${margin.left}, ${margin.top})`)
+            //         .attr("group", true)
 
-                svg5 = (
-                    d3.select(element).select("svg#fifth")
-                        .html('')
-                        .attr("width", "100%")
-                        .attr("height", bar_height_perc_string)
-                )
+            //     svg5 = (
+            //         d3.select(element).select("svg#fifth")
+            //             .html('')
+            //             .attr("width", "100%")
+            //             .attr("height", bar_height_perc_string)
+            //     )
 
-                group5 = svg5.append("g")
-                    .attr("transform", `translate(${margin.left}, ${margin.top})`)
-                    .attr("group", true)
-            } else if (!showDists) {
-                d3.select(element).select("svg#fourth")
-                    .html('')
+            //     group5 = svg5.append("g")
+            //         .attr("transform", `translate(${margin.left}, ${margin.top})`)
+            //         .attr("group", true)
+            // } else if (!showDists) {
+            //     d3.select(element).select("svg#fourth")
+            //         .html('')
                 
-                d3.select(element).select("svg#fifth")
-                    .html('')
-            }
+            //     d3.select(element).select("svg#fifth")
+            //         .html('')
+            // }
 
             // DATA SETUP -------------------------------------------------------------------
             var parseTimeDay = d3.timeParse("%Y-%m-%d");
@@ -293,12 +296,14 @@ export const object = {
                 // entry["expected_margin_dollars_with_appetite"] = +d["expected_margin_dollars_with_appetite"]                
                 // entry["margin_dollars_no_appetite"] = +d["margin_dollars_no_appetite"]
                 // entry["margin_dollars_with_appetite"] = +d["margin_dollars_with_appetite"]
-                
-                entry["cost"] = (+d["bid_to_dat"] * +d["dat_rate"]) - +d["margin_dollars"]
-                entry["cost_to_dat"] = +entry["cost"] / +d["dat_rate"]
+
+                entry["cost"] = (+entry["bid_to_dat"] * +entry["dat_rate"]) - +entry["margin_dollars"]
+                entry["cost_to_dat"] = +entry["cost"] / +entry["dat_rate"]
 
                 data_ready.push(entry)
             })
+
+            console.log("data_ready first", data_ready)
 
             const idAccessor = d => d.event_price_request_id;
             const shipperAccessor = d => d.shipper_id;
@@ -466,7 +471,7 @@ export const object = {
                     .style("font-size", "11px")
                     .style("font-family", "Roboto")
 
-            if (!showDists) {
+            // if (!showDists) {
                 const yBidLine1 = group1
                     .append("line")
                         .style("stroke-dasharray", "5,3")
@@ -487,13 +492,13 @@ export const object = {
                         .style("font-size", "11px")
                         .style("font-family", "Roboto")
                         .style("dominant-baseline", "middle")
-            } 
+            // } 
 
             if (showDists) {
                 const xCostLine1 = group1
                     .append("line")
                         .style("stroke-dasharray", "5,3")
-                        .style("stroke", "#3a4245")
+                        .style("stroke", "#007B82") //3a4245
                         .style("stroke-width", 1.)
                         .attr("x1", xScale(dataBidYes[0].cost_to_dat))
                         .attr("x2", xScale(dataBidYes[0].cost_to_dat))
@@ -506,7 +511,7 @@ export const object = {
                         .attr("x", xScale(dataBidYes[0].cost_to_dat))
                         .attr("y", yScale1(yScale1.domain()[0]) + 17)
                         .attr("text-anchor", "middle")
-                        .style("fill", "#3a4245")
+                        .style("fill", "#007B82") //3a4245
                         .style("font-size", "11px")
                         .style("font-family", "Roboto")
 
@@ -527,7 +532,7 @@ export const object = {
                         .attr("x", yScale1(yScale1.domain()[1]) + 8)
                         .attr("y", xScale(dataBidYes[0].cost_to_dat) + 3)
                         .attr("text-anchor", "start")
-                        .style("fill", "#3a4245")
+                        .style("fill", "#007B82") //3a4245
                         .style("font-size", "10px")
                         .style("font-family", "Roboto")
                         .attr("transform", `rotate(-90)`)
@@ -732,7 +737,7 @@ export const object = {
                     .style("font-size", "11px")
                     .style("font-family", "Roboto")
 
-            if (!showDists) {
+            // if (!showDists) {
                 const yBidLine2 = group2
                     .append("line")
                         .style("stroke-dasharray", "5,3")
@@ -753,13 +758,13 @@ export const object = {
                         .style("font-size", "11px")
                         .style("font-family", "Roboto")
                         .style("dominant-baseline", "middle")
-            }
+            // }
 
             if (showDists) {
                 const xCostLine2 = group2
                     .append("line")
                         .style("stroke-dasharray", "5,3")
-                        .style("stroke", "#3a4245")
+                        .style("stroke", "#007B82") //3a4245
                         .style("stroke-width", 1.)
                         .attr("x1", xScale(dataBidYes[0].cost_to_dat))
                         .attr("x2", xScale(dataBidYes[0].cost_to_dat))
@@ -772,7 +777,7 @@ export const object = {
                         .attr("x", xScale(dataBidYes[0].cost_to_dat))
                         .attr("y", yScale2(yScale2.domain()[0]) + 17)
                         .attr("text-anchor", "middle")
-                        .style("fill", "#3a4245")
+                        .style("fill", "#007B82") //3a4245
                         .style("font-size", "11px")
                         .style("font-family", "Roboto")
 
@@ -793,7 +798,7 @@ export const object = {
                         .attr("x", yScale2(yScale2.domain()[1]) + 8)
                         .attr("y", xScale(dataBidYes[0].cost_to_dat) + 3)
                         .attr("text-anchor", "start")
-                        .style("fill", "#3a4245")
+                        .style("fill", "#007B82") //3a4245
                         .style("font-size", "10px")
                         .style("font-family", "Roboto")
                         .attr("transform", `rotate(-90)`)
@@ -1016,7 +1021,7 @@ export const object = {
                     .style("font-size", "12px")
                     .style("font-family", "Roboto")
 
-            if (!showDists) {
+            // if (!showDists) {
                 const yBidLine3 = group3
                     .append("line")
                         .style("stroke-dasharray", "5,3")
@@ -1037,13 +1042,13 @@ export const object = {
                         .style("font-size", "11px")
                         .style("font-family", "Roboto")
                         .style("dominant-baseline", "middle")
-            }
+            // }
 
             if (showDists) {
                 const xCostLine3 = group3
                     .append("line")
                         .style("stroke-dasharray", "5,3")
-                        .style("stroke", "#3a4245")
+                        .style("stroke", "#007B82") //3a4245
                         .style("stroke-width", 1.)
                         .attr("x1", xScale(dataBidYes[0].cost_to_dat))
                         .attr("x2", xScale(dataBidYes[0].cost_to_dat))
@@ -1056,7 +1061,7 @@ export const object = {
                         .attr("x", xScale(dataBidYes[0].cost_to_dat))
                         .attr("y", yScale3(yScale3.domain()[0]) + 17)
                         .attr("text-anchor", "middle")
-                        .style("fill", "#3a4245")
+                        .style("fill", "#007B82") //3a4245
                         .style("font-size", "11px")
                         .style("font-family", "Roboto")
 
@@ -1077,7 +1082,7 @@ export const object = {
                         .attr("x", yScale3(yScale3.domain()[1]) + 8)
                         .attr("y", xScale(dataBidYes[0].cost_to_dat) + 3)
                         .attr("text-anchor", "start")
-                        .style("fill", "#3a4245")
+                        .style("fill", "#007B82") //3a4245
                         .style("font-size", "10px")
                         .style("font-family", "Roboto")
                         .attr("transform", `rotate(-90)`)
@@ -1209,15 +1214,33 @@ export const object = {
 
             tooltipBid.html(`<div id="tt-body"></div>`)
             const tooltipBidBody = tooltipBid.select("#tt-body")
-            tooltipBidBody.html(
-                `<span style="float:left;"><b>Optimal Bid</b></span><br>` + 
-                `<span style="float:left;">Ratio to DAT:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(dataBidYes[0].bid_to_dat)}</span><br>` + 
-                `<span style="float:left;">Win Probability:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(dataBidYes[0].pwin)}</span><br>` + 
-                `<span style="float:left;">Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(dataBidYes[0].margin_dollars)}</span><br>` + 
-                `<span style="float:left;">Expected Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(dataBidYes[0].expected_margin_dollars)}</span>` 
-            )
 
-            tooltipBid.style("left", width - 110 + "px")
+            if (!showDists) {
+                tooltipBidBody.html(
+                    `<span style="float:left;"><b>Optimal Bid</b></span><br>` + 
+                    `<span style="float:left;">Ratio to DAT:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(dataBidYes[0].bid_to_dat)}</span><br>` + 
+                    `<span style="float:left;">Win Probability:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(dataBidYes[0].pwin)}</span><br>` + 
+                    `<span style="float:left;">Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(dataBidYes[0].margin_dollars)}</span><br>` + 
+                    `<span style="float:left;">Expected Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(dataBidYes[0].expected_margin_dollars)}</span>` 
+                )    
+            } else if (showDists) {
+                tooltipBidBody.html(
+                    `<span style="float:left;"><b>Optimal Bid</b></span><br>` + 
+                    `<span style="float:left;">Ratio to DAT:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(dataBidYes[0].bid_to_dat)}</span><br>` + 
+                    `<span style="float:left;">Win Probability:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(dataBidYes[0].pwin)}</span><br>` + 
+                    `<span style="float:left;">Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(dataBidYes[0].margin_dollars)}</span><br>` + 
+                    `<span style="float:left;">Expected Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(dataBidYes[0].expected_margin_dollars)}</span><br>` +
+                    `<span style="float:left;color:#007B82;">Cost to DAT:&nbsp&nbsp</span>` + `<span style="float:right;color:#007B82;">${d3.format(",.0%")(dataBidYes[0].cost_to_dat)}</span>`
+                )    
+            }
+            
+            let position;
+            if (!showDists) {
+                position = -120
+            } else {
+                position = 25
+            }
+            tooltipBid.style("left", width + position + "px")
             tooltipBid.style("top", 5 + "px")
 
             let tooltipFocus;
@@ -1256,7 +1279,8 @@ export const object = {
                     `<span style="float:left;">Ratio to DAT:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(dataBidYesCR[0].bid_to_dat)}</span><br>` + 
                     `<span style="float:left;">Win Probability:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format(",.0%")(dataBidYesCR[0].pwin)}</span><br>` + 
                     `<span style="float:left;">Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(dataBidYesCR[0].margin_dollars_adj)}</span><br>` + 
-                    `<span style="float:left;">Expected Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(dataBidYesCR[0].expected_margin_dollars_adj)}</span>` 
+                    `<span style="float:left;">Expected Margin:&nbsp&nbsp</span>` + `<span style="float:right;">${d3.format("$,.0f")(dataBidYesCR[0].expected_margin_dollars_adj)}</span><br>` + 
+                    `<span style="float:left;">Cost Reduction:&nbsp&nbsp</span>` + `<span style="float:right;">$${config.cost_reduce_amt}</span>`
                 )
 
                 tooltipCR.style("left", width + 25 + "px")
@@ -1276,8 +1300,8 @@ export const object = {
 
                 tooltipComp.html(`<div id="tt-body"></div>`)
                 tooltipCompBody = tooltipComp.select("#tt-body")
-                tooltipComp.style("left", width - 110 + "px")
-                tooltipComp.style("top", 100 + "px")
+                tooltipComp.style("left", width - 120 + "px")
+                tooltipComp.style("top", 105 + "px")
             } else if (showCostReduc) {
                 tooltipComp = d3.select(".tooltip3")
                     .style("position", "absolute")
@@ -1313,358 +1337,363 @@ export const object = {
                     `<span style="color:#007b82;">${d3.format("$,.1f")(dataBidYesCR[0].expected_margin_dollars_adj)}</span>` + ")</div>" 
                 )
 
-                tooltipComp.style("left", width - 110 + "px")
-                tooltipComp.style("top", 100 + "px")
+                tooltipComp.style("left", width - 120 + "px")
+                tooltipComp.style("top", 105 + "px")
+            } 
+
+            if (showDists) {
+                d3.select(".tooltip2").html('')
+                d3.select(".tooltip3").html('')
             }
 
             // ----------------------------------------------------------------
             // DISTRIBUTION BAR CHARTS #1/2
-            if (showDists) {
-                // setup the data
-                const dataDist = data_ready.filter(function(d) {
-                    return (d.event_price_request_id != config.pr_id && +d.bid_to_dat >= +xmin && d.bid_to_dat <= +xmax && d.bid_made_at_this_level == "True")
-                })
+            // if (showDists) {
+            //     // setup the data
+            //     const dataDist = data_ready.filter(function(d) {
+            //         return (d.event_price_request_id != config.pr_id && +d.bid_to_dat >= +xmin && d.bid_to_dat <= +xmax && d.bid_made_at_this_level == "True")
+            //     })
 
-                dataDist.forEach((d, i) => {
-                    d["bidtodatCat"] = Math.floor(d.bid_to_dat * 10) / 10
-                    d["costtodatCat"] = Math.floor(d.cost_to_dat * 10) / 10
-                })
+            //     dataDist.forEach((d, i) => {
+            //         d["bidtodatCat"] = Math.floor(d.bid_to_dat * 10) / 10
+            //         d["costtodatCat"] = Math.floor(d.cost_to_dat * 10) / 10
+            //     })
 
-                console.log("dataDist", dataDist)
+            //     console.log("dataDist", dataDist)
 
-                // FIRST HISTOGRAM
-                const bidHist = d3.histogram()
-                    .value(function(d) { return d.bid_to_dat})
-                    .domain(xScale.domain())
-                    .thresholds(xScale.ticks(5))
-                    // .thresholds(10)
+            //     // FIRST HISTOGRAM
+            //     const bidHist = d3.histogram()
+            //         .value(function(d) { return d.bid_to_dat})
+            //         .domain(xScale.domain())
+            //         .thresholds(xScale.ticks(5))
+            //         // .thresholds(10)
 
-                console.log("xticks", xScale.ticks(10))
+            //     console.log("xticks", xScale.ticks(10))
 
-                const binsBid = bidHist(dataDist)
+            //     const binsBid = bidHist(dataDist)
 
-                //Axes
-                const xAxisGeneratorDist = d3.axisBottom() 
-                    .scale(xScale)
-                    .tickFormat(d3.format(",.0%"))
-                    .tickPadding(10)
-                    .tickSize(0)
-                    // .ticks(10)
+            //     //Axes
+            //     const xAxisGeneratorDist = d3.axisBottom() 
+            //         .scale(xScale)
+            //         .tickFormat(d3.format(",.0%"))
+            //         .tickPadding(10)
+            //         .tickSize(0)
+            //         // .ticks(10)
 
-                const xAxis4 = group4
-                    .append("g")
-                    .call(xAxisGeneratorDist)
-                        .style("transform", `translateY(${heightDist}px)`)
-                        .attr("class", "x-axis")
+            //     const xAxis4 = group4
+            //         .append("g")
+            //         .call(xAxisGeneratorDist)
+            //             .style("transform", `translateY(${heightDist}px)`)
+            //             .attr("class", "x-axis")
 
-                const yScale4 = d3.scaleLinear()
-                    .range([heightDist, 0])
-                    .domain([0, d3.max(binsBid, function(d) {
-                        return d.length;
-                    })])
+            //     const yScale4 = d3.scaleLinear()
+            //         .range([heightDist, 0])
+            //         .domain([0, d3.max(binsBid, function(d) {
+            //             return d.length;
+            //         })])
 
-                const yAxisGenerator4 = d3.axisLeft()
-                    .scale(yScale4)
-                    .tickFormat(d3.format(",.1f"))
-                    .tickSize(0)
-                    .tickPadding(10)
-                    .ticks(3)
+            //     const yAxisGenerator4 = d3.axisLeft()
+            //         .scale(yScale4)
+            //         .tickFormat(d3.format(",.1f"))
+            //         .tickSize(0)
+            //         .tickPadding(10)
+            //         .ticks(3)
 
-                const yAxis4 = group4   
-                    .append("g")
-                    .call(yAxisGenerator4)
-                        .attr("class", "y-axis")
+            //     const yAxis4 = group4   
+            //         .append("g")
+            //         .call(yAxisGenerator4)
+            //             .attr("class", "y-axis")
 
-                const xAxisText4 = group4
-                    .append("text")
-                        .text("Bid to DAT Ratio")
-                        .attr("y", yScale4(yScale4.domain()[0]) + 40)
-                        .attr("text-anchor", "start")
-                        .style("fill", "#3a4245")
-                        .style("font-size", "12px")
-                        .style("font-family", "Roboto")
+            //     const xAxisText4 = group4
+            //         .append("text")
+            //             .text("Bid to DAT Ratio")
+            //             .attr("y", yScale4(yScale4.domain()[0]) + 40)
+            //             .attr("text-anchor", "start")
+            //             .style("fill", "#3a4245")
+            //             .style("font-size", "12px")
+            //             .style("font-family", "Roboto")
 
-                const yAxisText4 = group4
-                    .append("text")
-                        .text("# Shipments")
-                        .attr("y", yScale4(yScale4.domain()[1]) - 70)
-                        .attr("text-anchor", "end")
-                        .style("fill", "#3a4245")
-                        .style("font-size", "12px")
-                        .style("font-family", "Roboto")
-                        .attr("transform", `rotate(-90)`)
+            //     const yAxisText4 = group4
+            //         .append("text")
+            //             .text("# Shipments")
+            //             .attr("y", yScale4(yScale4.domain()[1]) - 70)
+            //             .attr("text-anchor", "end")
+            //             .style("fill", "#3a4245")
+            //             .style("font-size", "12px")
+            //             .style("font-family", "Roboto")
+            //             .attr("transform", `rotate(-90)`)
 
-                const bidHistChart = group4.selectAll("rect")
-                    .data(binsBid)
-                    .enter()
-                    .append("rect")
-                        .attr("x", 1)
-                        .attr("transform", function(d) { return `translate(${xScale(d.x0)},${yScale4(d.length)})`})
-                        .attr("width", function(d) { 
-                            return d.x1 - d.x0 > 0 ? xScale(d.x1) - xScale(d.x0) - 1 : xScale(d.x1) - xScale(d.x0)})
-                        .attr("height", function(d) { return heightDist - yScale4(d.length)})
-                        .style("fill", "#007B82")
+            //     const bidHistChart = group4.selectAll("rect")
+            //         .data(binsBid)
+            //         .enter()
+            //         .append("rect")
+            //             .attr("x", 1)
+            //             .attr("transform", function(d) { return `translate(${xScale(d.x0)},${yScale4(d.length)})`})
+            //             .attr("width", function(d) { 
+            //                 return d.x1 - d.x0 > 0 ? xScale(d.x1) - xScale(d.x0) - 1 : xScale(d.x1) - xScale(d.x0)})
+            //             .attr("height", function(d) { return heightDist - yScale4(d.length)})
+            //             .style("fill", "#007B82")
 
-                // add average bid lines to first three charts
-                const avgBid = dataDist.reduce((a, { bid_to_dat }) => a + bid_to_dat, 0) / dataDist.length;
-                console.log("avgBid", avgBid)
+            //     // add average bid lines to first three charts
+            //     const avgBid = dataDist.reduce((a, { bid_to_dat }) => a + bid_to_dat, 0) / dataDist.length;
+            //     console.log("avgBid", avgBid)
 
-                const xBidLine41 = group1
-                    .append("line")
-                        .style("stroke-dasharray", "5,3")
-                        .style("stroke", "#007B82")
-                        .style("stroke-width", 1.)
-                        .attr("x1", xScale(avgBid))
-                        .attr("x2", xScale(avgBid))
-                        .attr("y1", yScale1(yScale1.domain()[1]) - 5)
-                        .attr("y2", yScale1(yScale1.domain()[0]))
+            //     const xBidLine41 = group1
+            //         .append("line")
+            //             .style("stroke-dasharray", "5,3")
+            //             .style("stroke", "#007B82")
+            //             .style("stroke-width", 1.)
+            //             .attr("x1", xScale(avgBid))
+            //             .attr("x2", xScale(avgBid))
+            //             .attr("y1", yScale1(yScale1.domain()[1]) - 5)
+            //             .attr("y2", yScale1(yScale1.domain()[0]))
 
-                const xBidText41 = group1
-                    .append("text")
-                        .text(d3.format(",.0%")(avgBid))
-                        .attr("x", xScale(avgBid))
-                        .attr("y", yScale1(yScale1.domain()[0]) + 17)
-                        .attr("text-anchor", "middle")
-                        .style("fill", "#007B82")
-                        .style("font-size", "11px")
-                        .style("font-family", "Roboto")
+            //     const xBidText41 = group1
+            //         .append("text")
+            //             .text(d3.format(",.0%")(avgBid))
+            //             .attr("x", xScale(avgBid))
+            //             .attr("y", yScale1(yScale1.domain()[0]) + 17)
+            //             .attr("text-anchor", "middle")
+            //             .style("fill", "#007B82")
+            //             .style("font-size", "11px")
+            //             .style("font-family", "Roboto")
 
-                const xBidLineLabel41 = group1
-                    .append("text")
-                        .text("Bid")
-                        .attr("x", yScale1(yScale1.domain()[1]) + 8)
-                        .attr("y", xScale(avgBid) + 3)
-                        .attr("text-anchor", "start")
-                        .style("fill", "#007B82")
-                        .style("font-size", "10px")
-                        .style("font-family", "Roboto")
-                        .attr("transform", `rotate(-90)`)
+            //     const xBidLineLabel41 = group1
+            //         .append("text")
+            //             .text("Bid")
+            //             .attr("x", yScale1(yScale1.domain()[1]) + 8)
+            //             .attr("y", xScale(avgBid) + 3)
+            //             .attr("text-anchor", "start")
+            //             .style("fill", "#007B82")
+            //             .style("font-size", "10px")
+            //             .style("font-family", "Roboto")
+            //             .attr("transform", `rotate(-90)`)
 
-                const xBidLine42 = group2
-                    .append("line")
-                        .style("stroke-dasharray", "5,3")
-                        .style("stroke", "#007B82")
-                        .style("stroke-width", 1.)
-                        .attr("x1", xScale(avgBid))
-                        .attr("x2", xScale(avgBid))
-                        .attr("y1", yScale2(yScale2.domain()[1]) - 5)
-                        .attr("y2", yScale2(yScale2.domain()[0]))
+            //     const xBidLine42 = group2
+            //         .append("line")
+            //             .style("stroke-dasharray", "5,3")
+            //             .style("stroke", "#007B82")
+            //             .style("stroke-width", 1.)
+            //             .attr("x1", xScale(avgBid))
+            //             .attr("x2", xScale(avgBid))
+            //             .attr("y1", yScale2(yScale2.domain()[1]) - 5)
+            //             .attr("y2", yScale2(yScale2.domain()[0]))
 
-                const xBidText42 = group2
-                    .append("text")
-                        .text(d3.format(",.0%")(avgBid))
-                        .attr("x", xScale(avgBid))
-                        .attr("y", yScale2(yScale2.domain()[0]) + 17)
-                        .attr("text-anchor", "middle")
-                        .style("fill", "#007B82")
-                        .style("font-size", "11px")
-                        .style("font-family", "Roboto")
+            //     const xBidText42 = group2
+            //         .append("text")
+            //             .text(d3.format(",.0%")(avgBid))
+            //             .attr("x", xScale(avgBid))
+            //             .attr("y", yScale2(yScale2.domain()[0]) + 17)
+            //             .attr("text-anchor", "middle")
+            //             .style("fill", "#007B82")
+            //             .style("font-size", "11px")
+            //             .style("font-family", "Roboto")
 
-                const xBidLineLabel42 = group2
-                    .append("text")
-                        .text("Bid")
-                        .attr("x", yScale2(yScale2.domain()[1]) + 8)
-                        .attr("y", xScale(avgBid) + 3)
-                        .attr("text-anchor", "start")
-                        .style("fill", "#007B82")
-                        .style("font-size", "10px")
-                        .style("font-family", "Roboto")
-                        .attr("transform", `rotate(-90)`)
+            //     const xBidLineLabel42 = group2
+            //         .append("text")
+            //             .text("Bid")
+            //             .attr("x", yScale2(yScale2.domain()[1]) + 8)
+            //             .attr("y", xScale(avgBid) + 3)
+            //             .attr("text-anchor", "start")
+            //             .style("fill", "#007B82")
+            //             .style("font-size", "10px")
+            //             .style("font-family", "Roboto")
+            //             .attr("transform", `rotate(-90)`)
 
-                const xBidLine43 = group3
-                    .append("line")
-                        .style("stroke-dasharray", "5,3")
-                        .style("stroke", "#007B82")
-                        .style("stroke-width", 1.)
-                        .attr("x1", xScale(avgBid))
-                        .attr("x2", xScale(avgBid))
-                        .attr("y1", yScale3(yScale3.domain()[1]) - 5)
-                        .attr("y2", yScale3(yScale3.domain()[0]))
+            //     const xBidLine43 = group3
+            //         .append("line")
+            //             .style("stroke-dasharray", "5,3")
+            //             .style("stroke", "#007B82")
+            //             .style("stroke-width", 1.)
+            //             .attr("x1", xScale(avgBid))
+            //             .attr("x2", xScale(avgBid))
+            //             .attr("y1", yScale3(yScale3.domain()[1]) - 5)
+            //             .attr("y2", yScale3(yScale3.domain()[0]))
 
-                const xBidText43 = group3
-                    .append("text")
-                        .text(d3.format(",.0%")(avgBid))
-                        .attr("x", xScale(avgBid))
-                        .attr("y", yScale3(yScale3.domain()[0]) + 17)
-                        .attr("text-anchor", "middle")
-                        .style("fill", "#007B82")
-                        .style("font-size", "11px")
-                        .style("font-family", "Roboto")
+            //     const xBidText43 = group3
+            //         .append("text")
+            //             .text(d3.format(",.0%")(avgBid))
+            //             .attr("x", xScale(avgBid))
+            //             .attr("y", yScale3(yScale3.domain()[0]) + 17)
+            //             .attr("text-anchor", "middle")
+            //             .style("fill", "#007B82")
+            //             .style("font-size", "11px")
+            //             .style("font-family", "Roboto")
 
-                const xBidLineLabel43 = group3
-                    .append("text")
-                        .text("Bid")
-                        .attr("x", yScale3(yScale3.domain()[1]) + 8)
-                        .attr("y", xScale(avgBid) + 3)
-                        .attr("text-anchor", "start")
-                        .style("fill", "#007B82")
-                        .style("font-size", "10px")
-                        .style("font-family", "Roboto")
-                        .attr("transform", `rotate(-90)`)
+            //     const xBidLineLabel43 = group3
+            //         .append("text")
+            //             .text("Bid")
+            //             .attr("x", yScale3(yScale3.domain()[1]) + 8)
+            //             .attr("y", xScale(avgBid) + 3)
+            //             .attr("text-anchor", "start")
+            //             .style("fill", "#007B82")
+            //             .style("font-size", "10px")
+            //             .style("font-family", "Roboto")
+            //             .attr("transform", `rotate(-90)`)
 
-                // ---------------------------------------
-                // SECOND HISTOGRAM
-                const costHist = d3.histogram()
-                    .value(function(d) { return d.cost_to_dat})
-                    .domain(xScale.domain())
-                    .thresholds(xScale.ticks(5))
-                    // .thresholds(10)
+            //     // ---------------------------------------
+            //     // SECOND HISTOGRAM
+            //     const costHist = d3.histogram()
+            //         .value(function(d) { return d.cost_to_dat})
+            //         .domain(xScale.domain())
+            //         .thresholds(xScale.ticks(5))
+            //         // .thresholds(10)
 
-                const binsCost = costHist(dataDist)
+            //     const binsCost = costHist(dataDist)
 
-                //Axes
-                const xAxis5 = group5
-                    .append("g")
-                    .call(xAxisGeneratorDist)
-                        .style("transform", `translateY(${heightDist}px)`)
-                        .attr("class", "x-axis")
+            //     //Axes
+            //     const xAxis5 = group5
+            //         .append("g")
+            //         .call(xAxisGeneratorDist)
+            //             .style("transform", `translateY(${heightDist}px)`)
+            //             .attr("class", "x-axis")
 
-                const yScale5 = d3.scaleLinear()
-                    .range([heightDist, 0])
-                    .domain([0, d3.max(binsCost, function(d) {
-                        return d.length;
-                    })])
+            //     const yScale5 = d3.scaleLinear()
+            //         .range([heightDist, 0])
+            //         .domain([0, d3.max(binsCost, function(d) {
+            //             return d.length;
+            //         })])
 
-                const yAxisGenerator5 = d3.axisLeft()
-                    .scale(yScale5)
-                    .tickFormat(d3.format(",.1f"))
-                    .tickSize(0)
-                    .tickPadding(10)
-                    .ticks(3)
+            //     const yAxisGenerator5 = d3.axisLeft()
+            //         .scale(yScale5)
+            //         .tickFormat(d3.format(",.1f"))
+            //         .tickSize(0)
+            //         .tickPadding(10)
+            //         .ticks(3)
 
-                const yAxis5 = group5
-                    .append("g")
-                    .call(yAxisGenerator5)
-                        .attr("class", "y-axis")
+            //     const yAxis5 = group5
+            //         .append("g")
+            //         .call(yAxisGenerator5)
+            //             .attr("class", "y-axis")
 
-                const xAxisText5 = group5
-                    .append("text")
-                        .text("Cost to DAT Ratio")
-                        .attr("y", yScale5(yScale5.domain()[0]) + 40)
-                        .attr("text-anchor", "start")
-                        .style("fill", "#3a4245")
-                        .style("font-size", "12px")
-                        .style("font-family", "Roboto")
+            //     const xAxisText5 = group5
+            //         .append("text")
+            //             .text("Cost to DAT Ratio")
+            //             .attr("y", yScale5(yScale5.domain()[0]) + 40)
+            //             .attr("text-anchor", "start")
+            //             .style("fill", "#3a4245")
+            //             .style("font-size", "12px")
+            //             .style("font-family", "Roboto")
 
-                const yAxisText5 = group5
-                    .append("text")
-                        .text("# Shipments")
-                        .attr("y", yScale5(yScale5.domain()[1]) - 70)
-                        .attr("text-anchor", "end")
-                        .style("fill", "#3a4245")
-                        .style("font-size", "12px")
-                        .style("font-family", "Roboto")
-                        .attr("transform", `rotate(-90)`)
+            //     const yAxisText5 = group5
+            //         .append("text")
+            //             .text("# Shipments")
+            //             .attr("y", yScale5(yScale5.domain()[1]) - 70)
+            //             .attr("text-anchor", "end")
+            //             .style("fill", "#3a4245")
+            //             .style("font-size", "12px")
+            //             .style("font-family", "Roboto")
+            //             .attr("transform", `rotate(-90)`)
 
-                const costHistChart = group5.selectAll("rect")
-                    .data(binsCost)
-                    .enter()
-                    .append("rect")
-                        .attr("x", 1)
-                        .attr("transform", function(d) { return `translate(${xScale(d.x0)},${yScale5(d.length)})`})
-                        .attr("width", function(d) { 
-                            return d.x1 - d.x0 > 0 ? xScale(d.x1) - xScale(d.x0) - 1 : xScale(d.x1) - xScale(d.x0)})
-                        .attr("height", function(d) { return heightDist - yScale5(d.length)})
-                        .style("fill", "#007B82")
+            //     const costHistChart = group5.selectAll("rect")
+            //         .data(binsCost)
+            //         .enter()
+            //         .append("rect")
+            //             .attr("x", 1)
+            //             .attr("transform", function(d) { return `translate(${xScale(d.x0)},${yScale5(d.length)})`})
+            //             .attr("width", function(d) { 
+            //                 return d.x1 - d.x0 > 0 ? xScale(d.x1) - xScale(d.x0) - 1 : xScale(d.x1) - xScale(d.x0)})
+            //             .attr("height", function(d) { return heightDist - yScale5(d.length)})
+            //             .style("fill", "#007B82")
 
-                // add average bid lines to first three charts
-                const avgCost = dataDist.reduce((a, { cost_to_dat }) => a + cost_to_dat, 0) / dataDist.length;
-                console.log("avgCost", avgCost)
+            //     // add average bid lines to first three charts
+            //     const avgCost = dataDist.reduce((a, { cost_to_dat }) => a + cost_to_dat, 0) / dataDist.length;
+            //     console.log("avgCost", avgCost)
 
-                const xCostLine41 = group1
-                    .append("line")
-                        .style("stroke-dasharray", "5,3")
-                        .style("stroke", "#007B82")
-                        .style("stroke-width", 1.)
-                        .attr("x1", xScale(avgCost))
-                        .attr("x2", xScale(avgCost))
-                        .attr("y1", yScale1(yScale1.domain()[1]) - 5)
-                        .attr("y2", yScale1(yScale1.domain()[0]))
+            //     const xCostLine41 = group1
+            //         .append("line")
+            //             .style("stroke-dasharray", "5,3")
+            //             .style("stroke", "#007B82")
+            //             .style("stroke-width", 1.)
+            //             .attr("x1", xScale(avgCost))
+            //             .attr("x2", xScale(avgCost))
+            //             .attr("y1", yScale1(yScale1.domain()[1]) - 5)
+            //             .attr("y2", yScale1(yScale1.domain()[0]))
 
-                const xCostText41 = group1
-                    .append("text")
-                        .text(d3.format(",.0%")(avgCost))
-                        .attr("x", xScale(avgCost))
-                        .attr("y", yScale1(yScale1.domain()[0]) + 17)
-                        .attr("text-anchor", "middle")
-                        .style("fill", "#007B82")
-                        .style("font-size", "11px")
-                        .style("font-family", "Roboto")
+            //     const xCostText41 = group1
+            //         .append("text")
+            //             .text(d3.format(",.0%")(avgCost))
+            //             .attr("x", xScale(avgCost))
+            //             .attr("y", yScale1(yScale1.domain()[0]) + 17)
+            //             .attr("text-anchor", "middle")
+            //             .style("fill", "#007B82")
+            //             .style("font-size", "11px")
+            //             .style("font-family", "Roboto")
 
-                const xCostLineLabel41 = group1
-                    .append("text")
-                        .text("Cost")
-                        .attr("x", yScale1(yScale1.domain()[1]) + 8)
-                        .attr("y", xScale(avgCost) + 3)
-                        .attr("text-anchor", "start")
-                        .style("fill", "#007B82")
-                        .style("font-size", "10px")
-                        .style("font-family", "Roboto")
-                        .attr("transform", `rotate(-90)`)
+            //     const xCostLineLabel41 = group1
+            //         .append("text")
+            //             .text("Cost")
+            //             .attr("x", yScale1(yScale1.domain()[1]) + 8)
+            //             .attr("y", xScale(avgCost) + 3)
+            //             .attr("text-anchor", "start")
+            //             .style("fill", "#007B82")
+            //             .style("font-size", "10px")
+            //             .style("font-family", "Roboto")
+            //             .attr("transform", `rotate(-90)`)
 
-                const xCostLine42 = group2
-                    .append("line")
-                        .style("stroke-dasharray", "5,3")
-                        .style("stroke", "#007B82")
-                        .style("stroke-width", 1.)
-                        .attr("x1", xScale(avgCost))
-                        .attr("x2", xScale(avgCost))
-                        .attr("y1", yScale2(yScale2.domain()[1]) - 5)
-                        .attr("y2", yScale2(yScale2.domain()[0]))
+            //     const xCostLine42 = group2
+            //         .append("line")
+            //             .style("stroke-dasharray", "5,3")
+            //             .style("stroke", "#007B82")
+            //             .style("stroke-width", 1.)
+            //             .attr("x1", xScale(avgCost))
+            //             .attr("x2", xScale(avgCost))
+            //             .attr("y1", yScale2(yScale2.domain()[1]) - 5)
+            //             .attr("y2", yScale2(yScale2.domain()[0]))
 
-                const xCostText42 = group2
-                    .append("text")
-                        .text(d3.format(",.0%")(avgCost))
-                        .attr("x", xScale(avgCost))
-                        .attr("y", yScale2(yScale2.domain()[0]) + 17)
-                        .attr("text-anchor", "middle")
-                        .style("fill", "#007B82")
-                        .style("font-size", "11px")
-                        .style("font-family", "Roboto")
+            //     const xCostText42 = group2
+            //         .append("text")
+            //             .text(d3.format(",.0%")(avgCost))
+            //             .attr("x", xScale(avgCost))
+            //             .attr("y", yScale2(yScale2.domain()[0]) + 17)
+            //             .attr("text-anchor", "middle")
+            //             .style("fill", "#007B82")
+            //             .style("font-size", "11px")
+            //             .style("font-family", "Roboto")
 
-                const xCostLineLabel42 = group2
-                    .append("text")
-                        .text("Cost")
-                        .attr("x", yScale2(yScale2.domain()[1]) + 8)
-                        .attr("y", xScale(avgCost) + 3)
-                        .attr("text-anchor", "start")
-                        .style("fill", "#007B82")
-                        .style("font-size", "10px")
-                        .style("font-family", "Roboto")
-                        .attr("transform", `rotate(-90)`)
+            //     const xCostLineLabel42 = group2
+            //         .append("text")
+            //             .text("Cost")
+            //             .attr("x", yScale2(yScale2.domain()[1]) + 8)
+            //             .attr("y", xScale(avgCost) + 3)
+            //             .attr("text-anchor", "start")
+            //             .style("fill", "#007B82")
+            //             .style("font-size", "10px")
+            //             .style("font-family", "Roboto")
+            //             .attr("transform", `rotate(-90)`)
 
-                const xCostLine43 = group3
-                    .append("line")
-                        .style("stroke-dasharray", "5,3")
-                        .style("stroke", "#007B82")
-                        .style("stroke-width", 1.)
-                        .attr("x1", xScale(avgCost))
-                        .attr("x2", xScale(avgCost))
-                        .attr("y1", yScale3(yScale3.domain()[1]) - 5)
-                        .attr("y2", yScale3(yScale3.domain()[0]))
+            //     const xCostLine43 = group3
+            //         .append("line")
+            //             .style("stroke-dasharray", "5,3")
+            //             .style("stroke", "#007B82")
+            //             .style("stroke-width", 1.)
+            //             .attr("x1", xScale(avgCost))
+            //             .attr("x2", xScale(avgCost))
+            //             .attr("y1", yScale3(yScale3.domain()[1]) - 5)
+            //             .attr("y2", yScale3(yScale3.domain()[0]))
 
-                const xCostText43 = group3
-                    .append("text")
-                        .text(d3.format(",.0%")(avgCost))
-                        .attr("x", xScale(avgCost))
-                        .attr("y", yScale3(yScale3.domain()[0]) + 17)
-                        .attr("text-anchor", "middle")
-                        .style("fill", "#007B82")
-                        .style("font-size", "11px")
-                        .style("font-family", "Roboto")
+            //     const xCostText43 = group3
+            //         .append("text")
+            //             .text(d3.format(",.0%")(avgCost))
+            //             .attr("x", xScale(avgCost))
+            //             .attr("y", yScale3(yScale3.domain()[0]) + 17)
+            //             .attr("text-anchor", "middle")
+            //             .style("fill", "#007B82")
+            //             .style("font-size", "11px")
+            //             .style("font-family", "Roboto")
 
-                const xCostLineLabel43 = group3
-                    .append("text")
-                        .text("Cost")
-                        .attr("x", yScale3(yScale3.domain()[1]) + 8)
-                        .attr("y", xScale(avgCost) + 3)
-                        .attr("text-anchor", "start")
-                        .style("fill", "#007B82")
-                        .style("font-size", "10px")
-                        .style("font-family", "Roboto")
-                        .attr("transform", `rotate(-90)`)
+            //     const xCostLineLabel43 = group3
+            //         .append("text")
+            //             .text("Cost")
+            //             .attr("x", yScale3(yScale3.domain()[1]) + 8)
+            //             .attr("y", xScale(avgCost) + 3)
+            //             .attr("text-anchor", "start")
+            //             .style("fill", "#007B82")
+            //             .style("font-size", "10px")
+            //             .style("font-family", "Roboto")
+            //             .attr("transform", `rotate(-90)`)
 
-            }
+            // }
 
             // ----------------------------------------------------------------
             // FORMATTING ALL AXES
