@@ -1469,7 +1469,7 @@ looker.plugins.visualizations.add({
                 tooltipComp.style("top", 125 + "px") //105
             } 
 
-            if (showDists) {
+            if (showDists) { 
                 d3.select(".tooltip2").html('')
                 d3.select(".tooltip3").html('')
             }
