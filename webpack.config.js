@@ -44,8 +44,8 @@ var webpackConfig = {
     // conwinrateSimple: './src/integration/contractWinRate/conwinrateSimple.js',
     // cycle: './src/integration/cycle/cycle.js',
     // linetest: './src/integration/line/line_test.js',
-    asp: './src/integration/ASP/asp.js',
-    // divergingBar: './src/integration/divergingBar/divergingBar.js',
+    // asp: './src/integration/ASP/asp.js',
+    divergingBar: './src/integration/divergingBar/divergingBar.js',
     // template: './src/integration/template/template.js',
   },
   output: {

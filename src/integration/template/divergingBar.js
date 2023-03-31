@@ -30,6 +30,22 @@ export const object = {
             section: "Setup",
             order: 3
         },
+        right_hovers: {
+            type: "string",
+            label: "Right Hover Measure Indices",
+            display: "text",
+            default: "",
+            section: "Setup",
+            order: 4
+        },
+        left_hovers: {
+            type: "string",
+            label: "Left Hover Measure Indices",
+            display: "text",
+            default: "",
+            section: "Setup",
+            order: 5
+        },
         y_label: {
             type: "string",
             label: "Y Axis Label",
@@ -674,6 +690,50 @@ export const object = {
                 `<span style="float:left;">% of Total:&nbsp&nbsp</span>` + 
                 `<span style="float:right;">${d3.format(",.1%")(subgroupValue / d.data[totalKey])}</span>`
             )
+
+            if (totalKey == "rightTot" && config.right_hovers) {
+                const data_row = data.filter((f, i) => {
+                    return (f[dimensions[0].name].value === d.data.label)
+                })
+
+                let rightHovers = []
+                const rightHoverItems  = config.right_hovers.split(",")
+                rightHoverItems.forEach(d => rightHovers.push(+d))
+
+                let right_add = "<br>"
+                rightHovers.forEach((d, i) => {
+                    let tmp = `<br><span style="float:left;">${measures[d].label_short}:&nbsp&nbsp</span>` + 
+                              `<span style="float:right;">${d3.format(",.0f")(data_row[0][measures[d].name].value)}</span>`
+
+                    right_add = right_add + tmp
+                })
+
+                tooltipBody.html(
+                    tooltipBody.html() + right_add
+                )
+            }
+
+            if (totalKey == "leftTot" && config.left_hovers) {
+                const data_row = data.filter((f, i) => {
+                    return (f[dimensions[0].name].value === d.data.label)
+                })
+
+                let leftHovers = []
+                const leftHoverItems  = config.left_hovers.split(",")
+                leftHoverItems.forEach(d => leftHovers.push(+d))
+
+                let left_add = "<br>"
+                leftHovers.forEach((d, i) => {
+                    let tmp = `<br><span style="float:left;">${measures[d].label_short}:&nbsp&nbsp</span>` + 
+                              `<span style="float:right;">${d3.format(",.0f")(data_row[0][measures[d].name].value)}</span>`
+
+                    left_add = left_add + tmp
+                })
+
+                tooltipBody.html(
+                    tooltipBody.html() + left_add
+                )
+            }
 
             if (d3.event.pageY < boundedHeight * 0.7) {
                 tooltip.style("top", d3.event.pageY - 40 + "px")
