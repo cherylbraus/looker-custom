@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
-import { object } from './divergingBar' //asp './sparklinesNew' ./hexmap conwinrate asp cycle
+import { object } from './divergingBar' //'./heatmap' //asp './sparklinesNew' ./hexmap conwinrate asp cycle
 import * as $ from 'jquery'
 
 // Query the element
@@ -100,7 +100,7 @@ keys.forEach(function(entry, i) {
 })
 
 
-d3.json("http://localhost:3001/dataDivergingSimple").then(function(data) { //dataASP dataDivergingSimple dataCycleChart dataConWinRate3 dataMCSmap2 dataSankey2 dataSparklineWorks dataSparklineIH
+d3.json("http://localhost:3001/dataDivergingAnn").then(function(data) { //dataHeatmapTableCalc dataASP dataDivergingSimple dataCycleChart dataConWinRate3 dataMCSmap2 dataSankey2 dataSparklineWorks dataSparklineIH
 	let todays_options = {}
 
 	$('input:radio:checked').each(function() {

@@ -54,21 +54,37 @@ looker.plugins.visualizations.add({
             section: "Axes",
             order: 1
         },          
+        y_ticklabels: {
+            type: "string",
+            label: "Y Axis Tick Labels",
+            display: "text",
+            default: "",
+            placeholder: "Comma separated list",
+            section: "Axes",
+            order: 2
+        },  
         left_margin: {
             type: "string",
             label: "Left Margin Width",
             display: "text",
             default: "120",
             section: "Axes",
-            order: 2
+            order: 3
+        },
+        show_xlabel: {
+            type: "boolean",
+            label: "Show X Axis Label",
+            default: "false",
+            section: "Axes",
+            order: 5
         },
         x_format: {
             type: "string",
             label: "X Value Format",
             display: "text",
-            default: ",.0f",
+            default: ",.2s",
             section: "Axes",
-            order: 3
+            order: 4
         },
         x_label: {
             type: "string",
@@ -76,7 +92,7 @@ looker.plugins.visualizations.add({
             display: "text",
             default: "",
             section: "Axes",
-            order: 4
+            order: 6
         }
     },
 
@@ -403,7 +419,22 @@ looker.plugins.visualizations.add({
 
         yValuesArray.sort((a, b) => +(b.leftTot) - +(a.leftTot))
 
-        const yValuesOrdered = yValuesArray.map(d => d.label)
+        let yValuesOrderedActual = yValuesArray.map(d => d.label)
+
+        let yValuesOrdered
+        let ytickMapping = {}
+        if (config.y_ticklabels) {
+            yValuesOrdered = [config.y_ticklabels]
+
+            for (let i = 0; i < yValuesOrderedActual.length; i++) {
+                ytickMapping[yValuesOrdered[i]] = yValuesOrderedActual[i]
+            }
+        } else {
+            yValuesOrdered = yValuesOrderedActual
+        }
+
+        console.log("yValuesOrdered", yValuesOrdered)
+        console.log("ytickmapping", ytickMapping)
 
         // AXES ---------------------------------------------------  
         const yScale = d3.scaleBand()
@@ -436,10 +467,10 @@ looker.plugins.visualizations.add({
 
         if (config.left_negative == false) {
             xAxisGenerator
-                .tickFormat(d => d3.format(",.2s")(Math.abs(d)))
+                .tickFormat(d => d3.format(config.x_format)(Math.abs(d)))
         } else {
             xAxisGenerator
-                .tickFormat(d => d3.format(",.2s")(d))
+                .tickFormat(d => d3.format(config.x_format)(d))
         }
             
 
@@ -484,7 +515,7 @@ looker.plugins.visualizations.add({
                 .enter()
                 .append("rect")
                     .attr("x", d => xScale(d[1]))
-                    .attr("y", d => yScale(d.data.label))
+                    .attr("y", d => yScale(Object.keys(ytickMapping).find(key => ytickMapping[key] === d.data.label) || d.data.label))
                     .attr("height", yScale.bandwidth())
                     .attr("width", d => xScale(d[0]) - xScale(d[1]))
                     .classed("left-bar", true)
@@ -512,7 +543,7 @@ looker.plugins.visualizations.add({
                 .enter()
                 .append("rect")
                     .attr("x", d => xScale(d[0]))
-                    .attr("y", d => yScale(d.data.label))
+                    .attr("y", d => yScale(Object.keys(ytickMapping).find(key => ytickMapping[key] === d.data.label) || d.data.label))
                     .attr("height", yScale.bandwidth())
                     .attr("width", d => xScale(d[1]) - xScale(d[0]))
                     .classed("right-bar", true)
@@ -526,8 +557,13 @@ looker.plugins.visualizations.add({
             .call(g => g.selectAll(".tick text")
                 .attr("dx", -8)
                 .attr("x", y => {
-                    const rowData = data_left.filter((d,i) => { return d.label == y})
-                    return xScale(rowData[0].leftTot) - xScale(0)
+                    if (config.y_ticklabels) {
+                        const rowData = data_left.filter((d,i) => { return d.label = ytickMapping[y]})
+                        return xScale(rowData[0].leftTot) - xScale(0)
+                    } else {
+                        const rowData = data_left.filter((d,i) => { return d.label == y})
+                        return xScale(rowData[0].leftTot) - xScale(0)
+                    }                    
                 })
             )
 
@@ -547,8 +583,9 @@ looker.plugins.visualizations.add({
 
         const xAxisLabel = xAxis.append("text")
             .attr("class", "axis-label")
-            .attr("x", width/2)
+            .attr("x", xScale(0))
             .attr("y", (margin.bottom - 8))
+            .style("text-anchor", "middle")
             .text(config.x_label)   
 
         // LEGEND --------------------------------------------------
@@ -605,7 +642,7 @@ looker.plugins.visualizations.add({
                 .style("text-anchor", "start")
                 .style("dominant-baseline", "middle")
                 .style("font-size", 11)
-                .text(measures[cols[i]].label_short)
+                .text(measures[cols[i]].label_short || measures[cols[i]].label)
         })
 
         // TOOLTIPS ---------------------------------------------------
@@ -637,7 +674,7 @@ looker.plugins.visualizations.add({
 
             const measureIndex = subgroupNameNumber.split("-")[1]
             const measureSide = subgroupNameNumber.split("-")[0]
-            const measureName = measures[measureIndex].label_short
+            const measureName = measures[measureIndex].label_short || measures[measureIndex].label
 
             let valueSign;
             if (measureSide == "left" && config.left_negative == false) {
@@ -655,7 +692,7 @@ looker.plugins.visualizations.add({
 
             console.log("totalKey", totalKey)
 
-            tooltipHeader.html(`${d.data.label}<hr>`)
+            tooltipHeader.html(`${Object.keys(ytickMapping).find(key => ytickMapping[key] === d.data.label) || d.data.label}<hr>`)
             tooltipBody.html(
                 `<span style="float:left;">${measureName}:&nbsp&nbsp</span>` + 
                 `<span style="float:right;">${d3.format(config.x_format)(subgroupValue * valueSign)}</span><br>` + 

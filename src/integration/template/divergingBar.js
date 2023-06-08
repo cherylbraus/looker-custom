@@ -54,14 +54,15 @@ export const object = {
             section: "Axes",
             order: 1
         },  
-        y_format: {
+        y_ticklabels: {
             type: "string",
-            label: "Y Value Format",
+            label: "Y Axis Tick Labels",
             display: "text",
-            default: ",.0f",
+            default: "",
+            placeholder: "Comma separated list",
             section: "Axes",
             order: 2
-        },
+        },  
         left_margin: {
             type: "string",
             label: "Left Margin Width",
@@ -75,6 +76,14 @@ export const object = {
             label: "Show X Axis Label",
             default: "false",
             section: "Axes",
+            order: 5
+        },
+        x_format: {
+            type: "string",
+            label: "X Value Format",
+            display: "text",
+            default: ",.2s",
+            section: "Axes",
             order: 4
         },
         x_label: {
@@ -83,7 +92,7 @@ export const object = {
             display: "text",
             default: "",
             section: "Axes",
-            order: 5
+            order: 6
         }
     },
 
@@ -410,7 +419,22 @@ export const object = {
 
         yValuesArray.sort((a, b) => +(b.leftTot) - +(a.leftTot))
 
-        const yValuesOrdered = yValuesArray.map(d => d.label)
+        let yValuesOrderedActual = yValuesArray.map(d => d.label)
+
+        let yValuesOrdered
+        let ytickMapping = {}
+        if (config.y_ticklabels) {
+            yValuesOrdered = [config.y_ticklabels]
+
+            for (let i = 0; i < yValuesOrderedActual.length; i++) {
+                ytickMapping[yValuesOrdered[i]] = yValuesOrderedActual[i]
+            }
+        } else {
+            yValuesOrdered = yValuesOrderedActual
+        }
+
+        console.log("yValuesOrdered", yValuesOrdered)
+        console.log("ytickmapping", ytickMapping)
 
         // AXES ---------------------------------------------------  
         const yScale = d3.scaleBand()
@@ -418,6 +442,8 @@ export const object = {
             .domain(yValuesOrdered)
             .range([boundedHeight, 0])
             .padding(0.2)
+
+        console.log("yScale", yScale.domain(), yScale.range())
 
         const yAxisGenerator = d3.axisLeft()
             .scale(yScale)
@@ -443,10 +469,10 @@ export const object = {
 
         if (config.left_negative == "false") {
             xAxisGenerator
-                .tickFormat(d => d3.format(",.2s")(Math.abs(d)))
+                .tickFormat(d => d3.format(config.x_format)(Math.abs(d)))
         } else {
             xAxisGenerator
-                .tickFormat(d => d3.format(",.2s")(d))
+                .tickFormat(d => d3.format(config.x_format)(d))
         }
             
 
@@ -491,7 +517,7 @@ export const object = {
                 .enter()
                 .append("rect")
                     .attr("x", d => xScale(d[1]))
-                    .attr("y", d => yScale(d.data.label))
+                    .attr("y", d => yScale(Object.keys(ytickMapping).find(key => ytickMapping[key] === d.data.label) || d.data.label))
                     .attr("height", yScale.bandwidth())
                     .attr("width", d => xScale(d[0]) - xScale(d[1]))
                     .classed("left-bar", true)
@@ -519,7 +545,7 @@ export const object = {
                 .enter()
                 .append("rect")
                     .attr("x", d => xScale(d[0]))
-                    .attr("y", d => yScale(d.data.label))
+                    .attr("y", d => yScale(Object.keys(ytickMapping).find(key => ytickMapping[key] === d.data.label) || d.data.label))
                     .attr("height", yScale.bandwidth())
                     .attr("width", d => xScale(d[1]) - xScale(d[0]))
                     .classed("right-bar", true)
@@ -533,8 +559,13 @@ export const object = {
             .call(g => g.selectAll(".tick text")
                 .attr("dx", -8)
                 .attr("x", y => {
-                    const rowData = data_left.filter((d,i) => { return d.label == y})
-                    return xScale(rowData[0].leftTot) - xScale(0)
+                    if (config.y_ticklabels) {
+                        const rowData = data_left.filter((d,i) => { return d.label = ytickMapping[y]})
+                        return xScale(rowData[0].leftTot) - xScale(0)
+                    } else {
+                        const rowData = data_left.filter((d,i) => { return d.label == y})
+                        return xScale(rowData[0].leftTot) - xScale(0)
+                    }                    
                 })
             )
 
@@ -555,8 +586,9 @@ export const object = {
         if (config.show_xlabel == "true"){
             const xAxisLabel = xAxis.append("text")
                 .attr("class", "axis-label")
-                .attr("x", width/2)
+                .attr("x", xScale(0))
                 .attr("y", (margin.bottom - 8))
+                .style("text-anchor", "middle")
                 .text(config.x_label)
         }        
 
@@ -614,7 +646,7 @@ export const object = {
                 .style("text-anchor", "start")
                 .style("dominant-baseline", "middle")
                 .style("font-size", 11)
-                .text(measures[cols[i]].label_short)
+                .text(measures[cols[i]].label_short || measures[cols[i]].label)
         })
 
         // legend.append("rect")
@@ -665,7 +697,9 @@ export const object = {
 
             const measureIndex = subgroupNameNumber.split("-")[1]
             const measureSide = subgroupNameNumber.split("-")[0]
-            const measureName = measures[measureIndex].label_short
+            const measureName = measures[measureIndex].label_short || measures[measureIndex].label
+
+            console.log("measureName", measureName)
 
             let valueSign;
             if (measureSide == "left" && config.left_negative == "false") {
@@ -683,10 +717,10 @@ export const object = {
 
             console.log("totalKey", totalKey)
 
-            tooltipHeader.html(`${d.data.label}<hr>`)
+            tooltipHeader.html(`${Object.keys(ytickMapping).find(key => ytickMapping[key] === d.data.label) || d.data.label}<hr>`)
             tooltipBody.html(
                 `<span style="float:left;">${measureName}:&nbsp&nbsp</span>` + 
-                `<span style="float:right;">${d3.format(config.y_format)(subgroupValue * valueSign)}</span><br>` + 
+                `<span style="float:right;">${d3.format(config.x_format)(subgroupValue * valueSign)}</span><br>` + 
                 `<span style="float:left;">% of Total:&nbsp&nbsp</span>` + 
                 `<span style="float:right;">${d3.format(",.1%")(subgroupValue / d.data[totalKey])}</span>`
             )

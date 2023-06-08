@@ -14,7 +14,8 @@ export const object = {
           display: "radio",
           values: [
             {"Gradient": "gradient"},
-            {"Sequential": "sequential"}
+            {"Sequential": "sequential"},
+            {"Diverging (Choose midpoint)": "diverging"}
           ],
           default: "gradient"
         },
@@ -83,9 +84,31 @@ export const object = {
           placeholder: "Separate breakpoints with commas",
           default: ""
         },
+        mid_breakpoint: {
+          section: "Binning",
+          order: 4,
+          type: "string",
+          display: "text",
+          label: "Custom midpoint",
+          placeholder: "If a percentage, use X.XX format",
+          default: "0"
+        },
+        metric_format: {
+          section: "Binning",
+          order: 5,
+          type: "string",
+          label: "Number type",
+          display: "select",
+          values: [
+            {"Raw Number": "number"},
+            {"USD": "usd"},
+            {"Percentage": "percentage"}
+          ],
+          default: "number"
+        },
         bin_null: {
           section: 'Binning',
-          order:4,
+          order:6,
           type: 'boolean',
           label: 'Count null as zero',
           default: false
@@ -339,6 +362,10 @@ export const object = {
       $('#vis').contents(':not(style)').remove();
       const error = '<div class="error-container"><div class="error-header">Too many buckets</div><div class="error">The sequential palette can manage 5 bins. Switch to the gradient palette for more bins.</div></div>'
       $('#vis').append(error);
+    } else if (config.color_palette == "diverging" && config.mid_breakpoint == "") {
+      $('#vis').contents(':not(style)').remove();
+      const error = '<div class="error-container"><div class="error-header">Incorrect data inputs</div><div class="error">The diverging palette requires a value for the mid-breakpoint.</div></div>'
+      $('#vis').append(error);
     } else {
             try {
         d3.select("#vis")
@@ -427,6 +454,8 @@ export const object = {
           })
       })
 
+      console.log("final_data", final_data)
+
       // Labels of row and columns -> unique identifier of the column called 'group' and 'variable'
       let myGroups = final_dimensions
 
@@ -462,15 +491,38 @@ export const object = {
 
       const sequentialPalette = ["#025187","#0072b5","#2b93ca","#5bacd7","#8fcae9","#bee7fd","#e0f3fd","#edf8fe"]
       const divergingPaletteOne = ["#27566b","#007b82","#339f7b","#8cbb61","#f1cc56"]
-      const divergingPaletteTwo = ["#27566b","#556391","#9d689c","#d96f85","#ee8d5c"]
+      // const divergingPaletteTwo = ["#27566b","#556391","#9d689c","#d96f85","#ee8d5c"]
+
+      const valueExtent = d3.extent(final_data, d => d.value)
+      const divergingPaletteTwo = d3.scaleDiverging()
+        .domain([valueExtent[0], +config.mid_breakpoint, valueExtent[1]])
+        .interpolator(d3.interpolateRdBu)
+
+      let numColors = 9
+      let colorArray = []
+      for (let i = 0; i < Math.floor(numColors / 2); i++) {
+        let value = valueExtent[0] + (i / (numColors - 1)) * (+config.mid_breakpoint - valueExtent[0]);
+        colorArray.push(divergingPaletteTwo(value))
+      }
+
+      colorArray.push(divergingPaletteTwo(+config.mid_breakpoint))
+
+      for (let i = Math. floor(numColors / 2) + 1; i < numColors; i++) {
+        let value = +config.mid_breakpoint + ((i - Math.floor(numColors / 2)) / (numColors - 1)) * (valueExtent[1] - +config.mid_breakpoint);
+        colorArray.push(divergingPaletteTwo(value))
+      }
 
       let palette; 
 
       if (config.color_palette == "gradient") {
         palette = sequentialPalette
+      } else if (config.color_palette == "diverging") {
+        palette = colorArray
       } else {
         palette = divergingPaletteOne
       }
+
+      console.log("diverging info", +config.mid_breakpoint, valueExtent[0], valueExtent[1], colorArray)
 
       const qScale = d3.scaleQuantize()
       const tScale = d3.scaleThreshold()
@@ -479,7 +531,6 @@ export const object = {
         let qPalette = palette.slice(0,config.number_quantiles).reverse()
         qScale.domain(extent)
           .range(qPalette);
-
         let tPalette = palette.slice(0,tScaleDomain.length).reverse()
         tScale.domain(tScaleDomain)
           .range(tPalette);
