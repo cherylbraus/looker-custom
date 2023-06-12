@@ -31,7 +31,7 @@ export const object = {
           order:4,
           type: 'boolean',
           label: 'Reverse palette',
-          default: false
+          default: "false"
         },
         rounded: {
           section: 'Formatting',
@@ -91,7 +91,7 @@ export const object = {
           display: "text",
           label: "Custom midpoint",
           placeholder: "If a percentage, use X.XX format",
-          default: "0"
+          default: "0.2"
         },
         metric_format: {
           section: "Binning",
@@ -237,6 +237,12 @@ export const object = {
                 min_measures: 1, max_measures: 40
             })) return
         }
+
+    const formatMap = {
+      'number': d3.format(",.0f"),
+      'usd': d3.format("$,.0f"),
+      'percentage': d3.format(",.0%") 
+    }
 
     function wrap() {
         const this_width = 100
@@ -493,36 +499,28 @@ export const object = {
       const divergingPaletteOne = ["#27566b","#007b82","#339f7b","#8cbb61","#f1cc56"]
       // const divergingPaletteTwo = ["#27566b","#556391","#9d689c","#d96f85","#ee8d5c"]
 
-      const valueExtent = d3.extent(final_data, d => d.value)
-      const divergingPaletteTwo = d3.scaleDiverging()
-        .domain([valueExtent[0], +config.mid_breakpoint, valueExtent[1]])
-        .interpolator(d3.interpolateRdBu)
+      // Diverging Palette Two for a gradient and not threshold
+      const colors = (config.reverse == "true") ? ['#025187', '#ffffff', '#e48d2d'] : ['#e48d2d', '#ffffff', '#025187'];
 
-      let numColors = 9
-      let colorArray = []
-      for (let i = 0; i < Math.floor(numColors / 2); i++) {
-        let value = valueExtent[0] + (i / (numColors - 1)) * (+config.mid_breakpoint - valueExtent[0]);
-        colorArray.push(divergingPaletteTwo(value))
-      }
+      // Create a linear scale
+      const divergingPaletteTwo = d3.scaleLinear()
+        // .domain([0, +config.mid_breakpoint, 1]) // Define the domain from 0% to 100%
+        .domain([extent[0], +config.mid_breakpoint, extent[1]]) // Define the domain using value extent
+        .range(colors)
 
-      colorArray.push(divergingPaletteTwo(+config.mid_breakpoint))
-
-      for (let i = Math. floor(numColors / 2) + 1; i < numColors; i++) {
-        let value = +config.mid_breakpoint + ((i - Math.floor(numColors / 2)) / (numColors - 1)) * (valueExtent[1] - +config.mid_breakpoint);
-        colorArray.push(divergingPaletteTwo(value))
+      // Define a function to get color for a specific value
+      function getColorForPercentage(pct) {
+        return divergingPaletteTwo(pct);
       }
 
       let palette; 
 
       if (config.color_palette == "gradient") {
         palette = sequentialPalette
-      } else if (config.color_palette == "diverging") {
-        palette = colorArray
       } else {
+        // this isn't used for the diverging option, just the sequential
         palette = divergingPaletteOne
-      }
-
-      console.log("diverging info", +config.mid_breakpoint, valueExtent[0], valueExtent[1], colorArray)
+      } 
 
       const qScale = d3.scaleQuantize()
       const tScale = d3.scaleThreshold()
@@ -627,7 +625,7 @@ export const object = {
 
           tooltipDimensionBody.html("<span>" + d.group + "</span>")
         if (d.value != null) {
-          tooltipValueBody.html("<span>" + d.value + "</span>")
+          tooltipValueBody.html("<span>" + formatMap[config.metric_format](d.value) + "</span>")
         } else {
           tooltipValueBody.html("<span class='null-val'>∅</span>")
         }
@@ -670,10 +668,15 @@ export const object = {
               .attr("height", y.bandwidth() )
               .style("fill", function(d) { 
                 if (d.value == null) {
-                  return "#c3c3c3"
+                  return "#f3f3f3"
                 } else {
-                  return scales[+config.automatic](+d.value)} 
-                })
+                  if (config.color_palette != 'diverging') {
+                    return scales[+config.automatic](+d.value)
+                  } else {
+                    return divergingPaletteTwo(+d.value)
+                  }                  
+                }
+              })
               .style("stroke-width", 4)
               .style("stroke", "none")
               .style("opacity", 1)
@@ -691,7 +694,22 @@ export const object = {
                 .attr("opacity", 0.5)
                 .attr("pointer-events", "none")
                 .attr("fill", (d)=>{
-                  if (config.reverse == "true") {
+                  if (config.color_palette == 'diverging') {
+                    let background = divergingPaletteTwo(+d.value)
+                    let colors = ['red', 'green', 'blue']
+
+                    let colorArr = background.slice(
+                      background.indexOf("(") + 1, 
+                      background.indexOf(")")
+                    ).split(", ");
+
+                    let colorObj = new Object()
+                    colorArr.forEach((k, i) => {
+                      colorObj[colors[i]] = +k
+                    })
+
+                    return ((colorObj['red'] * .299 + colorObj['green'] * .587 + colorObj['blue'] * .114) > 150) ? 'black' : 'white'
+                  } else if (config.reverse == "true") {
                     if (scales[+config.automatic](+d.value) == scales[+config.automatic].range()[0] || scales[+config.automatic](+d.value) == scales[+config.automatic].range()[1]) {
                       return "white"
                     }
@@ -702,7 +720,10 @@ export const object = {
                   }
                 })
                 .text((d)=>{
-                  if (d.value > 1000000) {
+                  if (config.color_palette == 'diverging' && d.value) {
+                    console.log("text value", +d.value)
+                    return formatMap[config.metric_format](+d.value)
+                  } else if (d.value > 1000000) {
                     return Math.round(d.value/100000)/10 + "M" }
                     else if (d.value > 1000) {
                     return Math.round(d.value/100)/10 + "K" } else {
@@ -740,10 +761,15 @@ export const object = {
               .attr("height", y.bandwidth() )
               .style("fill", function(d) { 
                 if (d.value == null) {
-                  return "#c3c3c3"
+                  return "#f3f3f3"
                 } else {
-                  return scales[+config.automatic](+d.value)} 
-                })
+                  if (config.color_palette != 'diverging') {
+                    return scales[+config.automatic](+d.value)
+                  } else {
+                    return divergingPaletteTwo(+d.value)
+                  }                  
+                }
+              })
               .style("stroke-width", 4)
               .style("stroke", "none")
               .style("opacity", 1)
@@ -761,7 +787,22 @@ export const object = {
                 .attr("opacity", 0.5)
                 .attr("pointer-events", "none")
                 .attr("fill", (d)=>{
-                  if (config.reverse == "true") {
+                  if (config.color_palette == 'diverging') {
+                    let background = divergingPaletteTwo(+d.value)
+                    let colors = ['red', 'green', 'blue']
+
+                    let colorArr = background.slice(
+                      background.indexOf("(") + 1, 
+                      background.indexOf(")")
+                    ).split(", ");
+
+                    let colorObj = new Object()
+                    colorArr.forEach((k, i) => {
+                      colorObj[colors[i]] = +k
+                    })
+
+                    return ((colorObj['red'] * .299 + colorObj['green'] * .587 + colorObj['blue'] * .114) > 150) ? 'black' : 'white'
+                  } else if (config.reverse == "true") {
                     if (scales[+config.automatic](+d.value) == scales[+config.automatic].range()[0] || scales[+config.automatic](+d.value) == scales[+config.automatic].range()[1]) {
                       return "white"
                     }
@@ -772,7 +813,10 @@ export const object = {
                   }
                 })
                 .text((d)=>{
-                  if (d.value > 1000000) {
+                  if (config.color_palette == 'diverging' && d.value) {
+                    console.log("text value", +d.value)
+                    return formatMap[config.metric_format](+d.value)
+                  } else if (d.value > 1000000) {
                     return Math.round(d.value/100000)/10 + "M" }
                     else if (d.value > 1000) {
                     return Math.round(d.value/100)/10 + "K" } else {
@@ -780,7 +824,6 @@ export const object = {
                     }
                   }) 
          }
-
         }
 
         // const histogram = d3.histogram()
@@ -802,6 +845,8 @@ export const object = {
         } else {
           legendGroupData = tScaleDomain
         }
+
+        console.log("legendGroupData", legendGroupData)
 
         // const leftLabel = svg.append("text")
         //     .attr('y', -154)
@@ -859,7 +904,7 @@ export const object = {
           svg
             .attr("transform",
                   "translate(" + margin.left + "," + margin.top + ")");
-        } else {
+        } else if (config.color_palette != 'diverging') {
           const legendContainer = svg.append("g")
             .attr("class", "legendContainer")
             .attr("transform", "translate(30, -30)");
@@ -922,14 +967,21 @@ export const object = {
                 sep = " – "
               }
               if (config.automatic == "1" || config.automatic == "2") {
+                // if user chooses set breakpoints or equal frequency binning
                 if (i == 0) {
                   if (extent[0] > legendGroupData[i]) {
+                    console.log("legendGroupData[i]", legendGroupData[i])
+                    // in this case legendGroupData is a flat array
+                    // if the lowest actual value is above the first entry in legendGroupData, create and 0 - X label
+                    // if the first entry in legendGroupData is less than 1M, round it, otherwise convert to M
                     if (legendGroupData[i] < 1000000) {
                       return "0" + sep + Math.round(legendGroupData[i])
                     } else {
-                      return "0" + sep + Math.round(legendGroupData[i]/1000000,2) + "M"
+                      return "0" + sep + Math.round(legendGroupData[i]/1000000,2) + "M" 
                     }
                   } else {
+                    // if lowest actual value is below first entry in legendGroupData, create extent[0] - X label
+                    // if first entry in legendGroupData is less than 1M, round it, otherwise convert to M
                     if (legendGroupData[i] < 1000000) {
                       return extent[0] + sep + Math.round(legendGroupData[i])
                     } else {
@@ -941,17 +993,23 @@ export const object = {
                     }
                   }
                 } else {
+                  // if this isn't the first label, create label of legendGroupData prior value - legendGroupData current value
+                  // if current value is les than 1M, just round both parts of label
                   if (legendGroupData[i] < 1000000) {
                       return Math.round(legendGroupData[i-1]) + sep + Math.round(legendGroupData[i])
                   } else {
+                    // if prior value is less than 1M, then round prior and convert current to M
                     if (legendGroupData[i-1] < 1000000) {
                       return Math.round(legendGroupData[i-1]) + sep + Math.round(legendGroupData[i]/1000000,2) + "M"
                     } else {
+                      // if prior value is greater than 1M, convert both values to M
                       return Math.round(legendGroupData[i-1]/1000000,2) + "M" + sep + Math.round(legendGroupData[i]/1000000,2) + "M" 
                     }
                   }
                 }
               } else {
+                // if user chose equal width binning, legendGroupData is a 2d array with [start,end] for each label
+                // for first entry, always starts with extent[0]
                 if (d[1] >= 1000000) {
                   if (d[0] >= 1000000) {
                     if (i == 0) {
@@ -975,6 +1033,59 @@ export const object = {
                 }
               }
             });
+        } else if (config.color_palette == 'diverging') {
+          const legendContainer = svg.append("g")
+            .attr("class", "legendContainer")
+            .attr("transform", "translate(30, -30)");
+
+            const defs = svg.append("defs")
+            let linearGradient = defs.append("linearGradient")
+              .attr("id", "linear-gradient")
+              .attr("x1", "0%")
+              .attr("y1", "0%")
+              .attr("x2", "100%")
+              .attr("y2", "0%")
+
+            const midpoint = +config.mid_breakpoint * 100
+
+            console.log("extent", extent)
+
+            let normalizedMidpoint = ((+config.mid_breakpoint - extent[0]) / (extent[1] - extent[0]));
+
+            linearGradient.selectAll("stop")
+              .data([
+                {offset: `0%`, color: colors[0]},
+                {offset: `${d3.format(".0%")(normalizedMidpoint)}`, color: colors[1]},
+                {offset: `100%`, color: colors[2]}
+              ])
+              .enter().append("stop")
+              .attr("offset", function(d) { return d.offset })
+              .attr("stop-color", function(d) { return d.color })
+
+            legendContainer.append("rect")
+              .attr("width", width - 35)
+              .attr('height', 20)
+              .style("fill", "url(#linear-gradient)")
+
+            const legendTicks = d3.scaleLinear()
+              // .domain([0, 1])
+              .domain([extent[0], extent[1]])
+              .range([0, width - 35])
+
+            const legendAxis = d3.axisTop(legendTicks)
+              .tickValues(divergingPaletteTwo.domain())
+              // .tickFormat(d3.format(".0%"))
+              .tickFormat(formatMap[config.metric_format])
+              .tickSize(0)
+
+            legendContainer
+              .attr("class", "axis")
+              .append("g")
+                .attr("class", "legend-labels")
+                .call(legendAxis)
+
+            d3.select(".legend-labels path")
+              .attr("opacity", 0)
         }
           
       } catch(error) {
