@@ -11,41 +11,42 @@ looker.plugins.visualizations.add({
     id: "heatmap",
     label: "ZDEV Heatmap",
     options: {
-       color_palette: {
-          section: 'Formatting',
+        color_palette: {
+          section: 'Arrangement',
           order:1,
           type: 'string',
           label: 'Palette Type',
           display: "radio",
           values: [
             {"Gradient": "gradient"},
-            {"Sequential (Max 5 bins)": "sequential"}
+            {"Sequential": "sequential"},
+            {"Diverging (Choose midpoint)": "diverging"}
           ],
           default: "gradient"
         },
         transpose: {
-          section: 'Formatting',
+          section: 'Arrangement',
           order:2,
           type: 'boolean',
           label: 'Transpose',
           default: false
         },
         reverse: {
-          section: 'Formatting',
+          section: 'Arrangement',
           order:4,
           type: 'boolean',
           label: 'Reverse palette',
           default: false
         },
         rounded: {
-          section: 'Formatting',
+          section: 'Arrangement',
           order:6,
           type: 'boolean',
           label: 'Rounded rectangles',
           default: true
         },
         text: {
-          section: 'Formatting',
+          section: 'Arrangement',
           order:3,
           type: 'boolean',
           label: 'Display value inside rects',
@@ -88,9 +89,31 @@ looker.plugins.visualizations.add({
           placeholder: "Separate breakpoints with commas",
           default: ""
         },
+        mid_breakpoint: {
+          section: "Binning",
+          order: 4,
+          type: "string",
+          display: "text",
+          label: "Custom midpoint",
+          placeholder: "If a percentage, use X.XX format",
+          default: "0.2"
+        },
+        metric_format: {
+          section: "Binning",
+          order: 5,
+          type: "string",
+          label: "Number type",
+          display: "select",
+          values: [
+            {"Raw Number": "number"},
+            {"USD": "usd"},
+            {"Percentage": "percentage"}
+          ],
+          default: "number"
+        },
         bin_null: {
           section: 'Binning',
-          order:4,
+          order:6,
           type: 'boolean',
           label: 'Count null as zero',
           default: false
@@ -173,7 +196,6 @@ looker.plugins.visualizations.add({
           label: 'Custom tooltip label for value',
           default: ''
         },
-        
       },
 
     // Set up the initial state of the visualization
@@ -252,6 +274,12 @@ looker.plugins.visualizations.add({
             })) return
         }
 
+    const formatMap = {
+      'number': d3.format(",.0f"),
+      'usd': d3.format("$,.0f"),
+      'percentage': d3.format(",.0%") 
+    }
+    
     function wrap() {
         const this_width = 100
         const this_padding = 5
@@ -349,15 +377,31 @@ looker.plugins.visualizations.add({
 
     const options = { ...this.options }
 
-    if (config.automatic == "0" || config.automatic == "2") {
+    if (config.color_palette == 'diverging') {
       options.breakpoints.hidden = true
-      options.number_quantiles.hidden = false
-      options.breakpoints == ""
+      options.number_quantiles.hidden = true
+      options.automatic.hidden = true
+      options.mid_breakpoint.hidden = false
+      options.metric_format.hidden = false
     } else {
       options.breakpoints.hidden = false
-      options.number_quantiles.hidden = true
-      options.number_quantiles == "5"
+      options.number_quantiles.hidden = false
+      options.automatic.hidden = false
+      options.mid_breakpoint.hidden = true
+      options.metric_format.hidden = true
+
+      if (config.automatic == "0" || config.automatic == "2") {
+        options.breakpoints.hidden = true
+        options.number_quantiles.hidden = false
+        options.breakpoints == ""
+      } else {
+        options.breakpoints.hidden = false
+        options.number_quantiles.hidden = true
+        options.number_quantiles == "5"
+      }
     }
+
+    
 
     this.trigger('registerOptions', options)
 
@@ -375,6 +419,10 @@ looker.plugins.visualizations.add({
     } else if (config.color_palette == "sequential" && +config.number_quantiles.length > 5) {
       $('#vis').contents(':not(style)').remove();
       const error = '<div class="error-container"><div class="error-header">Too many buckets</div><div class="error">The sequential palette can manage 5 bins. Switch to the gradient palette for more bins.</div></div>'
+      $('#vis').append(error);
+    } else if (config.color_palette == "diverging" && config.mid_breakpoint == "") {
+      $('#vis').contents(':not(style)').remove();
+      const error = '<div class="error-container"><div class="error-header">Incorrect data inputs</div><div class="error">The diverging palette requires a value for the mid-breakpoint.</div></div>'
       $('#vis').append(error);
     } else {
             try {
@@ -446,6 +494,9 @@ looker.plugins.visualizations.add({
         final_dimensions.push(entry[dimensions[0].name].value)
       })
 
+      console.log("dimensions", dimensions)
+      console.log("final_dimensions", final_dimensions)
+
       let final_data = []
       data.forEach((entry,i) => {
           // if (config.bin_null == "true") {
@@ -500,13 +551,25 @@ looker.plugins.visualizations.add({
 
       const sequentialPalette = ["#025187","#0072b5","#2b93ca","#5bacd7","#8fcae9","#bee7fd","#e0f3fd","#edf8fe"]
       const divergingPaletteOne = ["#27566b","#007b82","#339f7b","#8cbb61","#f1cc56"]
-      const divergingPaletteTwo = ["#27566b","#556391","#9d689c","#d96f85","#ee8d5c"]
+      // const divergingPaletteTwo = ["#27566b","#556391","#9d689c","#d96f85","#ee8d5c"]
+
+      // Diverging Palette Two for a gradient and not threshold
+      const colors = (config.reverse == true) ? ['#025187', '#ffffff', '#e48d2d'] : ['#e48d2d', '#ffffff', '#025187'];
+      const divergingPaletteTwo = d3.scaleLinear()
+        .domain([extent[0], +config.mid_breakpoint, extent[1]]) // Define the domain using value extent
+        .range(colors)
+
+      // Define a function to get color for a specific value
+      function getColorForPercentage(pct) {
+        return divergingPaletteTwo(pct);
+      }
 
       let palette; 
 
       if (config.color_palette == "gradient") {
         palette = sequentialPalette
       } else {
+        // this isn't used for the diverging option, just the sequential
         palette = divergingPaletteOne
       }
 
@@ -517,7 +580,6 @@ looker.plugins.visualizations.add({
         let qPalette = palette.slice(0,config.number_quantiles).reverse()
         qScale.domain(extent)
           .range(qPalette);
-
         let tPalette = palette.slice(0,tScaleDomain.length).reverse()
         tScale.domain(tScaleDomain)
           .range(tPalette);
@@ -558,7 +620,9 @@ looker.plugins.visualizations.add({
       const xAxis = svg.append("g")
         .style("font-size", 12)
         .attr("transform", "translate(10," + height + ")")
-        .call(d3.axisBottom(x).tickSize(0))
+        .call(d3.axisBottom(x)
+          .tickSize(0)
+          .tickFormat(d => d.split("|FIELD")[0]))
       
       xAxis.select(".domain").remove()
 
@@ -574,7 +638,9 @@ looker.plugins.visualizations.add({
             
       const yAxis = svg.append("g")
         .style("font-size", 12)
-        .call(d3.axisLeft(y).tickSize(0))
+        .call(d3.axisLeft(y)
+          .tickSize(0)
+          .tickFormat(d => d.split("|FIELD")[0]))
       
       yAxis.select(".domain").remove()
 
@@ -622,7 +688,7 @@ looker.plugins.visualizations.add({
 
           tooltipDimensionBody.html("<span>" + d.group + "</span>")
         if (d.value != null) {
-          tooltipValueBody.html("<span>" + d.value + "</span>")
+          tooltipValueBody.html("<span>" + formatMap[config.metric_format](d.value) + "</span>")
         } else {
           tooltipValueBody.html("<span class='null-val'>∅</span>")
         }
@@ -667,8 +733,13 @@ looker.plugins.visualizations.add({
                 if (d.value == null) {
                   return "#c3c3c3"
                 } else {
-                  return scales[+config.automatic](+d.value)} 
-                })
+                  if (config.color_palette != 'diverging') {
+                    return scales[+config.automatic](+d.value)
+                  } else {
+                    return divergingPaletteTwo(+d.value)
+                  }                  
+                }
+              })
               .style("stroke-width", 4)
               .style("stroke", "none")
               .style("opacity", 1)
@@ -681,12 +752,27 @@ looker.plugins.visualizations.add({
                 .attr("x", function(d) { return x(d.variable) + ((x.bandwidth() /1.967))})
                 .attr("y", function(d) { return y(d.group) + (y.bandwidth() /1.765) })
                 .attr("text-anchor", "middle")
-                .attr("font-size", 8)
+                .attr("font-size", 10)
                 .attr("font-weight", 500)
                 .attr("opacity", 0.5)
                 .attr("pointer-events", "none")
                 .attr("fill", (d)=>{
-                  if (config.reverse == true) {
+                  if (config.color_palette == 'diverging') {
+                    let background = divergingPaletteTwo(+d.value)
+                    let colors = ['red', 'green', 'blue']
+
+                    let colorArr = background.slice(
+                      background.indexOf("(") + 1, 
+                      background.indexOf(")")
+                    ).split(", ");
+
+                    let colorObj = new Object()
+                    colorArr.forEach((k, i) => {
+                      colorObj[colors[i]] = +k
+                    })
+
+                    return ((colorObj['red'] * .299 + colorObj['green'] * .587 + colorObj['blue'] * .114) > 150) ? 'black' : 'white'
+                  } else if (config.reverse == true) {
                     if (scales[+config.automatic](+d.value) == scales[+config.automatic].range()[0] || scales[+config.automatic](+d.value) == scales[+config.automatic].range()[1]) {
                       return "white"
                     }
@@ -697,7 +783,10 @@ looker.plugins.visualizations.add({
                   }
                 })
                 .text((d)=>{
-                  if (d.value > 1000000) {
+                  if (config.color_palette == 'diverging' && d.value) {
+                    console.log("text value", +d.value)
+                    return formatMap[config.metric_format](+d.value)
+                  } else if (d.value > 1000000) {
                     return Math.round(d.value/100000)/10 + "M" }
                     else if (d.value > 1000) {
                     return Math.round(d.value/100)/10 + "K" } else {
@@ -737,8 +826,13 @@ looker.plugins.visualizations.add({
                 if (d.value == null) {
                   return "#c3c3c3"
                 } else {
-                  return scales[+config.automatic](+d.value)} 
-                })
+                  if (config.color_palette != 'diverging') {
+                    return scales[+config.automatic](+d.value)
+                  } else {
+                    return divergingPaletteTwo(+d.value)
+                  }                  
+                }
+              })
               .style("stroke-width", 4)
               .style("stroke", "none")
               .style("opacity", 1)
@@ -751,12 +845,27 @@ looker.plugins.visualizations.add({
                 .attr("x", function(d) { return x(d.group) + ((x.bandwidth() /1.967))})
                 .attr("y", function(d) { return y(d.variable) + (y.bandwidth() /1.77) })
                 .attr("text-anchor", "middle")
-                .attr("font-size", 8)
+                .attr("font-size", 10)
                 .attr("font-weight", 500)
                 .attr("opacity", 0.5)
                 .attr("pointer-events", "none")
                 .attr("fill", (d)=>{
-                  if (config.reverse == true) {
+                  if (config.color_palette == 'diverging') {
+                    let background = divergingPaletteTwo(+d.value)
+                    let colors = ['red', 'green', 'blue']
+
+                    let colorArr = background.slice(
+                      background.indexOf("(") + 1, 
+                      background.indexOf(")")
+                    ).split(", ");
+
+                    let colorObj = new Object()
+                    colorArr.forEach((k, i) => {
+                      colorObj[colors[i]] = +k
+                    })
+
+                    return ((colorObj['red'] * .299 + colorObj['green'] * .587 + colorObj['blue'] * .114) > 150) ? 'black' : 'white'
+                  } else if (config.reverse == true) {
                     if (scales[+config.automatic](+d.value) == scales[+config.automatic].range()[0] || scales[+config.automatic](+d.value) == scales[+config.automatic].range()[1]) {
                       return "white"
                     }
@@ -767,7 +876,10 @@ looker.plugins.visualizations.add({
                   }
                 })
                 .text((d)=>{
-                  if (d.value > 1000000) {
+                  if (config.color_palette == 'diverging' && d.value) {
+                    console.log("text value", +d.value)
+                    return formatMap[config.metric_format](+d.value)
+                  } else if (d.value > 1000000) {
                     return Math.round(d.value/100000)/10 + "M" }
                     else if (d.value > 1000) {
                     return Math.round(d.value/100)/10 + "K" } else {
@@ -775,7 +887,6 @@ looker.plugins.visualizations.add({
                     }
                   }) 
          }
-
         }
 
         // const histogram = d3.histogram()
@@ -798,7 +909,7 @@ looker.plugins.visualizations.add({
           legendGroupData = tScaleDomain
         }
 
-     const leftLabel = svg.append("text")
+        const leftLabel = svg.append("text")
             .attr('y', (margin.left - margin.right)/-1)
             .attr('x', height/-2)
             .attr('text-anchor', 'middle')
@@ -848,12 +959,10 @@ looker.plugins.visualizations.add({
           leftLabel.attr('y', xOffset)
         }
 
-
-
+        if (config.color_palette != 'diverging') {
           const legendContainer = svg.append("g")
             .attr("class", "legendContainer")
             .attr("transform", "translate(30, -30)");
-
 
           const legendGroup = legendContainer.selectAll('.leg-group')
             .data(legendGroupData)
@@ -965,6 +1074,62 @@ looker.plugins.visualizations.add({
                 }
               }
             });
+        } else if (config.color_palette == 'diverging') {
+          const legendContainer = svg.append("g")
+            .attr("class", "legendContainer")
+            .attr("transform", "translate(30, -30)");
+
+            const defs = svg.append("defs")
+            let linearGradient = defs.append("linearGradient")
+              .attr("id", "linear-gradient")
+              .attr("x1", "0%")
+              .attr("y1", "0%")
+              .attr("x2", "100%")
+              .attr("y2", "0%")
+
+            const midpoint = +config.mid_breakpoint * 100
+
+            console.log("extent", extent)
+
+            let normalizedMidpoint = ((+config.mid_breakpoint - extent[0]) / (extent[1] - extent[0]));
+
+            linearGradient.selectAll("stop")
+              .data([
+                {offset: `0%`, color: colors[0]},
+                {offset: `${d3.format(".0%")(normalizedMidpoint)}`, color: colors[1]},
+                {offset: `100%`, color: colors[2]}
+              ])
+              .enter().append("stop")
+              .attr("offset", function(d) { return d.offset })
+              .attr("stop-color", function(d) { return d.color })
+
+            legendContainer.append("rect")
+              .attr("width", width - 35)
+              .attr('height', 20)
+              .style("fill", "url(#linear-gradient)")
+
+            const legendTicks = d3.scaleLinear()
+              // .domain([0, 1])
+              .domain([extent[0], extent[1]])
+              .range([0, width - 35])
+
+            const legendAxis = d3.axisTop(legendTicks)
+              .tickValues(divergingPaletteTwo.domain())
+              // .tickFormat(d3.format(".0%"))
+              .tickFormat(formatMap[config.metric_format])
+              .tickSize(0)
+
+            legendContainer
+              .attr("class", "axis")
+              .append("g")
+                .attr("class", "legend-labels")
+                .call(legendAxis)
+
+            d3.select(".legend-labels path")
+              .attr("opacity", 0)
+        }
+
+          
         
           
       } catch(error) {

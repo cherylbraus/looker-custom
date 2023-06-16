@@ -20952,7 +20952,8 @@ var heatmap_object = {
         d3.select("#vis").select("svg").html("");
         var dimensions = queryResponse.fields.dimension_like;
         var measures = queryResponse.fields.measure_like;
-        var pivots = queryResponse.fields.pivots; //This is just for getting responsive left margin
+        var pivots = queryResponse.fields.pivots;
+        console.log("pivots", pivots); //This is just for getting responsive left margin
 
         var formatRead;
 
@@ -21011,11 +21012,18 @@ var heatmap_object = {
         data.forEach(function (entry) {
           final_dimensions.push(entry[dimensions[0].name].value);
         });
+        console.log("dimensions", dimensions);
+        console.log("final_dimensions", final_dimensions);
+        console.log("measures", measures);
+        console.log("final measures", final_measures);
+        console.log("data", data[0][measures[0].name]);
+        console.log("data full", data);
         var final_data = [];
         data.forEach(function (entry, i) {
           // if (config.bin_null == "true") {
           //   console.log(entry, final_measures)
           // }
+          // console.log("each entry", entry)
           final_measures.forEach(function (ent) {
             var dat = {};
             dat['variable'] = ent;
@@ -21064,8 +21072,7 @@ var heatmap_object = {
         var divergingPaletteOne = ["#27566b", "#007b82", "#339f7b", "#8cbb61", "#f1cc56"]; // const divergingPaletteTwo = ["#27566b","#556391","#9d689c","#d96f85","#ee8d5c"]
         // Diverging Palette Two for a gradient and not threshold
 
-        var colors = config.reverse == "true" ? ['#025187', '#ffffff', '#e48d2d'] : ['#e48d2d', '#ffffff', '#025187']; // Create a linear scale
-
+        var colors = config.reverse == "true" ? ['#025187', '#ffffff', '#e48d2d'] : ['#e48d2d', '#ffffff', '#025187'];
         var divergingPaletteTwo = d3.scaleLinear() // .domain([0, +config.mid_breakpoint, 1]) // Define the domain from 0% to 100%
         .domain([extent[0], +config.mid_breakpoint, extent[1]]) // Define the domain using value extent
         .range(colors);
@@ -21111,7 +21118,9 @@ var heatmap_object = {
           y.range([height, 0]).domain(myVars).padding(0.05);
         }
 
-        var xAxis = svg.append("g").style("font-size", 12).attr("transform", "translate(10," + height + ")").call(d3.axisBottom(x).tickSize(0));
+        var xAxis = svg.append("g").style("font-size", 12).attr("transform", "translate(10," + height + ")").call(d3.axisBottom(x).tickSize(0).tickFormat(function (d) {
+          return d.split("|FIELD")[0];
+        }));
         xAxis.select(".domain").remove();
         xAxis.selectAll("text").style("text-anchor", "end").attr("dx", "-.8em").attr("dy", ".15em").attr("transform", "rotate(-35)");
 
@@ -21119,7 +21128,9 @@ var heatmap_object = {
           xAxis.selectAll("text").each(wrap);
         }
 
-        var yAxis = svg.append("g").style("font-size", 12).call(d3.axisLeft(y).tickSize(0));
+        var yAxis = svg.append("g").style("font-size", 12).call(d3.axisLeft(y).tickSize(0).tickFormat(function (d) {
+          return d.split("|FIELD")[0];
+        }));
         yAxis.select(".domain").remove();
 
         if (config.wrap_left == "true") {
@@ -21190,7 +21201,7 @@ var heatmap_object = {
               return x(d.variable) + x.bandwidth() / 1.967;
             }).attr("y", function (d) {
               return y(d.group) + y.bandwidth() / 1.765;
-            }).attr("text-anchor", "middle").attr("font-size", 8).attr("font-weight", 500).attr("opacity", 0.5).attr("pointer-events", "none").attr("fill", function (d) {
+            }).attr("text-anchor", "middle").attr("font-size", 10).attr("font-weight", 500).attr("opacity", 0.5).attr("pointer-events", "none").attr("fill", function (d) {
               if (config.color_palette == 'diverging') {
                 var background = divergingPaletteTwo(+d.value);
                 var _colors = ['red', 'green', 'blue'];
@@ -21259,7 +21270,7 @@ var heatmap_object = {
               return x(d.group) + x.bandwidth() / 1.967;
             }).attr("y", function (d) {
               return y(d.variable) + y.bandwidth() / 1.77;
-            }).attr("text-anchor", "middle").attr("font-size", 8).attr("font-weight", 500).attr("opacity", 0.5).attr("pointer-events", "none").attr("fill", function (d) {
+            }).attr("text-anchor", "middle").attr("font-size", 10).attr("font-weight", 500).attr("opacity", 0.5).attr("pointer-events", "none").attr("fill", function (d) {
               if (config.color_palette == 'diverging') {
                 var background = divergingPaletteTwo(+d.value);
                 var _colors2 = ['red', 'green', 'blue'];

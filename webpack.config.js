@@ -46,6 +46,7 @@ var webpackConfig = {
     // linetest: './src/integration/line/line_test.js',
     // asp: './src/integration/ASP/asp.js',
     // divergingBar: './src/integration/divergingBar/divergingBar.js',
+    // heatmap: './src/integration/heatmap/heatmap.js',
     template: './src/integration/template/template.js',
   },
   output: {

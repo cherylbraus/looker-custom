@@ -159,7 +159,6 @@ export const object = {
           label: 'Truncate y-axis labels',
           default: false
         }
-        
       },
 
     // Set up the initial state of the visualization
@@ -380,6 +379,8 @@ export const object = {
         const dimensions = queryResponse.fields.dimension_like;
         const measures = queryResponse.fields.measure_like;
         const pivots = queryResponse.fields.pivots;
+
+        console.log("pivots", pivots)
         
         //This is just for getting responsive left margin
         let formatRead;
@@ -435,17 +436,26 @@ export const object = {
               "translate(" + margin.left + "," + margin.top + ")");
 
       let final_measures = Object.keys(data[0][measures[0].name]).filter(key => key[0] != "$")
+
       let final_dimensions = []
       
       data.forEach((entry) => {
         final_dimensions.push(entry[dimensions[0].name].value)
-      })
+      }) 
+
+      console.log("dimensions", dimensions)
+      console.log("final_dimensions", final_dimensions)
+      console.log("measures", measures)
+      console.log("final measures", final_measures)
+      console.log("data", data[0][measures[0].name])
+      console.log("data full", data)
 
       let final_data = []
       data.forEach((entry,i) => {
           // if (config.bin_null == "true") {
           //   console.log(entry, final_measures)
           // }
+          // console.log("each entry", entry)
           final_measures.forEach((ent) => {
             let dat = {}
             dat['variable'] = ent
@@ -501,8 +511,6 @@ export const object = {
 
       // Diverging Palette Two for a gradient and not threshold
       const colors = (config.reverse == "true") ? ['#025187', '#ffffff', '#e48d2d'] : ['#e48d2d', '#ffffff', '#025187'];
-
-      // Create a linear scale
       const divergingPaletteTwo = d3.scaleLinear()
         // .domain([0, +config.mid_breakpoint, 1]) // Define the domain from 0% to 100%
         .domain([extent[0], +config.mid_breakpoint, extent[1]]) // Define the domain using value extent
@@ -569,7 +577,9 @@ export const object = {
       const xAxis = svg.append("g")
         .style("font-size", 12)
         .attr("transform", "translate(10," + height + ")")
-        .call(d3.axisBottom(x).tickSize(0))
+        .call(d3.axisBottom(x)
+        .tickSize(0)
+        .tickFormat(d => d.split("|FIELD")[0]))
       
       xAxis.select(".domain").remove()
 
@@ -585,7 +595,10 @@ export const object = {
             
       const yAxis = svg.append("g")
         .style("font-size", 12)
-        .call(d3.axisLeft(y).tickSize(0))
+        .call(d3.axisLeft(y)
+          .tickSize(0)
+          .tickFormat(d => d.split("|FIELD")[0]))
+
       
       yAxis.select(".domain").remove()
 
@@ -689,7 +702,7 @@ export const object = {
                 .attr("x", function(d) { return x(d.variable) + ((x.bandwidth() /1.967))})
                 .attr("y", function(d) { return y(d.group) + (y.bandwidth() /1.765) })
                 .attr("text-anchor", "middle")
-                .attr("font-size", 8)
+                .attr("font-size", 10)
                 .attr("font-weight", 500)
                 .attr("opacity", 0.5)
                 .attr("pointer-events", "none")
@@ -782,7 +795,7 @@ export const object = {
                 .attr("x", function(d) { return x(d.group) + ((x.bandwidth() /1.967))})
                 .attr("y", function(d) { return y(d.variable) + (y.bandwidth() /1.77) })
                 .attr("text-anchor", "middle")
-                .attr("font-size", 8)
+                .attr("font-size", 10)
                 .attr("font-weight", 500)
                 .attr("opacity", 0.5)
                 .attr("pointer-events", "none")
