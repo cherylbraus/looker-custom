@@ -14508,11 +14508,11 @@ function setMap(map, key, value) {
 // CONCATENATED MODULE: ./node_modules/d3-collection/src/set.js
 
 
-function set_Set() {}
+function Set() {}
 
 var proto = src_map.prototype;
-set_Set.prototype = set_set.prototype = {
-  constructor: set_Set,
+Set.prototype = set_set.prototype = {
+  constructor: Set,
   has: proto.has,
   add: function (value) {
     value += "";
@@ -14528,9 +14528,9 @@ set_Set.prototype = set_set.prototype = {
 };
 
 function set_set(object, f) {
-  var set = new set_Set(); // Copy constructor.
+  var set = new Set(); // Copy constructor.
 
-  if (object instanceof set_Set) object.each(function (value) {
+  if (object instanceof Set) object.each(function (value) {
     set.add(value);
   }); // Otherwise, assume it’s an array.
   else if (object) {
@@ -20598,188 +20598,67 @@ var utils_handleErrors = function (vis, res, options) {
         && check('mes-req', 'Measure', measures.length, options.min_measures, options.max_measures));
 };
 
-// CONCATENATED MODULE: ./src/integration/template/heatmap.js
-function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
-
-function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && iter[Symbol.iterator] != null || iter["@@iterator"] != null) return Array.from(iter); }
-
-function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-var heatmap_object = {
+// CONCATENATED MODULE: ./src/integration/template/line_forecast.js
+var line_forecast_object = {
   // Id and Label are legacy properties that no longer have any function besides documenting
   // what the visualization used to have. The properties are now set via the manifest
   // form within the admin/visualizations page of Looker.
-  id: "heatmap",
-  label: "ZDEV Heatmap",
+  id: "line_forecast",
+  label: "ZDEV Forecast Line",
   options: {
-    color_palette: {
-      section: 'Formatting',
-      order: 1,
-      type: 'string',
-      label: 'Palette Type',
-      display: "radio",
-      values: [{
-        "Gradient": "gradient"
-      }, {
-        "Sequential": "sequential"
-      }, {
-        "Diverging (Choose midpoint)": "diverging"
-      }],
-      "default": "gradient"
-    },
-    transpose: {
-      section: 'Formatting',
-      order: 2,
-      type: 'boolean',
-      label: 'Transpose',
-      "default": false
-    },
-    reverse: {
-      section: 'Formatting',
-      order: 4,
-      type: 'boolean',
-      label: 'Reverse palette',
-      "default": "false"
-    },
-    rounded: {
-      section: 'Formatting',
-      order: 6,
-      type: 'boolean',
-      label: 'Rounded rectangles',
-      "default": true
-    },
-    text: {
-      section: 'Formatting',
-      order: 3,
-      type: 'boolean',
-      label: 'Display value inside rects',
-      "default": false
-    },
-    automatic: {
-      section: 'Binning',
-      order: 1,
-      type: 'string',
-      label: 'Binning method',
-      display: "select",
-      values: [{
-        "Equal width binning": "0"
-      }, {
-        "Set breakpoints": "1"
-      }, {
-        "Equal frequency binning": "2"
-      }],
-      "default": "0"
-    },
-    number_quantiles: {
-      section: 'Binning',
-      order: 2,
-      type: 'string',
-      label: 'Number of bins',
-      display: "select",
-      values: [{
-        "Four": "4"
-      }, {
-        "Five": "5"
-      }, {
-        "Six": "6"
-      }, {
-        "Seven": "7"
-      }, {
-        "Eight": "8"
-      }],
-      "default": "5"
-    },
-    breakpoints: {
-      section: "Binning",
-      order: 3,
+    y_label: {
       type: "string",
+      label: "Y Axis Label",
       display: "text",
-      label: "Custom breakpoints (comma separated)",
-      placeholder: "Separate breakpoints with commas",
-      "default": ""
+      "default": "",
+      section: "Axes",
+      order: 1
     },
-    mid_breakpoint: {
-      section: "Binning",
-      order: 4,
+    y_format: {
       type: "string",
+      label: "Y Value Format",
       display: "text",
-      label: "Custom midpoint",
-      placeholder: "If a percentage, use X.XX format",
-      "default": "0.2"
+      "default": ",.2f",
+      section: "Axes",
+      order: 2
     },
-    metric_format: {
-      section: "Binning",
-      order: 5,
+    show_xlabel: {
+      type: "boolean",
+      label: "Show X Axis Label",
+      "default": "false",
+      section: "Axes",
+      order: 3
+    },
+    x_label: {
       type: "string",
-      label: "Number type",
-      display: "select",
-      values: [{
-        "Raw Number": "number"
-      }, {
-        "USD": "usd"
-      }, {
-        "Percentage": "percentage"
-      }],
-      "default": "number"
+      label: "X Axis Label",
+      display: "text",
+      "default": "",
+      section: "Axes",
+      order: 4
     },
-    bin_null: {
-      section: 'Binning',
-      order: 6,
-      type: 'boolean',
-      label: 'Count null as zero',
-      "default": false
+    x_format: {
+      type: "string",
+      label: "X Value Format",
+      display: "text",
+      "default": "%b %-d",
+      section: "Axes",
+      order: 5
     },
-    margin_bottom: {
-      section: 'Margins',
-      order: 1,
-      type: 'string',
-      display: 'text',
-      label: 'Margin - bottom',
-      "default": ''
+    months_forecasted: {
+      type: "string",
+      label: "# Months to Forecast",
+      display: "text",
+      "default": "3",
+      section: "Settings",
+      order: 1
     },
-    margin_left: {
-      section: 'Margins',
-      order: 2,
-      type: 'string',
-      display: 'text',
-      label: 'Margin - left',
-      "default": ''
-    },
-    label_bottom: {
-      section: 'Margins',
-      order: 3,
-      type: 'string',
-      display: 'text',
-      label: 'Label offset - bottom',
-      "default": ''
-    },
-    label_left: {
-      section: 'Margins',
-      order: 4,
-      type: 'string',
-      display: 'text',
-      label: 'Label offset - left',
-      "default": ''
-    },
-    wrap_bottom: {
-      section: 'Margins',
-      order: 3,
-      type: 'boolean',
-      label: 'Truncate x-axis labels',
-      "default": false
-    },
-    wrap_left: {
-      section: 'Margins',
-      order: 4,
-      type: 'boolean',
-      label: 'Truncate y-axis labels',
-      "default": false
+    curve_bool: {
+      type: "boolean",
+      label: "Curved Line",
+      "default": "false",
+      section: "Settings",
+      order: 2
     }
   },
   // Set up the initial state of the visualization
@@ -20792,8 +20671,8 @@ var heatmap_object = {
 
     if (environment == "prod") {
       if (!handleErrors(this, queryResponse, {
-        min_pivots: 1,
-        max_pivots: 1,
+        min_pivots: 0,
+        max_pivots: 0,
         min_dimensions: 1,
         max_dimensions: 40,
         min_measures: 1,
@@ -20801,701 +20680,304 @@ var heatmap_object = {
       })) return;
     }
 
-    var formatMap = {
-      'number': d3.format(",.0f"),
-      'usd': d3.format("$,.0f"),
-      'percentage': d3.format(",.0%")
-    };
+    try {
+      var margin = {
+        top: 35,
+        right: 30,
+        bottom: 50,
+        left: 70
+      };
+      var width = element.clientWidth - margin.left - margin.right;
+      var height = element.clientHeight - margin.top - margin.bottom;
+      d3.json('./dataLineForecast3.json').then(function (dat) {
+        var svg = d3.select(element).select('svg').html('').attr('width', '100%').attr('height', '100%');
+        var group = svg.append('g').attr('transform', "translate(".concat(margin.left, ",").concat(margin.top, ")")).attr('width', width).attr('height', height).classed('group', true); // .style('pointer-events', 'all')
 
-    function wrap() {
-      var this_width = 100;
-      var this_padding = 5;
-      var self = d3.select(this),
-          textLength = self.node().getComputedTextLength(),
-          text = self.text();
-
-      while (textLength > this_width - 2 * this_padding && text.length > 0) {
-        text = text.slice(0, -1);
-        self.text(text + '...');
-        textLength = self.node().getComputedTextLength();
-      }
-    }
-
-    function dupeCheck(array) {
-      return array.length === new Set(array).size;
-    } // equal frequency
-
-
-    function equalFreq(arrayI, bins) {
-      var returnFormat = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "arrays";
-
-      function arrayEquals(a, b) {
-        return Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every(function (val, index) {
-          return val === b[index];
-        });
-      }
-
-      var array = [];
-      arrayI.forEach(function (entry) {
-        return array.push(entry);
-      });
-      var fArray = []; // Get everything into separate arrays
-
-      if (config.bin_null == "false") {
-        array = array.filter(function (entry) {
-          return entry.value != null;
-        }).sort(function (a, b) {
-          return a.value - b.value;
-        });
-      } //may be useless
-
-
-      var binSize = function () {
-        return Math.floor(array.length / bins);
-      }();
-
-      while (array.length >= bins) {
-        fArray.push(array.splice(0, binSize).map(function (ent) {
-          return ent.value;
-        }));
-      }
-
-      var rem = 0;
-
-      while (array.length > 0) {
-        fArray[rem].push(array.pop().value);
-        rem++;
-      } // Sorting algorithm
-
-
-      var finished = false;
-
-      while (finished == false) {
-        var testArray = [];
-        var checkArray = [];
-        var halffinished = true; // creates test and check arrays. the final product should have each bin's average go in ascending order
-        // having a higher max value than the next bin's minimum value
-
-        for (var dy = 0; dy < fArray.length; dy++) {
-          testArray.push(fArray[dy].reduce(function (a, b) {
-            return a + b;
-          }) / fArray[dy].length);
-          checkArray.push(fArray[dy].reduce(function (a, b) {
-            return a + b;
-          }) / fArray[dy].length);
-
-          if (fArray[dy + 1] && d3.max(fArray[dy]) > d3.min(fArray[dy + 1])) {
-            halffinished = false;
-          }
-        }
-
-        if (halffinished == true && arrayEquals(testArray.sort(function (a, b) {
-          return a - b;
-        }), checkArray)) {
-          finished = true;
-        } else {
-          // Here we go through each nested array and ensure there is no crossover between the kth array
-          // And the k+1 th array in terms of values, flipping values that do not belong out of the lower array
-          for (var k = 0; k < fArray.length - 1; k++) {
-            while (d3.max(fArray[k]) > d3.min(fArray[k + 1])) {
-              var flip1 = d3.max(fArray[k]);
-              var flip2 = d3.min(fArray[k + 1]);
-              var flip1Ind = fArray[k].indexOf(flip1);
-              var flip2Ind = fArray[k + 1].indexOf(flip2);
-              fArray[k + 1].splice(flip2Ind, 1, flip1);
-              fArray[k].splice(flip1Ind, 1, flip2);
-            }
-          }
-        }
-      }
-
-      return fArray.map(function (ent) {
-        return d3.max(ent);
-      });
-    } // const options = { ...this.options }
-    // if (config.automatic == "0" || config.automatic == "2") {
-    //   options.breakpoints.hidden = true
-    //   options.number_quantiles.hidden = false
-    //   options.breakpoints == ""
-    // } else {
-    //   options.breakpoints.hidden = false
-    //   options.number_quantiles.hidden = true
-    //   options.number_quantiles == "5"
-    // }
-    // this.trigger('registerOptions', options)
-    // Custom error handling
-
-
-    if (queryResponse.fields.dimension_like.length != 1 || queryResponse.fields.measure_like.length != 1 || queryResponse.fields.pivots.length != 1) {
-      $('#vis').contents(':not(style)').remove();
-      var error = '<div class="error-container"><div class="error-header">Incorrect data inputs</div><div class="error">Heatmap requires one dimension, one measure and one pivot.</div></div>';
-      $('#vis').append(error);
-    } else if (config.color_palette == "gradient" && config.breakpoints.split(",").length > 8 || config.color_palette == "sequential" && config.breakpoints.split(",").length > 5) {
-      $('#vis').contents(':not(style)').remove();
-      var _error = '<div class="error-container"><div class="error-header">Too many buckets</div><div class="error">The gradient palette can manage 8 bins while the sequential palette manages 5 bins.</div></div>';
-      $('#vis').append(_error);
-    } else if (config.color_palette == "sequential" && +config.number_quantiles.length > 5) {
-      $('#vis').contents(':not(style)').remove();
-      var _error2 = '<div class="error-container"><div class="error-header">Too many buckets</div><div class="error">The sequential palette can manage 5 bins. Switch to the gradient palette for more bins.</div></div>';
-      $('#vis').append(_error2);
-    } else if (config.color_palette == "diverging" && config.mid_breakpoint == "") {
-      $('#vis').contents(':not(style)').remove();
-      var _error3 = '<div class="error-container"><div class="error-header">Incorrect data inputs</div><div class="error">The diverging palette requires a value for the mid-breakpoint.</div></div>';
-      $('#vis').append(_error3);
-    } else {
-      try {
-        // Define a function to get color for a specific value
-        var getColorForPercentage = function getColorForPercentage(pct) {
-          return divergingPaletteTwo(pct);
-        };
-
-        d3.select("#vis").select("svg").html("");
+        var mdata = dat.data.slice(0, 98);
+        var queryResponse = dat.queryResponse;
         var dimensions = queryResponse.fields.dimension_like;
         var measures = queryResponse.fields.measure_like;
-        var pivots = queryResponse.fields.pivots;
-        console.log("pivots", pivots); //This is just for getting responsive left margin
-
-        var formatRead;
-
-        if (config.transpose == "false") {
-          formatRead = Object.keys(data[0][measures[0].name]);
-        } else {
-          var return_array = [];
-          data.forEach(function (entry) {
-            return_array.push(entry[dimensions[0].name].value);
-          });
-          formatRead = return_array;
-        }
-
-        var highest = 0;
-        formatRead.forEach(function (entry) {
-          if (entry.includes("$")) {
-            return;
-          } else if (entry.length > highest) {
-            highest = entry.length;
-          }
-        });
-        var margin = {
-          top: 70,
-          right: 25,
-          bottom: 100,
-          left: highest * 4.8
-        };
-        console.log(margin.left);
-
-        if (config.margin_bottom.length > 0) {
-          margin.bottom = +config.margin_bottom;
-        }
-
-        if (config.margin_left.length > 0) {
-          margin.left = +config.margin_left;
-        }
-
-        var getNode = d3.select("#vis"); // Update this once we have a better idea how Looker integration will look
-
-        var new_node_width = getNode.select(function () {
-          return this.parentNode;
-        });
-        var new_node_height = getNode.select(function () {
-          return this.parentNode;
-        });
-        var w = new_node_width.node().getBoundingClientRect().width;
-        var h = new_node_height.node().getBoundingClientRect().height;
-        var width = w - margin.left - margin.right;
-        var height = h - margin.bottom - margin.top; // append the svg object to the body of the page
-
-        var svg = d3.select("#vis").select("svg").attr("width", width + margin.left + margin.right).attr("height", height + margin.top + margin.bottom).append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-        var final_measures = Object.keys(data[0][measures[0].name]).filter(function (key) {
-          return key[0] != "$";
-        });
-        var final_dimensions = [];
-        data.forEach(function (entry) {
-          final_dimensions.push(entry[dimensions[0].name].value);
-        });
         console.log("dimensions", dimensions);
-        console.log("final_dimensions", final_dimensions);
         console.log("measures", measures);
-        console.log("final measures", final_measures);
-        console.log("data", data[0][measures[0].name]);
-        console.log("data full", data);
-        var final_data = [];
-        data.forEach(function (entry, i) {
-          // if (config.bin_null == "true") {
-          //   console.log(entry, final_measures)
-          // }
-          // console.log("each entry", entry)
-          final_measures.forEach(function (ent) {
-            var dat = {};
-            dat['variable'] = ent;
-            dat['group'] = entry[dimensions[0].name].value;
+        console.log("data initial", mdata);
+        var parseTime = d3.timeParse("%Y-%m-%d"); // determine if data is historical (today or earlier) or forecast (after today)
 
-            if (config.bin_null == "true" && entry[measures[0].name][ent].value == null) {
-              dat['value'] = 0;
-            } else {
-              dat['value'] = entry[measures[0].name][ent].value;
-            }
-
-            final_data.push(dat);
-          });
+        var today = new Date();
+        today.setHours(0, 0, 0);
+        console.log("today", today);
+        var data_ready = [];
+        mdata.forEach(function (d) {
+          var entry = {};
+          entry['date'] = parseTime(d[dimensions[0].name].value);
+          entry['value'] = +d[dimensions[1].name].value;
+          entry['histpred'] = +d[dimensions[2].name].value;
+          entry['category'] = entry['date'] > today ? "Forecast" : "Historical";
+          entry['date'] = new Date(entry['date'].getFullYear(), entry['date'].getMonth(), 1, 0, 0, 0);
+          data_ready.push(entry);
         });
-        console.log("final_data", final_data); // Labels of row and columns -> unique identifier of the column called 'group' and 'variable'
-
-        var myGroups = final_dimensions;
-        var myVars = final_measures;
-        var extent = d3.extent(final_data, function (d) {
-          return +d.value;
+        data_ready.sort(function (a, b) {
+          return a.date - b.date;
         });
-        var tScaleDomain = config.breakpoints.split(",") || [""];
 
-        if (config.automatic == "1") {
-          tScaleDomain = tScaleDomain.map(function (ent) {
-            return +ent;
-          });
-          tScaleDomain.shift();
-          tScaleDomain.push(extent[1]);
-          tScaleDomain.sort(function (a, b) {
-            return a - b;
-          });
-        } else if (+config.automatic == 2) {
-          tScaleDomain = equalFreq(final_data, +config.number_quantiles);
-
-          if (dupeCheck(tScaleDomain) == false) {
-            tScaleDomain = Array.from(new Set(tScaleDomain));
-          }
-
-          if (tScaleDomain[0] == 0) {
-            tScaleDomain.shift();
-          }
-        }
-
-        var sequentialPalette = ["#025187", "#0072b5", "#2b93ca", "#5bacd7", "#8fcae9", "#bee7fd", "#e0f3fd", "#edf8fe"];
-        var divergingPaletteOne = ["#27566b", "#007b82", "#339f7b", "#8cbb61", "#f1cc56"]; // const divergingPaletteTwo = ["#27566b","#556391","#9d689c","#d96f85","#ee8d5c"]
-        // Diverging Palette Two for a gradient and not threshold
-
-        var colors = config.reverse == "true" ? ['#025187', '#ffffff', '#e48d2d'] : ['#e48d2d', '#ffffff', '#025187'];
-        var divergingPaletteTwo = d3.scaleLinear() // .domain([0, +config.mid_breakpoint, 1]) // Define the domain from 0% to 100%
-        .domain([extent[0], +config.mid_breakpoint, extent[1]]) // Define the domain using value extent
-        .range(colors);
-        var palette;
-
-        if (config.color_palette == "gradient") {
-          palette = sequentialPalette;
-        } else {
-          // this isn't used for the diverging option, just the sequential
-          palette = divergingPaletteOne;
-        }
-
-        var qScale = d3.scaleQuantize();
-        var tScale = d3.scaleThreshold();
-
-        if (config.reverse == "false") {
-          var qPalette = palette.slice(0, config.number_quantiles).reverse();
-          qScale.domain(extent).range(qPalette);
-          var tPalette = palette.slice(0, tScaleDomain.length).reverse();
-          tScale.domain(tScaleDomain).range(tPalette);
-        } else {
-          var _qPalette = palette.slice(0, config.number_quantiles);
-
-          qScale.domain(extent).range(_qPalette);
-
-          var _tPalette = palette.slice(0, tScaleDomain.length);
-
-          tScale.domain(tScaleDomain).range(_tPalette);
-        }
-
-        var scales = [qScale, tScale, tScale];
-        var legendScale = d3.scaleBand().domain(_toConsumableArray(Array(scales[+config.automatic].range().length).keys())).range([0, width - 72]); // Build X scales and axis:
-
-        var x = d3.scaleBand(); // Build Y scales and axis:
-
-        var y = d3.scaleBand();
-
-        if (config.transpose == "true") {
-          x.range([0, width]).domain(myVars).padding(0.05);
-          y.range([height, 0]).domain(myGroups).padding(0.05);
-        } else {
-          x.range([0, width]).domain(myGroups).padding(0.05);
-          y.range([height, 0]).domain(myVars).padding(0.05);
-        }
-
-        var xAxis = svg.append("g").style("font-size", 12).attr("transform", "translate(10," + height + ")").call(d3.axisBottom(x).tickSize(0).tickFormat(function (d) {
-          return d.split("|FIELD")[0];
-        }));
-        xAxis.select(".domain").remove();
-        xAxis.selectAll("text").style("text-anchor", "end").attr("dx", "-.8em").attr("dy", ".15em").attr("transform", "rotate(-35)");
-
-        if (config.wrap_bottom == "true") {
-          xAxis.selectAll("text").each(wrap);
-        }
-
-        var yAxis = svg.append("g").style("font-size", 12).call(d3.axisLeft(y).tickSize(0).tickFormat(function (d) {
-          return d.split("|FIELD")[0];
-        }));
-        yAxis.select(".domain").remove();
-
-        if (config.wrap_left == "true") {
-          yAxis.selectAll("text").each(wrap);
-        } // create a tooltip
-
-
-        var tooltip = d3.select(".tooltip").style("opacity", 0).style("background-color", "white").style("border-radius", "4px").style("padding", "5px").style("position", "absolute");
-        tooltip.html("<h1 id='dimension-header'>" + dimensions[0].name + "</h1><p id='dimension-body'></p><h1 id='value-header'>Value</h1><p id='value-body'></p>");
-        var tooltipValueBody = tooltip.select("#value-body");
-        var tooltipDimensionBody = tooltip.select("#dimension-body"); // Three function that change the tooltip when user hover / move / leave a cell
-
-        var mouseover = function mouseover(d) {
-          tooltip.style("opacity", 1);
-          d3.select(this).style("stroke", "black").style("stroke-width", 1).style("opacity", 1);
+        var dateAccessor = function dateAccessor(d) {
+          return d.date;
         };
 
-        var mousemove = function mousemove(d) {
-          tooltip.style("left", d3.mouse(this)[0] + "px").style("top", d3.mouse(this)[1] - 25 + "px");
-          tooltipDimensionBody.html("<span>" + d.group + "</span>");
+        var categoryAccessor = function categoryAccessor(d) {
+          return d.category;
+        };
 
-          if (d.value != null) {
-            tooltipValueBody.html("<span>" + formatMap[config.metric_format](d.value) + "</span>");
+        var valueAccessor = function valueAccessor(d) {
+          return d.value;
+        };
+
+        var histpredAccessor = function histpredAccessor(d) {
+          return d.histpred;
+        };
+
+        console.log("data_ready", data_ready);
+        var hist = data_ready.filter(function (d) {
+          return d.category == "Historical";
+        });
+        var forecast = data_ready.filter(function (d) {
+          return d.category == "Forecast";
+        }); // filter to number of months to forecast in future
+
+        forecast = forecast.slice(0, config.months_forecasted);
+        console.log("forecast filter", forecast);
+        var lasthist = hist[hist.length - 1];
+        lasthist['category'] = 'Forecast';
+        forecast.push(lasthist);
+        forecast.sort(function (a, b) {
+          return a.date - b.date;
+        });
+        console.log("hist", hist);
+        console.log("forecast", forecast);
+        console.log("lasthist", lasthist); // calculate standard deviation of historical values
+
+        var valueArray = data_ready.map(valueAccessor);
+
+        function dev(arr) {
+          var mean = arr.reduce(function (acc, curr) {
+            return acc + curr;
+          }, 0) / arr.length;
+          arr = arr.map(function (k) {
+            return Math.pow(k - mean, 2);
+          });
+          var sum = arr.reduce(function (acc, curr) {
+            return acc + curr;
+          }, 0);
+          var variance = sum / arr.length;
+          return Math.sqrt(sum / arr.length);
+        }
+
+        var valueStd = dev(valueArray);
+        var stepStd = valueStd / (forecast.length - 1);
+        console.log("standard deviation", valueStd, stepStd); // generate progression to +1/-1 std in forecast object array
+
+        forecast.forEach(function (d, i) {
+          d['stdint'] = stepStd * i;
+          d['stdup'] = d.value + d.stdint;
+          d['stddown'] = d.value - d.stdint;
+        });
+        console.log('forecast', forecast); // axes
+
+        var xScale = d3.scaleTime() // .domain(d3.extent(data_ready, d => dateAccessor(d)))
+        .domain([d3.min(data_ready, function (d) {
+          return dateAccessor(d);
+        }), d3.max(forecast, function (d) {
+          return dateAccessor(d);
+        })]).range([0, width]);
+        var xAxisGenerator = d3.axisBottom().scale(xScale).tickPadding(10).tickSize(0).tickFormat(function (d) {
+          return "".concat(d3.timeFormat(config.x_format)(d));
+        });
+        var xAxis = group.append('g').call(xAxisGenerator).style('transform', "translateY(".concat(height, "px)")).attr('class', 'x-axis');
+
+        if (config.show_xlabel == "true") {
+          var xAxisLabel = xAxis.append('text').attr('class', 'axis-label').attr('x', width / 2).attr('y', margin.bottom - 7).style('text-anchor', 'middle').text(config.x_label ? config.x_label : dimensions[0].label_short); // use label_short
+        }
+
+        var yMin = Math.min(d3.min(data_ready.map(function (d) {
+          return valueAccessor(d);
+        })), d3.min(forecast.map(function (d) {
+          return d.stddown;
+        })));
+        var yMax = Math.max(d3.max(data_ready.map(function (d) {
+          return valueAccessor(d);
+        })), d3.max(forecast.map(function (d) {
+          return d.stdup;
+        })));
+        var yScale = d3.scaleLinear().domain([yMin, yMax]).range([height, 0]);
+        var yAxisGenerator = d3.axisLeft().scale(yScale).tickPadding(10).tickSize(-width).tickFormat(function (d) {
+          return "".concat(d3.format(config.y_format)(d));
+        });
+        var yAxis = group.append('g').call(yAxisGenerator).attr('class', 'y-axis');
+        var yAxisLabel = yAxis.append('text').attr('class', 'axis-label').attr('x', -height / 2).attr('y', -margin.left + 13).style('transform', 'rotate(-90deg)').text(config.y_label ? config.y_label : dimensions[1].label_short); // use label_short
+
+        console.log("axes", xScale.domain(), xScale.range(), yScale.domain(), yScale.range()); // draw data
+
+        var area = d3.area().x(function (d) {
+          return xScale(d.date);
+        }).y0(function (d) {
+          return yScale(d.stdup);
+        }).y1(function (d) {
+          return yScale(d.stddown);
+        });
+        var stdarea = group.append("path").datum(forecast).attr('class', 'area').attr('d', area).style("fill", "lightgrey").style("opacity", .6);
+        console.log("stdarea", stdarea);
+        var line = d3.line().defined(function (d) {
+          return d['value'] != null;
+        }).x(function (d) {
+          return xScale(d.date);
+        }).y(function (d) {
+          return yScale(d['value']);
+        });
+        var line2 = d3.line().defined(function (d) {
+          return d['histpred'] != null;
+        }).x(function (d) {
+          return xScale(d.date);
+        }).y(function (d) {
+          return yScale(d['histpred']);
+        });
+
+        if (config.curve_bool == "true") {
+          line.curve(d3.curveNatural);
+          line2.curve(d3.curveNatural);
+        }
+
+        var histLine = group.append("path").data([hist]).attr('class', 'histline').attr('d', line).attr('fill', 'none').attr('stroke', '#007b82').attr('stroke-width', '1.5px');
+        var histpredLine = group.append("path").data([hist]).attr('class', 'histpredline').attr('d', line2).attr('fill', 'none').attr('stroke', '#007b82').attr('stroke-width', '1.5px').attr('stroke-dasharray', '3 3');
+        var forecastLine = group.append("path").data([forecast]).attr('class', 'forecastline').attr('d', line).attr('fill', 'none').attr('stroke', '#323232').attr('stroke-width', '2px').attr('stroke-dasharray', '3 3'); // legend
+
+        var legend = group.append('g').attr("transform", "translate(0, -22)").classed("legendContainer", true);
+        var legendHist = legend.append('g').classed('legend', true).attr('transform', "translate(0, 0)");
+        legendHist.append("line").attr('x1', 0).attr('x2', 25).attr('y1', 2).attr('y2', 2).style('stroke', '#007b82').style('stroke-width', '1.5px');
+        legendHist.append('text').attr('x', 30).attr('y', 3).style('text-anchor', 'start').style('dominant-baseline', 'middle').style('font-size', 11).text('Historical');
+        var legendHistPred = legend.append('g').classed('legend', true).attr('transform', 'translate(90, 0)');
+        legendHistPred.append("line").attr('x1', 0).attr('x2', 25).attr('y1', 2).attr('y2', 2).style('stroke', '#007b82').style('stroke-width', '1.5px').attr('stroke-dasharray', '3 3');
+        legendHistPred.append('text').attr('x', 30).attr('y', 3).style('text-anchor', 'start').style('dominant-baseline', 'middle').style('font-size', 11).text('Hist. Prediction');
+        var legendForecast = legend.append('g').classed('legend', true).attr('transform', 'translate(210, 0)');
+        legendForecast.append("line").attr('x1', 0).attr('x2', 25).attr('y1', 2).attr('y2', 2).style('stroke', '#323232').style('stroke-width', '2px').attr('stroke-dasharray', '3 3');
+        legendForecast.append('text').attr('x', 30).attr('y', 3).style('text-anchor', 'start').style('dominant-baseline', 'middle').style('font-size', 11).text('Forecast');
+        var legendProgression = legend.append('g').classed('legend', true).attr('transform', 'translate(300, 0)');
+        legendProgression.append("rect").attr('x', 0).attr('y', 0).attr('width', 25).attr('height', 5).attr("fill", "lightgrey").attr("fill-opacity", .6);
+        legendProgression.append('text').attr('x', 30).attr('y', 3).style('text-anchor', 'start').style('dominant-baseline', 'middle').style('font-size', 11).text('Progression to +/- 1 Standard Deviation'); // tooltips
+        // const tt = d3.select(".tooltip")
+
+        var tooltip = d3.select(".tooltip").style("position", "absolute").style("padding", "5px").style("background-color", "white").style("opacity", 0).style("border-radius", "4px").style("display", "block").style("border", "solid").style("border-color", "lightgrey").style("border-width", ".5px").attr("pointer-events", "none").classed("tooltip", true);
+        tooltip.html("<div id=\"tt-header\"></div><p id=\"tt-body\"></p>");
+        var tooltipHeader = tooltip.select("#tt-header");
+        var tooltipBody = tooltip.select("#tt-body");
+        var tt = group.append("g").classed("tooltip", true).attr("pointer-events", "all");
+        var tooltipCircles = tt.append("g").classed("tooltipCircle", true);
+        var tooltipCirclesPred = tt.append("g").classed("tooltipCirclePred", true);
+        var tooltipBox = tt.append("rect").classed("tooltipBox", true).attr("width", width).attr("height", height).attr("fill", "transparent").style('pointer-events', 'all').on("mousemove", drawTooltip).on("mouseout", removeTooltip);
+
+        function removeTooltip() {
+          tooltip.transition().duration(0).style("opacity", 0);
+          tooltipCircles.selectAll("circle").remove();
+          tooltipCirclesPred.selectAll("circle").remove();
+        }
+
+        function drawTooltip() {
+          var mousePosition = d3.mouse(this);
+          var hoveredDate = xScale.invert(mousePosition[0]);
+          hoveredDate = new Date(hoveredDate.getFullYear(), hoveredDate.getMonth(), hoveredDate.getDate(), 0, 0, 0);
+          var lasthistDate = lasthist.date;
+          console.log("date comp", hoveredDate, lasthistDate);
+          var hoveredDayNum = hoveredDate.getDate();
+
+          if (hoveredDayNum > 15) {
+            hoveredDate = new Date(hoveredDate.getFullYear(), hoveredDate.getMonth() + 1, 1, 0, 0, 0);
           } else {
-            tooltipValueBody.html("<span class='null-val'>∅</span>");
-          }
-        };
-
-        var mouseleave = function mouseleave(d) {
-          tooltip.style("opacity", 0);
-          d3.select(this).style("stroke", "none").style("opacity", 1);
-        }; // add the squares
+            hoveredDate = new Date(hoveredDate.getFullYear(), hoveredDate.getMonth(), 1, 0, 0, 0);
+          } // if forecast date, change date to be closest month start
 
 
-        if (config.transpose == "true") {
-          var tiles = svg.selectAll(".tile").data(final_data).enter().append("g").attr("class", "tile");
-          tiles.append("rect").attr("x", function (d) {
-            return x(d.variable);
-          }).attr("y", function (d) {
-            return y(d.group);
-          }) // Change rounded to square here
-          .attr("rx", function () {
-            if (config.rounded == "true") {
-              return 4;
-            } else {
-              return 0;
-            }
-          }).attr("ry", function () {
-            if (config.rounded == "true") {
-              return 4;
-            } else {
-              return 0;
-            }
-          }).attr("width", x.bandwidth()).attr("height", y.bandwidth()).style("fill", function (d) {
-            if (d.value == null) {
-              return "#f3f3f3";
-            } else {
-              if (config.color_palette != 'diverging') {
-                return scales[+config.automatic](+d.value);
-              } else {
-                return divergingPaletteTwo(+d.value);
-              }
-            }
-          }).style("stroke-width", 4).style("stroke", "none").style("opacity", 1).on("mouseover", mouseover).on("mousemove", mousemove).on("mouseleave", mouseleave);
+          var type = hoveredDate > lasthist.date ? 'forecast' : 'hist';
+          console.log("updated hoveredDate", hoveredDate);
+          var ttdata = [];
 
-          if (config.text == "true" && final_dimensions.length < 25) {
-            tiles.append("text").attr("x", function (d) {
-              return x(d.variable) + x.bandwidth() / 1.967;
-            }).attr("y", function (d) {
-              return y(d.group) + y.bandwidth() / 1.765;
-            }).attr("text-anchor", "middle").attr("font-size", 10).attr("font-weight", 500).attr("opacity", 0.5).attr("pointer-events", "none").attr("fill", function (d) {
-              if (config.color_palette == 'diverging') {
-                var background = divergingPaletteTwo(+d.value);
-                var _colors = ['red', 'green', 'blue'];
-                var colorArr = background.slice(background.indexOf("(") + 1, background.indexOf(")")).split(", ");
-                var colorObj = new Object();
-                colorArr.forEach(function (k, i) {
-                  colorObj[_colors[i]] = +k;
-                });
-                return colorObj['red'] * .299 + colorObj['green'] * .587 + colorObj['blue'] * .114 > 150 ? 'black' : 'white';
-              } else if (config.reverse == "true") {
-                if (scales[+config.automatic](+d.value) == scales[+config.automatic].range()[0] || scales[+config.automatic](+d.value) == scales[+config.automatic].range()[1]) {
-                  return "white";
-                }
-              } else {
-                if (scales[+config.automatic](+d.value) == scales[+config.automatic].range()[scales[+config.automatic].range().length - 1] || scales[+config.automatic](+d.value) == scales[+config.automatic].range()[scales[+config.automatic].range().length - 2]) {
-                  return "white";
-                }
-              }
-            }).text(function (d) {
-              if (config.color_palette == 'diverging' && d.value) {
-                console.log("text value", +d.value);
-                return formatMap[config.metric_format](+d.value);
-              } else if (d.value > 1000000) {
-                return Math.round(d.value / 100000) / 10 + "M";
-              } else if (d.value > 1000) {
-                return Math.round(d.value / 100) / 10 + "K";
-              } else {
-                return d.value;
-              }
+          if (hoveredDate <= lasthist.date) {
+            var filtered = hist.filter(function (d) {
+              return d3.timeFormat("%b %d %Y")(d.date) == d3.timeFormat("%b %d %Y")(hoveredDate);
             });
-          }
-        } else {
-          var _tiles = svg.selectAll(".tile").data(final_data).enter().append("g").attr("class", "tile");
+            console.log("filtered hist", filtered);
 
-          _tiles.append("rect").attr("x", function (d) {
-            return x(d.group);
-          }).attr("y", function (d) {
-            return y(d.variable);
-          }) // Change rounded to square here
-          .attr("rx", function () {
-            if (config.rounded == "true") {
-              return 4;
-            } else {
-              return 0;
+            if (filtered.length > 0) {
+              ttdata.push(filtered[0]);
             }
-          }).attr("ry", function () {
-            if (config.rounded == "true") {
-              return 4;
-            } else {
-              return 0;
-            }
-          }).attr("width", x.bandwidth()).attr("height", y.bandwidth()).style("fill", function (d) {
-            if (d.value == null) {
-              return "#f3f3f3";
-            } else {
-              if (config.color_palette != 'diverging') {
-                return scales[+config.automatic](+d.value);
-              } else {
-                return divergingPaletteTwo(+d.value);
-              }
-            }
-          }).style("stroke-width", 4).style("stroke", "none").style("opacity", 1).on("mouseover", mouseover).on("mousemove", mousemove).on("mouseleave", mouseleave);
-
-          if (config.text == "true" && final_dimensions.length < 25) {
-            _tiles.append("text").attr("x", function (d) {
-              return x(d.group) + x.bandwidth() / 1.967;
-            }).attr("y", function (d) {
-              return y(d.variable) + y.bandwidth() / 1.77;
-            }).attr("text-anchor", "middle").attr("font-size", 10).attr("font-weight", 500).attr("opacity", 0.5).attr("pointer-events", "none").attr("fill", function (d) {
-              if (config.color_palette == 'diverging') {
-                var background = divergingPaletteTwo(+d.value);
-                var _colors2 = ['red', 'green', 'blue'];
-                var colorArr = background.slice(background.indexOf("(") + 1, background.indexOf(")")).split(", ");
-                var colorObj = new Object();
-                colorArr.forEach(function (k, i) {
-                  colorObj[_colors2[i]] = +k;
-                });
-                return colorObj['red'] * .299 + colorObj['green'] * .587 + colorObj['blue'] * .114 > 150 ? 'black' : 'white';
-              } else if (config.reverse == "true") {
-                if (scales[+config.automatic](+d.value) == scales[+config.automatic].range()[0] || scales[+config.automatic](+d.value) == scales[+config.automatic].range()[1]) {
-                  return "white";
-                }
-              } else {
-                if (scales[+config.automatic](+d.value) == scales[+config.automatic].range()[scales[+config.automatic].range().length - 1] || scales[+config.automatic](+d.value) == scales[+config.automatic].range()[scales[+config.automatic].range().length - 2]) {
-                  return "white";
-                }
-              }
-            }).text(function (d) {
-              if (config.color_palette == 'diverging' && d.value) {
-                console.log("text value", +d.value);
-                return formatMap[config.metric_format](+d.value);
-              } else if (d.value > 1000000) {
-                return Math.round(d.value / 100000) / 10 + "M";
-              } else if (d.value > 1000) {
-                return Math.round(d.value / 100) / 10 + "K";
-              } else {
-                return d.value;
-              }
+          } else {
+            var _filtered = forecast.filter(function (d) {
+              return d3.timeFormat("%b %d %Y")(d.date) == d3.timeFormat("%b %d %Y")(hoveredDate);
             });
+
+            console.log('filtered forecast', _filtered);
+
+            if (_filtered.length > 0) {
+              ttdata.push(_filtered[0]);
+            }
           }
-        } // const histogram = d3.histogram()
-        //   .value(function(d) { 
-        //     return +d.value; })
-        //   .domain(d3.extent(data, (d)=>{
-        //               return d.value
-        //             }))
-        //   .thresholds(config.number_quantiles);
 
-
-        var qRange = qScale.range();
-        var qDomain = qRange.map(function (entry) {
-          return qScale.invertExtent(entry);
-        });
-        var legendGroupData;
-
-        if (config.automatic == "0") {
-          legendGroupData = qDomain;
-        } else {
-          legendGroupData = tScaleDomain;
-        }
-
-        console.log("legendGroupData", legendGroupData); // const leftLabel = svg.append("text")
-        //     .attr('y', -154)
-        //     .attr('x', height/-1.7)
-        //     .attr('text-anchor', 'middle')
-        //     .attr('transform','rotate(-90)')
-        //     .style('font-size', 14)
-        //     .style('font-weight', 700)
-        //     .text(pivots[0].label_short);
-
-        var leftLabel = svg.append("text").attr('y', -120).attr('x', height / -2).attr('text-anchor', 'middle').attr('transform', 'rotate(-90)').style('font-size', 14).style('font-weight', 700);
-        var bottomLabel = svg.append("text").attr('y', height + margin.top).attr('x', width / 2).attr('text-anchor', 'middle').style('font-size', 14).style('font-weight', 700);
-
-        if (config.transpose == "true") {
-          bottomLabel.text(pivots[0].label_short);
-          leftLabel.text(dimensions[0].label_short);
-        } else {
-          leftLabel.text(pivots[0].label_short);
-          bottomLabel.text(dimensions[0].label_short);
-        }
-
-        if (config.label_bottom.length > 0) {
-          var yOffset = height + margin.top + +config.label_bottom;
-          bottomLabel.attr('y', yOffset);
-        }
-
-        if (config.label_left.length > 0) {
-          console.log(config.label_left, highest);
-          var xOffset = (highest * 4.8 / 2 + margin.right + +config.label_left) * -1;
-          leftLabel.attr('y', xOffset);
-        }
-
-        if (height < 180) {
-          margin.top = 20;
-          svg.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-        } else if (config.color_palette != 'diverging') {
-          var legendContainer = svg.append("g").attr("class", "legendContainer").attr("transform", "translate(30, -30)");
-          var legendGroup = legendContainer.selectAll('.leg-group').data(legendGroupData).enter().append('g').attr('class', 'leg-group').attr('transform', function (d, i) {
-            return 'translate(' + 38 + ',' + -14 + ')';
+          tooltipCircles.selectAll("circle").remove();
+          tooltipCircles.selectAll("circle").data(ttdata).enter().append("circle").attr("r", 4).attr("cx", function (d) {
+            return xScale(d.date);
+          }).attr("cy", function (d) {
+            return yScale(d.value);
+          }).style("fill", function (d) {
+            return d.date > lasthist.date ? "#323232" : "#007b82";
           });
-          var legendPrefix = legendContainer.append('text').attr('dy', 14).attr('dx', -28).attr('text-anchor', 'start').attr('font-size', 12).text("Bin values: ");
-          var legendCircle = legendGroup.append('rect').attr('y', 20).attr('x', function (d, i) {
-            return legendScale(i);
-          }).attr('height', 10).attr('width', legendScale.bandwidth()).attr('fill', function (d, i) {
-            return scales[+config.automatic].range()[i];
-          });
-          var legendText = legendGroup.append('text').attr('x', function (d, i) {
-            return legendScale(i) + legendScale.bandwidth();
-          }).attr('y', 0).attr('dy', 14).attr('dx', 0).attr('text-anchor', 'end').attr('font-size', function () {
-            if ($("svg").width() < 380) {
-              return 8;
-            } else if (legendGroupData.length == 4 && $("svg").width() > 550) {
-              return 16;
-            } else if (legendGroupData.length == 5) {
-              return 14;
-            } else if (legendGroupData.length >= 7 || $("svg").width() < 550) {
-              return 10;
-            } else if (legendGroupData.length == 6) {
-              return 12;
-            }
-          }).text(function (d, i) {
-            var sep;
+          tooltipCirclesPred.selectAll("circle").remove();
 
-            if (legendGroupData.length >= 7) {
-              sep = "–";
-            } else {
-              sep = " – ";
+          if (ttdata[0].date <= lasthist.date) {
+            tooltipCirclesPred.selectAll("circle").data(ttdata).enter().append("circle").attr("r", 4).attr("cx", function (d) {
+              return xScale(d.date);
+            }).attr("cy", function (d) {
+              return yScale(d.histpred);
+            }).style("fill", "#ffffff").style("stroke", "#007b82");
+          }
+
+          console.log("ttdata", ttdata); // have title case for the labels in the tooltip text
+
+          function titleCase(str) {
+            var sentence = str.toLowerCase().split(" ");
+
+            for (var i = 0; i < sentence.length; i++) {
+              sentence[i] = sentence[i][0].toUpperCase() + sentence[i].slice(1);
             }
 
-            if (config.automatic == "1" || config.automatic == "2") {
-              // if user chooses set breakpoints or equal frequency binning
-              if (i == 0) {
-                if (extent[0] > legendGroupData[i]) {
-                  console.log("legendGroupData[i]", legendGroupData[i]); // in this case legendGroupData is a flat array
-                  // if the lowest actual value is above the first entry in legendGroupData, create and 0 - X label
-                  // if the first entry in legendGroupData is less than 1M, round it, otherwise convert to M
+            return sentence.join(" ");
+          }
 
-                  if (legendGroupData[i] < 1000000) {
-                    return "0" + sep + Math.round(legendGroupData[i]);
-                  } else {
-                    return "0" + sep + Math.round(legendGroupData[i] / 1000000, 2) + "M";
-                  }
-                } else {
-                  // if lowest actual value is below first entry in legendGroupData, create extent[0] - X label
-                  // if first entry in legendGroupData is less than 1M, round it, otherwise convert to M
-                  if (legendGroupData[i] < 1000000) {
-                    return extent[0] + sep + Math.round(legendGroupData[i]);
-                  } else {
-                    if (extent[0] < 1000000) {
-                      return extent[0] + sep + Math.round(legendGroupData[i] / 1000000, 2) + "M";
-                    } else {
-                      return Math.round(extent[0], 2) + "M" + sep + Math.round(legendGroupData[i] / 1000000, 2) + "M";
-                    }
-                  }
-                }
-              } else {
-                // if this isn't the first label, create label of legendGroupData prior value - legendGroupData current value
-                // if current value is les than 1M, just round both parts of label
-                if (legendGroupData[i] < 1000000) {
-                  return Math.round(legendGroupData[i - 1]) + sep + Math.round(legendGroupData[i]);
-                } else {
-                  // if prior value is less than 1M, then round prior and convert current to M
-                  if (legendGroupData[i - 1] < 1000000) {
-                    return Math.round(legendGroupData[i - 1]) + sep + Math.round(legendGroupData[i] / 1000000, 2) + "M";
-                  } else {
-                    // if prior value is greater than 1M, convert both values to M
-                    return Math.round(legendGroupData[i - 1] / 1000000, 2) + "M" + sep + Math.round(legendGroupData[i] / 1000000, 2) + "M";
-                  }
-                }
-              }
-            } else {
-              // if user chose equal width binning, legendGroupData is a 2d array with [start,end] for each label
-              // for first entry, always starts with extent[0]
-              if (d[1] >= 1000000) {
-                if (d[0] >= 1000000) {
-                  if (i == 0) {
-                    return (extent[0] / 1000000, 2) + "M" + sep + Math.round(d[1] / 1000000, 2) + "M";
-                  } else {
-                    return Math.round(d[0] / 1000000, 2) + "M" + sep + Math.round(d[1] / 1000000, 2) + "M";
-                  }
-                } else {
-                  if (i == 0) {
-                    return extent[0] + sep + Math.round(d[1] / 1000000, 2) + "M";
-                  } else {
-                    return Math.round(d[0]) + sep + Math.round(d[1] / 1000000, 2) + "M";
-                  }
-                }
-              } else {
-                if (i == 0) {
-                  return extent[0] + sep + Math.round(d[1]);
-                } else {
-                  return Math.round(d[0]) + sep + Math.round(d[1]);
-                }
-              }
-            }
-          });
-        } else if (config.color_palette == 'diverging') {
-          var _legendContainer = svg.append("g").attr("class", "legendContainer").attr("transform", "translate(30, -30)");
+          tooltip.transition().duration(0).style("opacity", 0.95);
+          tooltipHeader.html(d3.timeFormat("%b %Y")(ttdata[0].date) + "<hr>");
 
-          var defs = svg.append("defs");
-          var linearGradient = defs.append("linearGradient").attr("id", "linear-gradient").attr("x1", "0%").attr("y1", "0%").attr("x2", "100%").attr("y2", "0%");
-          var midpoint = +config.mid_breakpoint * 100;
-          console.log("extent", extent);
-          var normalizedMidpoint = (+config.mid_breakpoint - extent[0]) / (extent[1] - extent[0]);
-          linearGradient.selectAll("stop").data([{
-            offset: "0%",
-            color: colors[0]
-          }, {
-            offset: "".concat(d3.format(".0%")(normalizedMidpoint)),
-            color: colors[1]
-          }, {
-            offset: "100%",
-            color: colors[2]
-          }]).enter().append("stop").attr("offset", function (d) {
-            return d.offset;
-          }).attr("stop-color", function (d) {
-            return d.color;
-          });
+          if (type == 'hist') {
+            tooltipBody.html("<span style=\"float:left;\">".concat(titleCase(config.y_label ? config.y_label : dimensions[1].label_short), ":&nbsp&nbsp</span>") + // use label_short
+            "<span style=\"float:right;\">".concat(d3.format(config.y_format)(ttdata[0].value), "</span><br>") + "<span style=\"float:left;\">Historical Prediction:&nbsp&nbsp</span>" + "<span style=\"float:right;\">".concat(d3.format(config.y_format)(ttdata[0].histpred), "</span>"));
+          } else {
+            tooltipBody.html("<span style=\"float:left;\">".concat(titleCase(config.y_label ? config.y_label : dimensions[1].label_short), ":&nbsp&nbsp</span>") + // use label_short
+            "<span style=\"float:right;\">".concat(d3.format(config.y_format)(ttdata[0].value), "</span><br>") + "<span style=\"float:left;\">Upper Range:&nbsp&nbsp</span>" + "<span style=\"float:right;\">".concat(d3.format(config.y_format)(ttdata[0].stdup), "</span><br>") + "<span style=\"float:left;\">Lower Range:&nbsp&nbsp</span>" + "<span style=\"float:right;\">".concat(d3.format(config.y_format)(ttdata[0].stddown), "</span>"));
+          }
 
-          _legendContainer.append("rect").attr("width", width - 35).attr('height', 20).style("fill", "url(#linear-gradient)");
+          if (d3.event.pageY < height * 0.7) {
+            tooltip.style("top", d3.event.pageY - 30 + 'px');
+          } else {
+            tooltip.style("top", d3.event.pageY - 150 + 'px');
+          }
 
-          var legendTicks = d3.scaleLinear() // .domain([0, 1])
-          .domain([extent[0], extent[1]]).range([0, width - 35]);
-          var legendAxis = d3.axisTop(legendTicks).tickValues(divergingPaletteTwo.domain()) // .tickFormat(d3.format(".0%"))
-          .tickFormat(formatMap[config.metric_format]).tickSize(0);
-
-          _legendContainer.attr("class", "axis").append("g").attr("class", "legend-labels").call(legendAxis);
-
-          d3.select(".legend-labels path").attr("opacity", 0);
+          if (d3.event.pageX < width * 0.7) {
+            tooltip.style("left", d3.event.pageX + 10 + 'px');
+          } else {
+            tooltip.style("left", d3.event.pageX - 250 + 'px');
+          }
         }
-      } catch (error) {
-        console.log(error);
-      }
+      });
+    } catch (error) {
+      console.log(error);
     }
+
+    done(); // }
   }
 };
 // EXTERNAL MODULE: ./node_modules/jquery/dist/jquery.js
@@ -21524,24 +21006,24 @@ var done = function done() {
 
 var menuOptions = "<div id='menu'><h1><strong>Menu</strong></h1><div id='menu-options'></div></div></div>";
 jquery("body").append(menuOptions);
-var template_keys = Object.keys(heatmap_object.options);
-console.log("object.options", heatmap_object.options);
-console.log("Object", Object.keys(heatmap_object.options));
+var template_keys = Object.keys(line_forecast_object.options);
+console.log("object.options", line_forecast_object.options);
+console.log("Object", Object.keys(line_forecast_object.options));
 console.log("keys", template_keys);
 template_keys.forEach(function (entry, i) {
-  var array_name = heatmap_object.options[entry].label;
+  var array_name = line_forecast_object.options[entry].label;
   jquery("#menu-options").append("<p>" + array_name + "</p>");
   var form = jquery('<form>', {
     id: 'id-1',
     "class": 'menu-options-entry'
   }).appendTo('#menu-options'); // console.log("display", object.options[entry].display, ["radio","select"].includes(object.options[entry].display))
 
-  if (["radio", "select"].includes(heatmap_object.options[entry].display)) {
-    var array_values = heatmap_object.options[entry].values;
+  if (["radio", "select"].includes(line_forecast_object.options[entry].display)) {
+    var array_values = line_forecast_object.options[entry].values;
     array_values.forEach(function (ent) {
       var str;
 
-      if (ent[Object.keys(ent)[0]] == heatmap_object.options[entry]["default"]) {
+      if (ent[Object.keys(ent)[0]] == line_forecast_object.options[entry]["default"]) {
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent[Object.keys(ent)] + "' id='" + Object.keys(ent)[0] + "' name='" + array_name + "' value='" + Object.keys(ent)[0] + "' checked></input><label class='form-label' for='" + Object.keys(ent)[0] + "'>" + Object.keys(ent)[0] + "</label>";
       } else {
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent[Object.keys(ent)] + "' id='" + Object.keys(ent)[0] + "' name='" + array_name + "' value='" + Object.keys(ent)[0] + "'></input><label class='form-label' for='" + Object.keys(ent)[0] + "'>" + Object.keys(ent)[0] + "</label>";
@@ -21549,22 +21031,22 @@ template_keys.forEach(function (entry, i) {
 
       form.append(str);
     });
-  } else if (heatmap_object.options[entry].display == "number") {
+  } else if (line_forecast_object.options[entry].display == "number") {
     var str;
-    str = "<input type='number' internal_cat='" + template_keys[i] + "' internal_value='" + heatmap_object.options[entry]["default"] + "' id='" + template_keys[i] + "' min='0' name='" + heatmap_object.options[entry]["label"] + "' value='" + heatmap_object.options[entry]["default"] + "'></input><label class='form-label' for='" + heatmap_object.options[entry]["label"] + "'>" + heatmap_object.options[entry]["label"] + "</label>";
+    str = "<input type='number' internal_cat='" + template_keys[i] + "' internal_value='" + line_forecast_object.options[entry]["default"] + "' id='" + template_keys[i] + "' min='0' name='" + line_forecast_object.options[entry]["label"] + "' value='" + line_forecast_object.options[entry]["default"] + "'></input><label class='form-label' for='" + line_forecast_object.options[entry]["label"] + "'>" + line_forecast_object.options[entry]["label"] + "</label>";
     form.append(str);
-  } else if (heatmap_object.options[entry].display == "text") {
+  } else if (line_forecast_object.options[entry].display == "text") {
     var _str;
 
-    _str = "<input type='text' internal_cat='" + template_keys[i] + "' internal_value='" + heatmap_object.options[entry]["default"] + "' id='" + template_keys[i] + "' name='" + heatmap_object.options[entry]["label"] + "' value='" + heatmap_object.options[entry]["default"] + "'></input><label class='form-label' for='" + heatmap_object.options[entry]["label"] + "'>" + heatmap_object.options[entry]["label"] + "</label>";
+    _str = "<input type='text' internal_cat='" + template_keys[i] + "' internal_value='" + line_forecast_object.options[entry]["default"] + "' id='" + template_keys[i] + "' name='" + line_forecast_object.options[entry]["label"] + "' value='" + line_forecast_object.options[entry]["default"] + "'></input><label class='form-label' for='" + line_forecast_object.options[entry]["label"] + "'>" + line_forecast_object.options[entry]["label"] + "</label>";
     form.append(_str);
-  } else if (heatmap_object.options[entry].type == "boolean") {
+  } else if (line_forecast_object.options[entry].type == "boolean") {
     var _array_values = ["true", "false"];
 
     _array_values.forEach(function (ent) {
       var str;
 
-      if (ent == heatmap_object.options[entry]["default"]) {
+      if (ent == line_forecast_object.options[entry]["default"]) {
         // console.log("adding default")
         str = "<input type='radio' internal_cat='" + template_keys[i] + "' internal_value='" + ent + "' id='" + template_keys[i] + "' name='" + array_name + "' value='" + ent + "' checked></input><label class='form-label' for ='" + ent + "'>" + ent + "</label>";
       } else {
@@ -21574,8 +21056,8 @@ template_keys.forEach(function (entry, i) {
 
       form.append(str);
     });
-  } else if (heatmap_object.options[entry].type == "array") {
-    var _array_values2 = heatmap_object.options[entry]["default"]; // console.log("array_values", array_values)
+  } else if (line_forecast_object.options[entry].type == "array") {
+    var _array_values2 = line_forecast_object.options[entry]["default"]; // console.log("array_values", array_values)
 
     _array_values2.forEach(function (ent) {
       var str; // console.log("ent", ent)
@@ -21610,26 +21092,26 @@ json("http://localhost:3001/dataHeatmapTableCalc").then(function (data) {
 
   var details = ""; // Fire first instance of chart
 
-  heatmap_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment); // On change to options, loop through selections and then redraw chart
+  line_forecast_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment); // On change to options, loop through selections and then redraw chart
 
   jquery('input:radio').on("click", function () {
     jquery('input:radio:checked').each(function () {
       todays_options[this.attributes.internal_cat.value] = this.attributes.internal_value.value;
     });
-    heatmap_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
+    line_forecast_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
   });
   jquery('input[type=number]').on("input", function () {
     // const id = $('input[type=number]').attr("id")
     var id = this.attributes.id.value;
     var num = jquery("#" + id).val();
     todays_options[this.attributes.internal_cat.value] = num;
-    heatmap_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
+    line_forecast_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
   });
   jquery('input[type=text]').on("input", function () {
     var id = this.attributes.id.value;
     var str = jquery("#" + id).val();
     todays_options[this.attributes.internal_cat.value] = str;
-    heatmap_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
+    line_forecast_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
   }); // Handle the mousedown event
   // that's triggered when user drags the resizer
 
@@ -21659,7 +21141,7 @@ json("http://localhost:3001/dataHeatmapTableCalc").then(function (data) {
     // Remove the handlers of `mousemove` and `mouseup`
     document.removeEventListener('mousemove', mouseMoveHandler);
     document.removeEventListener('mouseup', mouseUpHandler);
-    heatmap_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
+    line_forecast_object.updateAsync(data.data, src_select("#vis")._groups[0][0], todays_options, data.queryResponse, details, done, this_environment);
   }; // Query all resizers
 
 

@@ -47,7 +47,8 @@ var webpackConfig = {
     // asp: './src/integration/ASP/asp.js',
     // divergingBar: './src/integration/divergingBar/divergingBar.js',
     // heatmap: './src/integration/heatmap/heatmap.js',
-    template: './src/integration/template/template.js',
+    lineForecast: './src/integration/line/lineForecast.js',
+    // template: './src/integration/template/template.js',
   },
   output: {
     filename: "[name].js",
@@ -58,12 +59,12 @@ var webpackConfig = {
   resolve: {
     extensions: [".ts", ".js"]
   },
-  optimization: {
-    minimize: false
-  },
-  // plugins: [
-  //   new UglifyJSPlugin()
-  // ],
+  // optimization: {
+  //   minimize: false
+  // },
+  plugins: [
+    new UglifyJSPlugin()
+  ],
   module: {
     rules: [
       { test: /\.js$/, loader: "babel-loader" },

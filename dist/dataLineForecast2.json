@@ -1,0 +1,1821 @@
+{"queryResponse": {
+    "data": [
+        {
+            "RATE_DATE": {
+                "value": "2023-03-21"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.1410631474927104
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-03-22"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.1362315764937576
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-03-23"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.121883884906674
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-03-24"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.1239267418574346
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-03-25"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.1186570403719402
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-03-26"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.1157184748758344
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-03-27"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.115461196821229
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-03-28"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.114110810908808
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-03-29"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0997368270808794
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-03-30"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.096645978124906
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-03-31"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0965623357253387
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0939637613843245
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-02"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0935390095239685
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-03"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.093374878916494
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-04"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.095948261044296
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-05"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.091804515672385
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-06"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.084233650843921
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-07"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0818032271151523
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-08"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0734902344928954
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-09"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.070916346151959
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-10"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.068942099431466
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-11"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0650637295471674
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-12"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.050127016833488
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-13"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.044715242490832
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-14"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0425868209197873
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-15"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.038036497152292
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-16"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0300496373851624
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-17"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.028474827778178
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-18"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.040470851031343
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-19"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.034037363903609
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-20"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0279495247849852
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-21"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0274606700675974
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-22"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0235518342633005
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-23"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.018995556602669
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-24"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0177691431638594
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-25"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0102166852120504
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-26"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0068191044716146
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-27"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0078136676570084
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-28"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.007515165222442
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-29"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0075408105686505
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-04-30"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.005076996687884
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0041893112072957
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-02"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9978940568330752
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-03"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9949736710377803
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-04"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9926705092390857
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-05"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9917968833340076
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-06"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9869147388220292
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-07"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9815642621937837
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-08"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9794181054694666
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-09"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9697066851006393
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-10"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9646809484146592
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-11"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9612842370460444
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-12"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9647392591673014
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-13"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9632917868631747
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-14"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9613652643656376
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-15"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9601932801690525
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-16"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9559334888108115
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-17"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9646110810852224
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-18"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 1.9802387394610994
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-19"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0054876485216067
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-20"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.023455765218768
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-21"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0263857450191307
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-22"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0245634614882886
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-23"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.033700568231643
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-24"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.032737783889539
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-25"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0297496755157223
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-26"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.03811942317902
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-27"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0430593813760543
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-28"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0402747715257434
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-29"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.040405600328855
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-30"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.045281325741873
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-05-31"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0402718387999546
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.039269038833358
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-02"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0446220231687886
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-03"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.046487400245883
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-04"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0437748578163535
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-05"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0450709352253447
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-06"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.040034444283065
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-07"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0322949731611395
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-08"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.028419242606106
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-09"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0295040283990193
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-10"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0259203384004065
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-11"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.020341829431468
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-12"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0207294018936586
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-13"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.021031598442341
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-14"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.017384119628994
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-15"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.017119507241257
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-16"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0183704578728303
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-17"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0167417728756494
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-18"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0109968559444167
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-19"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.010369707074852
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-20"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0122125487686446
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-06-21"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0208513339035274
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-07-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.1755479627909415
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-08-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.138796117317733
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-09-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.1543003584974225
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-10-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.1211558749434722
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-11-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.154838116949576
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2023-12-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.199656304469486
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2024-01-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.214267221284163
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2024-02-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.1501236442701073
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2024-03-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.1719984458695416
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2024-04-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0788814491216625
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2024-05-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.0797720066781147
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2024-06-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.162183059316928
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2024-07-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.189396882084442
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2024-08-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.2016149879341165
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2024-09-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.2647665440321347
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2024-10-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.2744119195639643
+            }
+        },
+        {
+            "RATE_DATE": {
+                "value": "2024-11-01"
+            },
+            "AVERAGE_OF_ALL_IN_RPM": {
+                "value": 2.3120057889485275
+            }
+        }
+    ],
+    "expired": false,
+    "fields": {
+        "measures": [
+            {
+                "name": "AVERAGE_OF_ALL_IN_RPM",
+                "label": "AVERAGE_OF_ALL_IN_RPM",
+                "type": "number",
+                "datatype": null,
+                "sortable": true,
+                "is_numeric": true
+            }
+        ],
+        "dimensions": [
+            {
+                "name": "RATE_DATE",
+                "label": "RATE_DATE",
+                "type": "date",
+                "datatype": null,
+                "sortable": true
+            }
+        ],
+        "table_calculations": [],
+        "pivots": [],
+        "dimension_like": [
+            {
+                "name": "RATE_DATE",
+                "label": "RATE_DATE",
+                "type": "date",
+                "datatype": null,
+                "sortable": true
+            }
+        ],
+        "measure_like": [
+            {
+                "name": "AVERAGE_OF_ALL_IN_RPM",
+                "label": "AVERAGE_OF_ALL_IN_RPM",
+                "type": "number",
+                "datatype": null,
+                "sortable": true,
+                "is_numeric": true
+            }
+        ]
+    },
+    "id": "query-result-5:{}",
+    "runtime": "0.202",
+    "sql": "WITH RPM AS (\n  SELECT \n    SIMP.*,\n    MIL.PC_MILER_PRACTICAL_MILEAGE_MAX ,\n    SIMP.DAT_FORECAST_SCALED / MIL.PC_MILER_PRACTICAL_MILEAGE_MAX RATE_PER_MILE\n  FROM MLP_PROD.PUBLIC.SIMULATED_PATHS_OUTPUT SIMP\n  JOIN stark_prod.recreated_tables.transfix_lanes_mileage MIL\n    ON simp.TRANSFIX_LANE_ID = mil.TRANSFIX_LANE_ID\n),\nMAX_MODEL AS (\n  SELECT MAX(MODEL_CREATED_AT) LATEST_MODEL\n  FROM MLP_PROD.PUBLIC.SIMULATED_PATHS_OUTPUT SIMP\n  WHERE TO_DATE(MODEL_CREATED_AT) < DATE('2023-06-02')\n),\nHISTORICAL AS (\nSELECT\n    (TO_CHAR(TO_DATE(\"lane_market_dat_rates\".\"HAPPENED_AT\" ), 'YYYY-MM-DD')) AS \"RATE_DATE\",\n    AVG(CAST(CAST(((\"lane_market_dat_rates\".\"ESTIMATED_LINEHAUL_TOTAL\") + ((\"lane_market_dat_rates\".\"MILES\") * (\"lane_market_dat_rates\".\"AVERAGE_FUEL_SURCHARGE_RATE\"))) AS DOUBLE PRECISION) / CAST((\"lane_market_dat_rates\".\"MILES\") AS DOUBLE PRECISION) AS DOUBLE PRECISION)) AS average_of_all_in_rpm\nFROM \"DAT_PROD\".\"API\".\"RATES\"  AS \"lane_market_dat_rates\"\nWHERE\n  TO_DATE(\"lane_market_dat_rates\".\"HAPPENED_AT\" ) >= DATEADD(MONTH, -3, CURRENT_DATE())\n  AND (\"lane_market_dat_rates\".\"MILES\" ) > 300 \nGROUP BY 1\nORDER BY \"RATE_DATE\"\n),\nPREDICTION_AVERAGE AS (\n  SELECT\n    MONTH,\n    -- MODEL_CREATED_AT,\n    AVG(RATE_PER_MILE) AS average_of_all_in_rpm\n  FROM \n    RPM\n  JOIN MAX_MODEL ON 1=1\n  WHERE \n    LATEST_MODEL = MODEL_CREATED_AT\n    AND PC_MILER_PRACTICAL_MILEAGE_MAX > 300\n  GROUP BY 1\n  ORDER BY 1\n  LIMIT 60\n)\n\n\nSELECT \"RATE_DATE\", average_of_all_in_rpm\nFROM HISTORICAL\nUNION ALL\nSELECT MONTH, average_of_all_in_rpm\nFROM PREDICTION_AVERAGE\nWHERE MONTH NOT IN (SELECT \"RATE_DATE\" FROM HISTORICAL)\nORDER BY \"RATE_DATE\"\n\n\n-- SELECT\n--   MONTH,\n--   MAX(RATE_PER_MILE)\n-- FROM\n--   RPM\n-- GROUP BY 1\n-- LIMIT 10",
+    "timezone": "America/New_York",
+    "is_local": true,
+    "table_calcs_complete": true,
+    "tracked_attributes": {
+        "result.data.length": 110,
+        "result.from_cache": false,
+        "result.runtime": "0.202",
+        "result.sql.length": 1726
+    },
+    "sorts": []
+}, "data": [
+    {
+        "RATE_DATE": {
+            "value": "2023-03-21"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.1410631474927104
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-03-22"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.1362315764937576
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-03-23"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.121883884906674
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-03-24"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.1239267418574346
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-03-25"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.1186570403719402
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-03-26"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.1157184748758344
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-03-27"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.115461196821229
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-03-28"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.114110810908808
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-03-29"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0997368270808794
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-03-30"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.096645978124906
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-03-31"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0965623357253387
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0939637613843245
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-02"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0935390095239685
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-03"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.093374878916494
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-04"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.095948261044296
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-05"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.091804515672385
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-06"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.084233650843921
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-07"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0818032271151523
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-08"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0734902344928954
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-09"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.070916346151959
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-10"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.068942099431466
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-11"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0650637295471674
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-12"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.050127016833488
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-13"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.044715242490832
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-14"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0425868209197873
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-15"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.038036497152292
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-16"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0300496373851624
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-17"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.028474827778178
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-18"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.040470851031343
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-19"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.034037363903609
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-20"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0279495247849852
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-21"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0274606700675974
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-22"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0235518342633005
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-23"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.018995556602669
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-24"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0177691431638594
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-25"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0102166852120504
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-26"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0068191044716146
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-27"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0078136676570084
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-28"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.007515165222442
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-29"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0075408105686505
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-04-30"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.005076996687884
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0041893112072957
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-02"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9978940568330752
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-03"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9949736710377803
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-04"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9926705092390857
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-05"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9917968833340076
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-06"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9869147388220292
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-07"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9815642621937837
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-08"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9794181054694666
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-09"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9697066851006393
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-10"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9646809484146592
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-11"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9612842370460444
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-12"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9647392591673014
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-13"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9632917868631747
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-14"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9613652643656376
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-15"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9601932801690525
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-16"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9559334888108115
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-17"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9646110810852224
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-18"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 1.9802387394610994
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-19"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0054876485216067
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-20"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.023455765218768
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-21"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0263857450191307
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-22"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0245634614882886
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-23"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.033700568231643
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-24"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.032737783889539
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-25"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0297496755157223
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-26"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.03811942317902
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-27"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0430593813760543
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-28"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0402747715257434
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-29"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.040405600328855
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-30"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.045281325741873
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-05-31"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0402718387999546
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.039269038833358
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-02"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0446220231687886
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-03"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.046487400245883
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-04"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0437748578163535
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-05"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0450709352253447
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-06"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.040034444283065
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-07"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0322949731611395
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-08"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.028419242606106
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-09"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0295040283990193
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-10"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0259203384004065
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-11"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.020341829431468
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-12"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0207294018936586
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-13"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.021031598442341
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-14"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.017384119628994
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-15"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.017119507241257
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-16"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0183704578728303
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-17"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0167417728756494
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-18"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0109968559444167
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-19"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.010369707074852
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-20"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0122125487686446
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-06-21"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0208513339035274
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-07-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.1755479627909415
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-08-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.138796117317733
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-09-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.1543003584974225
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-10-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.1211558749434722
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-11-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.154838116949576
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2023-12-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.199656304469486
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2024-01-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.214267221284163
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2024-02-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.1501236442701073
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2024-03-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.1719984458695416
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2024-04-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0788814491216625
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2024-05-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.0797720066781147
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2024-06-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.162183059316928
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2024-07-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.189396882084442
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2024-08-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.2016149879341165
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2024-09-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.2647665440321347
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2024-10-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.2744119195639643
+        }
+    },
+    {
+        "RATE_DATE": {
+            "value": "2024-11-01"
+        },
+        "AVERAGE_OF_ALL_IN_RPM": {
+            "value": 2.3120057889485275
+        }
+    }
+]}

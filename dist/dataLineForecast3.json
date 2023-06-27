@@ -1,0 +1,1314 @@
+{"queryResponse":{
+    "parent_id": "34472d53f0169080c1d652ca7f34bd02",
+    "sql_changed": true,
+    "aggregate_table_used_info": null,
+    "added_params": null,
+    "data": [
+        {
+            "forecast_average.rate_date": {
+                "value": "2021-07-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 3.0934026405641073
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.9519831046811635
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2021-08-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 3.199323333884805
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 3.060473141947995
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2021-09-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 3.245148579183954
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 3.088820715200076
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2021-10-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 3.2894733688448663
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 3.1566296808011
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2021-11-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 3.3510362789470896
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 3.2037108951722653
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2021-12-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 3.6255953371952465
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 3.198441408736975
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2022-01-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 3.5375906311488667
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 3.216843356188551
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2022-02-28"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 3.428487020789055
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 3.3877695565042525
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2022-03-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 3.0504776086969705
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 3.4348143278406624
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2022-04-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.8901725346080513
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 3.3701757444060636
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2022-05-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.8536945291756917
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 3.116379648847658
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2022-06-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.77597142206149
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.9315431533879495
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2022-07-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.7291991274024165
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.8796170936471976
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2022-08-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.6422413149510073
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.767815163029995
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2022-09-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.6544695190372845
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.706871196186918
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2022-10-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.5723495162534746
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.5975410068594393
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2022-11-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.5909420155780634
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.6539214737199264
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2022-12-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.650175860132335
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.5828721344708687
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2023-01-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.4298718560857053
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.527705469955637
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2023-02-28"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.3351783267500723
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.5252577338565443
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2023-03-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.229109960235794
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.338545887393705
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2023-04-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.2068942523829707
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.113135373024648
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2023-05-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.2313507249643223
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.2003136900502605
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2023-06-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.204002538275149
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.204002538275149
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2023-07-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.1608990436264524
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.1608990436264524
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2023-08-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.171682546026553
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.171682546026553
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2023-09-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.134220730304726
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.134220730304726
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2023-10-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.116291939182765
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.116291939182765
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2023-11-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.16921776099883
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.16921776099883
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2023-12-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.182848226078654
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.182848226078654
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2024-01-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.1217952029498033
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.1217952029498033
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2024-02-29"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.143569145681618
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.143569145681618
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2024-03-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.052513502741757
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.052513502741757
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2024-04-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.0551519733994557
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.0551519733994557
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2024-05-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.13920832322232
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.13920832322232
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2024-06-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.162173533854844
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.162173533854844
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2024-07-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.16954880055839
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.16954880055839
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2024-08-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.2318293965390317
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.2318293965390317
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2024-09-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.2404283587583964
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.2404283587583964
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2024-10-31"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.2685592534691934
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.2685592534691934
+            }
+        },
+        {
+            "forecast_average.rate_date": {
+                "value": "2024-11-30"
+            },
+            "forecast_average.average_of_all_in_rpm": {
+                "value": 2.3227497069708014
+            },
+            "forecast_average.hist_rpm_1_mo": {
+                "value": 2.3227497069708014
+            }
+        }
+    ],
+    "drill_menu_build_time": 0.049061,
+    "expired": false,
+    "fields": {
+        "measures": [],
+        "dimensions": [
+            {
+                "align": "left",
+                "can_filter": true,
+                "category": "dimension",
+                "default_filter_value": null,
+                "description": "",
+                "enumerations": null,
+                "field_group_label": null,
+                "fill_style": "range",
+                "fiscal_month_offset": 0,
+                "has_allowed_values": false,
+                "hidden": false,
+                "is_filter": false,
+                "is_numeric": false,
+                "label": "Forecasting Averages Rate Date",
+                "label_from_parameter": null,
+                "label_short": "Rate Date",
+                "map_layer": null,
+                "name": "forecast_average.rate_date",
+                "strict_value_format": false,
+                "requires_refresh_on_sort": false,
+                "sortable": true,
+                "suggestions": null,
+                "tags": [],
+                "type": "date",
+                "user_attribute_filter_types": [
+                    "datetime",
+                    "advanced_filter_datetime"
+                ],
+                "value_format": null,
+                "view": "forecast_average",
+                "view_label": "Forecasting Averages",
+                "dynamic": false,
+                "week_start_day": "monday",
+                "original_view": "forecast_average",
+                "dimension_group": null,
+                "error": null,
+                "field_group_variant": "Rate Date",
+                "measure": false,
+                "parameter": false,
+                "primary_key": false,
+                "project_name": "snowflake",
+                "scope": "forecast_average",
+                "suggest_dimension": "forecast_average.rate_date",
+                "suggest_explore": "forecast_average",
+                "suggestable": false,
+                "is_fiscal": false,
+                "is_timeframe": true,
+                "can_time_filter": false,
+                "time_interval": {
+                    "name": "day",
+                    "count": 1
+                },
+                "lookml_link": "/projects/snowflake/files/MarketPlace%2FCore%2Fviews%2Fforecast_average.view.lkml?line=87",
+                "permanent": null,
+                "source_file": "MarketPlace/Core/views/forecast_average.view.lkml",
+                "source_file_path": "snowflake/MarketPlace/Core/views/forecast_average.view.lkml",
+                "sql": "${TABLE}.\"RATE_DATE\" ",
+                "sql_case": null,
+                "filters": null,
+                "times_used": 0,
+                "sorted": {
+                    "desc": false,
+                    "sort_index": 0
+                }
+            },
+            {
+                "align": "right",
+                "can_filter": true,
+                "category": "dimension",
+                "default_filter_value": null,
+                "description": "",
+                "enumerations": null,
+                "field_group_label": null,
+                "fill_style": null,
+                "fiscal_month_offset": 0,
+                "has_allowed_values": false,
+                "hidden": false,
+                "is_filter": false,
+                "is_numeric": true,
+                "label": "Forecasting Averages Average of All In Rpm",
+                "label_from_parameter": null,
+                "label_short": "Average of All In Rpm",
+                "map_layer": null,
+                "name": "forecast_average.average_of_all_in_rpm",
+                "strict_value_format": false,
+                "requires_refresh_on_sort": false,
+                "sortable": true,
+                "suggestions": null,
+                "tags": [],
+                "type": "number",
+                "user_attribute_filter_types": [
+                    "number",
+                    "advanced_filter_number"
+                ],
+                "value_format": null,
+                "view": "forecast_average",
+                "view_label": "Forecasting Averages",
+                "dynamic": false,
+                "week_start_day": "monday",
+                "original_view": "forecast_average",
+                "dimension_group": null,
+                "error": null,
+                "field_group_variant": "Average of All In Rpm",
+                "measure": false,
+                "parameter": false,
+                "primary_key": false,
+                "project_name": "snowflake",
+                "scope": "forecast_average",
+                "suggest_dimension": "forecast_average.average_of_all_in_rpm",
+                "suggest_explore": "forecast_average",
+                "suggestable": false,
+                "is_fiscal": false,
+                "is_timeframe": false,
+                "can_time_filter": false,
+                "time_interval": null,
+                "lookml_link": "/projects/snowflake/files/MarketPlace%2FCore%2Fviews%2Fforecast_average.view.lkml?line=92",
+                "permanent": null,
+                "source_file": "MarketPlace/Core/views/forecast_average.view.lkml",
+                "source_file_path": "snowflake/MarketPlace/Core/views/forecast_average.view.lkml",
+                "sql": "${TABLE}.\"AVERAGE_OF_ALL_IN_RPM\" ",
+                "sql_case": null,
+                "filters": null,
+                "times_used": 0
+            },
+            {
+                "align": "right",
+                "can_filter": true,
+                "category": "dimension",
+                "default_filter_value": null,
+                "description": "",
+                "enumerations": null,
+                "field_group_label": null,
+                "fill_style": null,
+                "fiscal_month_offset": 0,
+                "has_allowed_values": false,
+                "hidden": false,
+                "is_filter": false,
+                "is_numeric": true,
+                "label": "Forecasting Averages Hist Rpm 1 Mo",
+                "label_from_parameter": null,
+                "label_short": "Hist Rpm 1 Mo",
+                "map_layer": null,
+                "name": "forecast_average.hist_rpm_1_mo",
+                "strict_value_format": false,
+                "requires_refresh_on_sort": false,
+                "sortable": true,
+                "suggestions": null,
+                "tags": [],
+                "type": "number",
+                "user_attribute_filter_types": [
+                    "number",
+                    "advanced_filter_number"
+                ],
+                "value_format": null,
+                "view": "forecast_average",
+                "view_label": "Forecasting Averages",
+                "dynamic": false,
+                "week_start_day": "monday",
+                "original_view": "forecast_average",
+                "dimension_group": null,
+                "error": null,
+                "field_group_variant": "Hist Rpm 1 Mo",
+                "measure": false,
+                "parameter": false,
+                "primary_key": false,
+                "project_name": "snowflake",
+                "scope": "forecast_average",
+                "suggest_dimension": "forecast_average.hist_rpm_1_mo",
+                "suggest_explore": "forecast_average",
+                "suggestable": false,
+                "is_fiscal": false,
+                "is_timeframe": false,
+                "can_time_filter": false,
+                "time_interval": null,
+                "lookml_link": "/projects/snowflake/files/MarketPlace%2FCore%2Fviews%2Fforecast_average.view.lkml?line=97",
+                "permanent": null,
+                "source_file": "MarketPlace/Core/views/forecast_average.view.lkml",
+                "source_file_path": "snowflake/MarketPlace/Core/views/forecast_average.view.lkml",
+                "sql": "${TABLE}.\"HIST_RPM_1MO\" ",
+                "sql_case": null,
+                "filters": null,
+                "times_used": 0
+            }
+        ],
+        "table_calculations": [],
+        "pivots": [],
+        "measure_like": [],
+        "dimension_like": [
+            {
+                "align": "left",
+                "can_filter": true,
+                "category": "dimension",
+                "default_filter_value": null,
+                "description": "",
+                "enumerations": null,
+                "field_group_label": null,
+                "fill_style": "range",
+                "fiscal_month_offset": 0,
+                "has_allowed_values": false,
+                "hidden": false,
+                "is_filter": false,
+                "is_numeric": false,
+                "label": "Forecasting Averages Rate Date",
+                "label_from_parameter": null,
+                "label_short": "Rate Date",
+                "map_layer": null,
+                "name": "forecast_average.rate_date",
+                "strict_value_format": false,
+                "requires_refresh_on_sort": false,
+                "sortable": true,
+                "suggestions": null,
+                "tags": [],
+                "type": "date",
+                "user_attribute_filter_types": [
+                    "datetime",
+                    "advanced_filter_datetime"
+                ],
+                "value_format": null,
+                "view": "forecast_average",
+                "view_label": "Forecasting Averages",
+                "dynamic": false,
+                "week_start_day": "monday",
+                "original_view": "forecast_average",
+                "dimension_group": null,
+                "error": null,
+                "field_group_variant": "Rate Date",
+                "measure": false,
+                "parameter": false,
+                "primary_key": false,
+                "project_name": "snowflake",
+                "scope": "forecast_average",
+                "suggest_dimension": "forecast_average.rate_date",
+                "suggest_explore": "forecast_average",
+                "suggestable": false,
+                "is_fiscal": false,
+                "is_timeframe": true,
+                "can_time_filter": false,
+                "time_interval": {
+                    "name": "day",
+                    "count": 1
+                },
+                "lookml_link": "/projects/snowflake/files/MarketPlace%2FCore%2Fviews%2Fforecast_average.view.lkml?line=87",
+                "permanent": null,
+                "source_file": "MarketPlace/Core/views/forecast_average.view.lkml",
+                "source_file_path": "snowflake/MarketPlace/Core/views/forecast_average.view.lkml",
+                "sql": "${TABLE}.\"RATE_DATE\" ",
+                "sql_case": null,
+                "filters": null,
+                "times_used": 0,
+                "sorted": {
+                    "desc": false,
+                    "sort_index": 0
+                }
+            },
+            {
+                "align": "right",
+                "can_filter": true,
+                "category": "dimension",
+                "default_filter_value": null,
+                "description": "",
+                "enumerations": null,
+                "field_group_label": null,
+                "fill_style": null,
+                "fiscal_month_offset": 0,
+                "has_allowed_values": false,
+                "hidden": false,
+                "is_filter": false,
+                "is_numeric": true,
+                "label": "Forecasting Averages Average of All In Rpm",
+                "label_from_parameter": null,
+                "label_short": "Average of All In Rpm",
+                "map_layer": null,
+                "name": "forecast_average.average_of_all_in_rpm",
+                "strict_value_format": false,
+                "requires_refresh_on_sort": false,
+                "sortable": true,
+                "suggestions": null,
+                "tags": [],
+                "type": "number",
+                "user_attribute_filter_types": [
+                    "number",
+                    "advanced_filter_number"
+                ],
+                "value_format": null,
+                "view": "forecast_average",
+                "view_label": "Forecasting Averages",
+                "dynamic": false,
+                "week_start_day": "monday",
+                "original_view": "forecast_average",
+                "dimension_group": null,
+                "error": null,
+                "field_group_variant": "Average of All In Rpm",
+                "measure": false,
+                "parameter": false,
+                "primary_key": false,
+                "project_name": "snowflake",
+                "scope": "forecast_average",
+                "suggest_dimension": "forecast_average.average_of_all_in_rpm",
+                "suggest_explore": "forecast_average",
+                "suggestable": false,
+                "is_fiscal": false,
+                "is_timeframe": false,
+                "can_time_filter": false,
+                "time_interval": null,
+                "lookml_link": "/projects/snowflake/files/MarketPlace%2FCore%2Fviews%2Fforecast_average.view.lkml?line=92",
+                "permanent": null,
+                "source_file": "MarketPlace/Core/views/forecast_average.view.lkml",
+                "source_file_path": "snowflake/MarketPlace/Core/views/forecast_average.view.lkml",
+                "sql": "${TABLE}.\"AVERAGE_OF_ALL_IN_RPM\" ",
+                "sql_case": null,
+                "filters": null,
+                "times_used": 0
+            },
+            {
+                "align": "right",
+                "can_filter": true,
+                "category": "dimension",
+                "default_filter_value": null,
+                "description": "",
+                "enumerations": null,
+                "field_group_label": null,
+                "fill_style": null,
+                "fiscal_month_offset": 0,
+                "has_allowed_values": false,
+                "hidden": false,
+                "is_filter": false,
+                "is_numeric": true,
+                "label": "Forecasting Averages Hist Rpm 1 Mo",
+                "label_from_parameter": null,
+                "label_short": "Hist Rpm 1 Mo",
+                "map_layer": null,
+                "name": "forecast_average.hist_rpm_1_mo",
+                "strict_value_format": false,
+                "requires_refresh_on_sort": false,
+                "sortable": true,
+                "suggestions": null,
+                "tags": [],
+                "type": "number",
+                "user_attribute_filter_types": [
+                    "number",
+                    "advanced_filter_number"
+                ],
+                "value_format": null,
+                "view": "forecast_average",
+                "view_label": "Forecasting Averages",
+                "dynamic": false,
+                "week_start_day": "monday",
+                "original_view": "forecast_average",
+                "dimension_group": null,
+                "error": null,
+                "field_group_variant": "Hist Rpm 1 Mo",
+                "measure": false,
+                "parameter": false,
+                "primary_key": false,
+                "project_name": "snowflake",
+                "scope": "forecast_average",
+                "suggest_dimension": "forecast_average.hist_rpm_1_mo",
+                "suggest_explore": "forecast_average",
+                "suggestable": false,
+                "is_fiscal": false,
+                "is_timeframe": false,
+                "can_time_filter": false,
+                "time_interval": null,
+                "lookml_link": "/projects/snowflake/files/MarketPlace%2FCore%2Fviews%2Fforecast_average.view.lkml?line=97",
+                "permanent": null,
+                "source_file": "MarketPlace/Core/views/forecast_average.view.lkml",
+                "source_file_path": "snowflake/MarketPlace/Core/views/forecast_average.view.lkml",
+                "sql": "${TABLE}.\"HIST_RPM_1MO\" ",
+                "sql_case": null,
+                "filters": null,
+                "times_used": 0
+            }
+        ]
+    },
+    "fill_fields": [],
+    "forecast_result": null,
+    "has_row_totals": false,
+    "has_totals": false,
+    "id": "query-result-7:{\"hidden_points_if_no\":[],\"hidden_fields\":[]}",
+    "null_sort_treatment": "high",
+    "number_format": "1,234.56",
+    "ran_at": "2023-06-26T15:23:17+00:00",
+    "runtime": "2.583",
+    "sql": "WITH forecast_average AS (WITH RPM AS (\n        SELECT\n          MONTH,\n          MODEL_CREATED_AT,\n          MIL.PC_MILER_PRACTICAL_MILEAGE_MAX ,\n          SIMP.DAT_FORECAST_SCALED / MIL.PC_MILER_PRACTICAL_MILEAGE_MAX RATE_PER_MILE,\n          FORECAST_MONTH_INDEX\n        FROM MLP_PROD.PUBLIC.SIMULATED_PATHS_OUTPUT SIMP\n        JOIN stark_prod.recreated_tables.transfix_lanes_mileage MIL\n          ON simp.TRANSFIX_LANE_ID = mil.TRANSFIX_LANE_ID\n      ),\n      MAX_MODEL AS (\n        SELECT MAX(MODEL_CREATED_AT) LATEST_MODEL\n        FROM MLP_PROD.PUBLIC.SIMULATED_PATHS_OUTPUT SIMP\n      ),\n      HISTORICAL AS (\n        SELECT\n          CONCAT(YEAR(RATE_DATE),'-',LPAD(MONTH(RATE_DATE), 2, '0'),'-01') AS RATE_DATE,\n          AVG((SPOT_AVG_LINEHAUL_TOTAL+(PC_MILER_PRACTICAL_MILEAGE*SPOT_FUEL_SURCHARGE))/PC_MILER_PRACTICAL_MILEAGE) AS AVERAGE_OF_ALL_IN_RPM\n        FROM\n          \"DAT_PROD\".\"FTP_FILES\".\"DAT_HISTORICAL_SPOT_RATES\"\n        WHERE\n          PC_MILER_PRACTICAL_MILEAGE > 300\n        GROUP BY 1\n        ORDER BY \"RATE_DATE\"\n      ),\n      PREDICTION_AVERAGE AS (\n        SELECT\n          MONTH,\n          AVG(RATE_PER_MILE) AS average_of_all_in_rpm\n        FROM\n          RPM\n        JOIN MAX_MODEL ON 1=1\n        WHERE\n          LATEST_MODEL = MODEL_CREATED_AT\n          AND PC_MILER_PRACTICAL_MILEAGE_MAX > 300\n        GROUP BY 1\n        ORDER BY 1\n      ),\n      PREDICTION_ALL AS (\n        SELECT \"RATE_DATE\", average_of_all_in_rpm\n        FROM HISTORICAL\n        UNION ALL\n        SELECT MONTH, average_of_all_in_rpm\n        FROM PREDICTION_AVERAGE\n        WHERE MONTH NOT IN (SELECT \"RATE_DATE\" FROM HISTORICAL)\n        ORDER BY \"RATE_DATE\"\n      ),\n      HISTORICAL_PREDICTION AS (\n        SELECT\n          MONTH,\n          AVG(RATE_PER_MILE) AS HIST_RPM_1MO\n        FROM RPM\n        WHERE\n          FORECAST_MONTH_INDEX = 2\n          AND PC_MILER_PRACTICAL_MILEAGE_MAX > 300\n        GROUP BY MONTH\n\n        UNION ALL\n\n        SELECT MONTH, average_of_all_in_rpm\n        FROM PREDICTION_AVERAGE\n        WHERE MONTH NOT IN (SELECT MONTH FROM RPM WHERE FORECAST_MONTH_INDEX = 2 AND PC_MILER_PRACTICAL_MILEAGE_MAX > 300 GROUP BY MONTH)\n\n        )\n\n\n        SELECT\n        PREDICTION_ALL.*,\n        HISTORICAL_PREDICTION.HIST_RPM_1MO\n        FROM PREDICTION_ALL\n        LEFT JOIN HISTORICAL_PREDICTION\n        ON HISTORICAL_PREDICTION.MONTH = PREDICTION_ALL.RATE_DATE\n        WHERE\n        HISTORICAL_PREDICTION.HIST_RPM_1MO IS NOT NULL\n        ORDER BY 1\n        )\nSELECT\n    (TO_CHAR(TO_DATE(CONVERT_TIMEZONE('UTC', 'America/New_York', CAST(forecast_average.\"RATE_DATE\"  AS TIMESTAMP_NTZ))), 'YYYY-MM-DD')) AS \"forecast_average.rate_date\",\n    forecast_average.\"AVERAGE_OF_ALL_IN_RPM\"  AS \"forecast_average.average_of_all_in_rpm\",\n    forecast_average.\"HIST_RPM_1MO\"  AS \"forecast_average.hist_rpm_1_mo\"\nFROM forecast_average\nGROUP BY\n    (TO_DATE(CONVERT_TIMEZONE('UTC', 'America/New_York', CAST(forecast_average.\"RATE_DATE\"  AS TIMESTAMP_NTZ)))),\n    2,\n    3\nORDER BY\n    1\nFETCH NEXT 500 ROWS ONLY",
+    "sql_explain": "EXPLAIN WITH forecast_average AS (WITH RPM AS (\n        SELECT\n          MONTH,\n          MODEL_CREATED_AT,\n          MIL.PC_MILER_PRACTICAL_MILEAGE_MAX ,\n          SIMP.DAT_FORECAST_SCALED / MIL.PC_MILER_PRACTICAL_MILEAGE_MAX RATE_PER_MILE,\n          FORECAST_MONTH_INDEX\n        FROM MLP_PROD.PUBLIC.SIMULATED_PATHS_OUTPUT SIMP\n        JOIN stark_prod.recreated_tables.transfix_lanes_mileage MIL\n          ON simp.TRANSFIX_LANE_ID = mil.TRANSFIX_LANE_ID\n      ),\n      MAX_MODEL AS (\n        SELECT MAX(MODEL_CREATED_AT) LATEST_MODEL\n        FROM MLP_PROD.PUBLIC.SIMULATED_PATHS_OUTPUT SIMP\n      ),\n      HISTORICAL AS (\n        SELECT\n          CONCAT(YEAR(RATE_DATE),'-',LPAD(MONTH(RATE_DATE), 2, '0'),'-01') AS RATE_DATE,\n          AVG((SPOT_AVG_LINEHAUL_TOTAL+(PC_MILER_PRACTICAL_MILEAGE*SPOT_FUEL_SURCHARGE))/PC_MILER_PRACTICAL_MILEAGE) AS AVERAGE_OF_ALL_IN_RPM\n        FROM\n          \"DAT_PROD\".\"FTP_FILES\".\"DAT_HISTORICAL_SPOT_RATES\"\n        WHERE\n          PC_MILER_PRACTICAL_MILEAGE > 300\n        GROUP BY 1\n        ORDER BY \"RATE_DATE\"\n      ),\n      PREDICTION_AVERAGE AS (\n        SELECT\n          MONTH,\n          AVG(RATE_PER_MILE) AS average_of_all_in_rpm\n        FROM\n          RPM\n        JOIN MAX_MODEL ON 1=1\n        WHERE\n          LATEST_MODEL = MODEL_CREATED_AT\n          AND PC_MILER_PRACTICAL_MILEAGE_MAX > 300\n        GROUP BY 1\n        ORDER BY 1\n      ),\n      PREDICTION_ALL AS (\n        SELECT \"RATE_DATE\", average_of_all_in_rpm\n        FROM HISTORICAL\n        UNION ALL\n        SELECT MONTH, average_of_all_in_rpm\n        FROM PREDICTION_AVERAGE\n        WHERE MONTH NOT IN (SELECT \"RATE_DATE\" FROM HISTORICAL)\n        ORDER BY \"RATE_DATE\"\n      ),\n      HISTORICAL_PREDICTION AS (\n        SELECT\n          MONTH,\n          AVG(RATE_PER_MILE) AS HIST_RPM_1MO\n        FROM RPM\n        WHERE\n          FORECAST_MONTH_INDEX = 2\n          AND PC_MILER_PRACTICAL_MILEAGE_MAX > 300\n        GROUP BY MONTH\n\n        UNION ALL\n\n        SELECT MONTH, average_of_all_in_rpm\n        FROM PREDICTION_AVERAGE\n        WHERE MONTH NOT IN (SELECT MONTH FROM RPM WHERE FORECAST_MONTH_INDEX = 2 AND PC_MILER_PRACTICAL_MILEAGE_MAX > 300 GROUP BY MONTH)\n\n        )\n\n\n        SELECT\n        PREDICTION_ALL.*,\n        HISTORICAL_PREDICTION.HIST_RPM_1MO\n        FROM PREDICTION_ALL\n        LEFT JOIN HISTORICAL_PREDICTION\n        ON HISTORICAL_PREDICTION.MONTH = PREDICTION_ALL.RATE_DATE\n        WHERE\n        HISTORICAL_PREDICTION.HIST_RPM_1MO IS NOT NULL\n        ORDER BY 1\n        )\nSELECT\n    (TO_CHAR(TO_DATE(CONVERT_TIMEZONE('UTC', 'America/New_York', CAST(forecast_average.\"RATE_DATE\"  AS TIMESTAMP_NTZ))), 'YYYY-MM-DD')) AS \"forecast_average.rate_date\",\n    forecast_average.\"AVERAGE_OF_ALL_IN_RPM\"  AS \"forecast_average.average_of_all_in_rpm\",\n    forecast_average.\"HIST_RPM_1MO\"  AS \"forecast_average.hist_rpm_1_mo\"\nFROM forecast_average\nGROUP BY\n    (TO_DATE(CONVERT_TIMEZONE('UTC', 'America/New_York', CAST(forecast_average.\"RATE_DATE\"  AS TIMESTAMP_NTZ)))),\n    2,\n    3\nORDER BY\n    1\nFETCH NEXT 500 ROWS ONLY",
+    "supports_pivot_in_db": true,
+    "timezone": "America/New_York",
+    "is_local": true,
+    "table_calcs_complete": true,
+    "tracked_attributes": {
+        "result.drill_menu_build_time": 0.049061,
+        "result.from_cache": false,
+        "result.runtime": "2.583",
+        "result.sql.length": 3023,
+        "result.supports_pivot_in_db": true
+    },
+    "sorts": []
+}, "data": [
+    {
+        "forecast_average.rate_date": {
+            "value": "2021-07-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 3.0934026405641073
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.9519831046811635
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2021-08-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 3.199323333884805
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 3.060473141947995
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2021-09-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 3.245148579183954
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 3.088820715200076
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2021-10-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 3.2894733688448663
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 3.1566296808011
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2021-11-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 3.3510362789470896
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 3.2037108951722653
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2021-12-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 3.6255953371952465
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 3.198441408736975
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2022-01-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 3.5375906311488667
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 3.216843356188551
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2022-02-28"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 3.428487020789055
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 3.3877695565042525
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2022-03-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 3.0504776086969705
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 3.4348143278406624
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2022-04-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.8901725346080513
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 3.3701757444060636
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2022-05-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.8536945291756917
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 3.116379648847658
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2022-06-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.77597142206149
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.9315431533879495
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2022-07-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.7291991274024165
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.8796170936471976
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2022-08-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.6422413149510073
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.767815163029995
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2022-09-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.6544695190372845
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.706871196186918
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2022-10-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.5723495162534746
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.5975410068594393
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2022-11-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.5909420155780634
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.6539214737199264
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2022-12-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.650175860132335
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.5828721344708687
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2023-01-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.4298718560857053
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.527705469955637
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2023-02-28"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.3351783267500723
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.5252577338565443
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2023-03-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.229109960235794
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.338545887393705
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2023-04-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.2068942523829707
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.113135373024648
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2023-05-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.2313507249643223
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.2003136900502605
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2023-06-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.204002538275149
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.204002538275149
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2023-07-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.1608990436264524
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.1608990436264524
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2023-08-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.171682546026553
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.171682546026553
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2023-09-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.134220730304726
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.134220730304726
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2023-10-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.116291939182765
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.116291939182765
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2023-11-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.16921776099883
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.16921776099883
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2023-12-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.182848226078654
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.182848226078654
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2024-01-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.1217952029498033
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.1217952029498033
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2024-02-29"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.143569145681618
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.143569145681618
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2024-03-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.052513502741757
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.052513502741757
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2024-04-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.0551519733994557
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.0551519733994557
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2024-05-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.13920832322232
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.13920832322232
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2024-06-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.162173533854844
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.162173533854844
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2024-07-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.16954880055839
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.16954880055839
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2024-08-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.2318293965390317
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.2318293965390317
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2024-09-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.2404283587583964
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.2404283587583964
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2024-10-31"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.2685592534691934
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.2685592534691934
+        }
+    },
+    {
+        "forecast_average.rate_date": {
+            "value": "2024-11-30"
+        },
+        "forecast_average.average_of_all_in_rpm": {
+            "value": 2.3227497069708014
+        },
+        "forecast_average.hist_rpm_1_mo": {
+            "value": 2.3227497069708014
+        }
+    }
+]}
