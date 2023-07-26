@@ -47,8 +47,9 @@ var webpackConfig = {
     // asp: './src/integration/ASP/asp.js',
     // divergingBar: './src/integration/divergingBar/divergingBar.js',
     // heatmap: './src/integration/heatmap/heatmap.js',
-    lineForecast: './src/integration/line/lineForecast.js',
-    // template: './src/integration/template/template.js',
+    // lineForecast: './src/integration/line/lineForecast.js',
+    // animatedBubble: './src/integration/animations/animatedBubble.js',
+    template: './src/integration/template/template.js',
   },
   output: {
     filename: "[name].js",

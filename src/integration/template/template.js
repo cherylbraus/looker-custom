@@ -1,7 +1,7 @@
 import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
 import { formatType, handleErrors } from '../common/utils'
-import { object } from './line_forecast' //'./heatmap' //asp './sparklinesNew' ./hexmap conwinrate asp cycle
+import { object } from './barRace' //barRace //'./heatmap' //asp './sparklinesNew' ./hexmap conwinrate asp cycle
 import * as $ from 'jquery'
 
 // Query the element
