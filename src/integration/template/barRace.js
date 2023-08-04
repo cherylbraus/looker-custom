@@ -1,5 +1,6 @@
 import * as d3 from 'd3'
 import * as d3Collection from 'd3-collection'
+import { isCallLikeExpression } from 'typescript';
 import { formatType, handleErrors } from '../common/utils'
 
 export const object = {
@@ -10,45 +11,85 @@ export const object = {
     id: "bar_race",
     label: "ZDev Bar Race",
     options: {
-        y_label: {
-            type: "string",
-            label: "Y Axis Label",
-            display: "text",
-            default: "",
-            section: "Axes",
-            order: 1
-        },  
-        y_format: {
-            type: "string",
-            label: "Y Value Format",
-            display: "text",
-            default: ",.2f",
-            section: "Axes",
-            order: 2
-        },
-        show_xlabel: {
-            type: "boolean",
-            label: "Show X Axis Label",
-            default: "false",
-            section: "Axes",
-            order: 3
-        },
         x_label: {
             type: "string",
             label: "X Axis Label",
             display: "text",
             default: "",
             section: "Axes",
-            order: 4
+            order: 1
         },
         x_format: {
             type: "string",
             label: "X Value Format",
             display: "text",
-            default: "%b %-d",
+            default: ",.0f",
+            section: "Axes",
+            order: 2
+        },   
+        x_ticklabel_size: {
+            type: "string",
+            label: "X-Tick Font Size",
+            display: "text",
+            default: "12",
+            section: "Axes",
+            order: 3
+        },
+        show_ylabel: {
+            type: "boolean",
+            label: "Show Y Axis Label",
+            default: "false",
+            section: "Axes",
+            order: 4
+        },
+        y_label: {
+            type: "string",
+            label: "Y Axis Label",
+            display: "text",
+            default: "",
             section: "Axes",
             order: 5
-        },   
+        },  
+        axes_label_size: {
+            type: "string",
+            label: "X/Y Axis Label Size",
+            display: "text",
+            default: "12",
+            section: "Axes",
+            order: 6
+        },
+        bar_number: {
+            type: "string",
+            label: "# Bars Show",
+            display: "text",
+            default: "10",
+            section: "Setup",
+            order: 1
+        },
+        duration: {
+            type: "string",
+            label: "Transition Duration",
+            display: "text",
+            default: "250",
+            section: "Setup",
+            order: 2
+        },
+        interpolations: {
+            type: "string",
+            label: "# Interpolations Between Each Period",
+            display: "text",
+            default: "10",
+            section: "Setup",
+            order: 3
+        },
+        label_size: {
+            type: "string",
+            label: "Bar Label Font Size",
+            display: "text",
+            default: "12",
+            section: "Setup",
+            order: 4
+        }
       },
 
     // Set up the initial state of the visualization
@@ -77,8 +118,58 @@ export const object = {
               .tick {
                 font-family: Roboto;
               }
+              .axis-label {
+                fill: #3a4245;
+                // font-size: 12px;
+                font-family: 'Open Sans', 'Helvetica', 'sans-serif';
+                text-anchor: middle;
+              }
+  
+              .y-axis, .x-axis {
+                font-family: 'Open Sans', 'Helvetica', 'sans-serif';
+              }
+  
+              .zero-line {
+                stroke: #ccd6eb;
+                stroke-width: 1.0;
+              }
+  
+              .x-axis .domain {
+                stroke: #ccd6eb;
+                stroke-width: 1;
+              }
+  
+              .y-axis .domain {
+                stroke: none;
+              }
+  
+              .x-axis text, .y-axis text {
+                font-size: 12px;
+                color: #3a4245;
+                visibility: visible;
+              }
+  
+              .inner-x-axis text {
+                font-size: 9px;
+                color: #3a4245;
+                visibility: visible;
+              }
+  
+              .x-axis text .hide, .y-axis text .hide {
+                visibility: hidden;
+              }
+  
+              .x-axis line, .y-axis line {
+                stroke: #f0f0f0;
+                stroke-width: 1;
+                opacity: 1;
+              }
+  
+              .x-axis line .hide, .y-axis line .hide {
+                opacity: 0;
+              }
               .label {
-                font-size: 10px;
+                font-size: 12px;
               }
               .tooltip {
                 box-shadow: rgb(60 64 67 / 30%) 0px 1px 2px 0px, rgb(60 64 67 / 15%) 0px 2px 6px 2px;
@@ -129,9 +220,9 @@ export const object = {
 
     try {
 
-        const margin = {top: 35, right: 30, bottom: 50, left: 70};
+        const margin = {top: 25, right: 6, bottom: 80, left: 20};
         const width = element.clientWidth - margin.left - margin.right;
-        const height = element.clientHeight - margin.top - margin.bottom;
+        let height = element.clientHeight - margin.top - margin.bottom;
     
         d3.json('./dataBarRace.json').then(function(dat) { 
             // setup
@@ -144,8 +235,8 @@ export const object = {
     
             const group = svg.append('g')
                 .attr('transform', `translate(${margin.left},${margin.top})`)
-                .attr('width', width)
-                .attr('height', height)
+                .attr('width', '100%')
+                .attr('height', '100%')
                 .classed('group', true)
                 // .style('pointer-events', 'all')
 
@@ -190,9 +281,11 @@ export const object = {
 
             const names = new Set(data_final.map(d => d.name))
             const dates = new Set(data_final.map(d => d.date))
+            const cats = new Set(data_final.map(d => d.cat))
 
             console.log("names", names)
             console.log("dates", dates)
+            console.log("cats", cats)
 
             // Create a nested structure with d3.nest()
             var nest = d3.nest()
@@ -213,12 +306,15 @@ export const object = {
 
             console.log('datevalues', datevalues)
 
-            const duration = 250;
-            const n = 12;
-            const k = 10;
+            const duration = config.duration ? Number(config.duration) : 250;
+            const n = config.bar_number ? Number(config.bar_number) : 10;;
+            const k = config.interpolations ? Number(config.interpolations) : 10;
 
             function rank(value) {
-                const data = Array.from(names, name => ({name, value: value(name)}));
+                const data = Array.from(names, name => {
+                    const cat = data_final.find(x => x.name === name)
+                    return ({name, value: value(name), category: cat['cat']})
+                });
                 data.sort((a, b) => d3.descending(a.value, b.value));
                 for (let i = 0; i < data.length; ++i) data[i].rank = Math.min(n, i);
                 return data;
@@ -227,491 +323,316 @@ export const object = {
             const test = rank(name => datevalues[0][1].get(name))
             console.log("test rank", test)
 
-            
-
-            // let data_group = []
-            // dates.forEach(d => {
-            //     let mainEntry = {}
-            //     mainEntry['date'] = parseTime(d)
-
-            //     const tmp = data_final.filter(t => {
-            //         return (t.date == d)
-            //     })
-
-            //     let dataSet = []
-            //     tmp.forEach(t => {
-            //         let entry = {}
-            //         entry['name'] = t['name']
-            //         entry['cat'] = t['cat']
-            //         entry['value'] = +t['value']
-            //         dataSet.push(entry)
-            //     })
-
-            //     mainEntry['dataSet'] = dataSet
-            //     data_group.push(mainEntry)
-            // })
-
-            // data_group.sort((a,b) => a.date - b.date)
-
-            // data_group.forEach(d => {
-            //     d['dataSet'].sort((a, b) => b.value - a.value)
-            //     d['dataSet'].forEach((dd, i) => {
-            //         dd.rank = i
-            //     })
-            // })
-
-            // console.log("data_group", data_group)
-
-            // // axes
-            // const xScale = d3.scaleLinear()
-            //     .range([0, width])
-
-            // const xAxisGenerator = d3.axisBottom()
-            //     .scale(xScale)
-            //     .tickPadding(10)
-            //     .tickSize(0)
-            //     .tickFormat(d => `${d}`)
-
-            // const xAxis = group.append('g')
-            //     .call(xAxisGenerator)
-            //         .style("transform", `translateY(${height}px)`)
-            //         .attr("class", "x-axis")
-            
-            // const yScale = d3.scaleBand()
-            //     .range([0, height])
-            //     .padding(0.2)
-
-            // const yAxisGenerator = d3.axisLeft()
-            //     .scale(yScale)
-            //     .tickPadding(10)
-            //     .tickFormat(d => `${d}`)
-
-            // const yAxis = group.append('g')
-            //     .call(yAxisGenerator)
-            //         .attr("class", "y-axis")
-
-            // // chart
-            // const duration = 250;
-            // const n = 12;
-            // const k = 10;
-
-            // function rank(value) {
-            //     const copyObject = (obj) => {
-            //         let result = {}
-            //         Object.entries(obj).forEach(([key, value]) => {
-            //             result[key] = value;
-            //         });
-            //         return result
-            //     };
-            //     data = copyObject(data_group);
-            //     console.log("copied data", data)
-            //     for (let i = 0; i < data.length; ++i) data[i].rank = Math.min(n, i);
-            //     return data;
-            // };
-
-            // function keyframes() {
-            //     const keyframes = [];
-            //     let ka, a, kb, b;
-            //     for ([[ka, a], [kb, b]] of d3.pairs(dates)) {
-            //         for (let i = 0; i < k; ++i) {
-            //             const t = i / k;
-            //             keyframes.push([
-            //                 new Date(ka * (1 - t) + kb * t),
-            //                 rank(name => (a.get(name) || 0) * (1  - t) + (b.get(name) || 0) * t)
-            //             ])
-            //         }
-            //     }
-            //     keyframes.push([new Date(kb), rank(name => b.get(name) || 0)])
-            //     return keyframes;
-            // }
-
-            // // replay;
-
-            // const updateBars = bars(svg);
-            // const updateAxis = axis(svg);
-            // const updateLabels = labels(svg);
-            // const updateTicker = ticker(svg);
-
-            // yield svg.node();
-
-            // for (const keyframe of keyframes) {
-            //     const transition = svg.transition()
-            //         .duration(duration)
-            //         .ease(d3.easeLinear);
-
-            //     xScale.domain([0, keyframe[1][0].value]);
-
-            //     updateAxis(keyframe, transition);
-            //     updateBars(keyframe, transition);
-            //     updateLabels(keyframe, transition);
-            //     updateTicker(keyframe, transition);
-
-            //     invalidation.then(() => svg.interrupt());
-            //     await transition.end();
-            // }
-
-
-            // // axes
-            // const xScale = d3.scaleTime()
-            //     // .domain(d3.extent(data_ready, d => dateAccessor(d)))
-            //     .domain([d3.min(data_ready, d => dateAccessor(d)), d3.max(forecast, d => dateAccessor(d))])
-            //     .range([0, width])
-
-            // const xAxisGenerator = d3.axisBottom()
-            //     .scale(xScale)
-            //     .tickPadding(10)
-            //     .tickSize(0)
-            //     .tickFormat((d) => `${d3.timeFormat(config.x_format)(d)}`)
-
-            // const xAxis = group.append('g')
-            //     .call(xAxisGenerator)
-            //         .style('transform', `translateY(${height}px)`)
-            //         .attr('class', 'x-axis')
-
-            // if (config.show_xlabel == "true") {
-            //     const xAxisLabel = xAxis.append('text')
-            //         .attr('class', 'axis-label')
-            //         .attr('x', width / 2)
-            //         .attr('y', margin.bottom - 7)
-            //         .style('text-anchor', 'middle')
-            //         .text(config.x_label ? config.x_label : dimensions[0].label_short) // use label_short
-            // }
-            
-            // const yMin = Math.min(d3.min(data_ready.map(d => valueAccessor(d))), 
-            //                         d3.min(forecast.map(d => d.stddown)))
-            // const yMax = Math.max(d3.max(data_ready.map(d => valueAccessor(d))), 
-            //                         d3.max(forecast.map(d => d.stdup)))
-
-            // const yScale = d3.scaleLinear()
-            //     .domain([yMin, yMax])
-            //     .range([height, 0])
-
-            // const yAxisGenerator = d3.axisLeft()
-            //     .scale(yScale)
-            //     .tickPadding(10)
-            //     .tickSize(-width)
-            //     .tickFormat((d) => `${d3.format(config.y_format)(d)}`)
-
-            // const yAxis = group.append('g')
-            //     .call(yAxisGenerator)
-            //         .attr('class', 'y-axis')
-
-            // const yAxisLabel = yAxis.append('text')
-            //     .attr('class', 'axis-label')
-            //     .attr('x', (-height/2))
-            //     .attr('y', -margin.left + 13)
-            //     .style('transform', 'rotate(-90deg)')
-            //     .text(config.y_label ? config.y_label : dimensions[1].label_short) // use label_short
-
-            // console.log("axes", xScale.domain(), xScale.range(), yScale.domain(), yScale.range())
-
-            // // draw data
-            // const area = d3.area()
-            //     .x(function(d) { return xScale(d.date)})
-            //     .y0(function(d) { return yScale(d.stdup)})
-            //     .y1(function(d) { return yScale(d.stddown)})
-
-            // const stdarea = group.append("path")
-            //     .datum(forecast)
-            //     .attr('class', 'area')
-            //     .attr('d', area)
-            //     .style("fill", "lightgrey")
-            //     .style("opacity", .6)
-
-            // console.log("stdarea", stdarea)
-
-            // const line = d3.line()
-            //     .defined(function(d) { return d['value'] != null})
-            //     .x(function(d) { return xScale(d.date)})
-            //     .y(function(d) { return yScale(d['value'])})
-
-            // const line2 = d3.line()
-            //     .defined(function(d) { return d['histpred'] != null})
-            //     .x(function(d) { return xScale(d.date)})
-            //     .y(function(d) { return yScale(d['histpred'])})
-
-            // if (config.curve_bool == "true") {
-            //     line    
-            //         .curve(d3.curveNatural)
-            //     line2
-            //         .curve(d3.curveNatural)
-            // }
-
-            // const histLine = group.append("path")
-            //     .data([hist])
-            //     .attr('class', 'histline')
-            //     .attr('d', line)
-            //     .attr('fill', 'none')
-            //     .attr('stroke', '#007b82')
-            //     .attr('stroke-width', '1.5px')
-
-            // const histpredLine = group.append("path")
-            //     .data([hist])
-            //     .attr('class', 'histpredline')
-            //     .attr('d', line2)
-            //     .attr('fill', 'none')
-            //     .attr('stroke', '#007b82')
-            //     .attr('stroke-width', '1.5px')
-            //     .attr('stroke-dasharray', '3 3')
-
-            // const forecastLine = group.append("path")
-            //     .data([forecast])
-            //     .attr('class', 'forecastline')
-            //     .attr('d', line)
-            //     .attr('fill', 'none')
-            //     .attr('stroke', '#323232')
-            //     .attr('stroke-width', '2px')
-            //     .attr('stroke-dasharray', '3 3')
-
-            // // legend
-            // const legend = group.append('g')
-            //     .attr("transform", `translate(0, -22)`)
-            //     .classed("legendContainer", true)
-
-            // const legendHist = legend.append('g')
-            //     .classed('legend', true)
-            //     .attr('transform', `translate(0, 0)`)
-
-            // legendHist.append("line")
-            //     .attr('x1', 0)
-            //     .attr('x2', 25)
-            //     .attr('y1', 2)
-            //     .attr('y2', 2)
-            //     .style('stroke', '#007b82')
-            //     .style('stroke-width', '1.5px')
-
-            // legendHist.append('text')
-            //     .attr('x', 30)
-            //     .attr('y', 3)
-            //     .style('text-anchor', 'start')
-            //     .style('dominant-baseline', 'middle')
-            //     .style('font-size', 11)
-            //     .text('Historical')
-
-            // const legendHistPred = legend.append('g')
-            //     .classed('legend', true)
-            //     .attr('transform', 'translate(90, 0)')
-
-            // legendHistPred.append("line")
-            //     .attr('x1', 0)
-            //     .attr('x2', 25)
-            //     .attr('y1', 2)
-            //     .attr('y2', 2)
-            //     .style('stroke', '#007b82')
-            //     .style('stroke-width', '1.5px')
-            //     .attr('stroke-dasharray', '3 3')
-
-            // legendHistPred.append('text')
-            //     .attr('x', 30)
-            //     .attr('y', 3)
-            //     .style('text-anchor', 'start')
-            //     .style('dominant-baseline', 'middle')
-            //     .style('font-size', 11)
-            //     .text('Hist. Prediction') 
-
-            // const legendForecast = legend.append('g')
-            //     .classed('legend', true)
-            //     .attr('transform', 'translate(210, 0)')
-
-            // legendForecast.append("line")
-            //     .attr('x1', 0)
-            //     .attr('x2', 25)
-            //     .attr('y1', 2)
-            //     .attr('y2', 2)
-            //     .style('stroke', '#323232')
-            //     .style('stroke-width', '2px')
-            //     .attr('stroke-dasharray', '3 3')
-
-            // legendForecast.append('text')
-            //     .attr('x', 30)
-            //     .attr('y', 3)
-            //     .style('text-anchor', 'start')
-            //     .style('dominant-baseline', 'middle')
-            //     .style('font-size', 11)
-            //     .text('Forecast') 
-
-            // const legendProgression = legend.append('g')
-            //     .classed('legend', true)
-            //     .attr('transform', 'translate(300, 0)')
-
-            // legendProgression.append("rect")
-            //     .attr('x', 0)
-            //     .attr('y', 0)
-            //     .attr('width', 25)
-            //     .attr('height', 5)
-            //     .attr("fill", "lightgrey")
-            //     .attr("fill-opacity", .6)
-
-            // legendProgression.append('text')
-            //     .attr('x', 30)
-            //     .attr('y', 3)
-            //     .style('text-anchor', 'start')
-            //     .style('dominant-baseline', 'middle')
-            //     .style('font-size', 11)
-            //     .text('Progression to +/- 1 Standard Deviation')
-
-            // // tooltips
-            // // const tt = d3.select(".tooltip")
-            // const tooltip = d3.select(".tooltip")
-            //     .style("position", "absolute")
-            //     .style("padding", "5px")
-            //     .style("background-color", "white")
-            //     .style("opacity", 0)
-            //     .style("border-radius", "4px")
-            //     .style("display", "block")
-            //     .style("border", "solid")
-            //     .style("border-color", "lightgrey")
-            //     .style("border-width", ".5px")
-            //     .attr("pointer-events", "none")
-            //     .classed("tooltip", true)
-            
-            // tooltip.html(`<div id="tt-header"></div><p id="tt-body"></p>`)
-
-            // const tooltipHeader = tooltip.select("#tt-header")
-            // const tooltipBody = tooltip.select("#tt-body")
-
-            // const tt = group.append("g")
-            //     .classed("tooltip", true)
-            //     .attr("pointer-events", "all")
-
-            // const tooltipCircles = tt.append("g")
-            //     .classed("tooltipCircle", true)
-
-            // const tooltipCirclesPred = tt.append("g")
-            //     .classed("tooltipCirclePred", true)
-    
-            // const tooltipBox = tt.append("rect")
-            //     .classed("tooltipBox", true)
-            //     .attr("width", width)
-            //     .attr("height", height)
-            //     .attr("fill", "transparent")
-            //     .style('pointer-events', 'all')
-            //     .on("mousemove", drawTooltip)
-            //     .on("mouseout", removeTooltip)
-
-            // function removeTooltip() {
-            //     tooltip 
-            //         .transition()
-            //         .duration(0)
-            //         .style("opacity", 0)
-            //     tooltipCircles.selectAll("circle").remove();
-            //     tooltipCirclesPred.selectAll("circle").remove();
-            // }
-
-            // function drawTooltip() {
-            //     const mousePosition = d3.mouse(this)
-            //     let hoveredDate = xScale.invert(mousePosition[0])
-            //     hoveredDate = new Date(hoveredDate.getFullYear(), hoveredDate.getMonth(), hoveredDate.getDate(), 0, 0, 0)
-            //     const lasthistDate = lasthist.date
-
-            //     console.log("date comp", hoveredDate, lasthistDate)
-
-            //     const hoveredDayNum = hoveredDate.getDate()
-            //     if (hoveredDayNum > 15) {
-            //         hoveredDate = new Date(hoveredDate.getFullYear(), hoveredDate.getMonth()+1, 1, 0, 0, 0)
-            //     } else {
-            //         hoveredDate = new Date(hoveredDate.getFullYear(), hoveredDate.getMonth(), 1, 0, 0, 0)
-            //     }
-
-            //     // if forecast date, change date to be closest month start
-            //     const type = hoveredDate > lasthist.date ? 'forecast' : 'hist'
-
-            //     console.log("updated hoveredDate", hoveredDate)
-
-            //     const ttdata = []                
+            const keyframes = function() {
+                const keyframes = [];
+                let ka, a, kb, b;
+              
+                for (let i = 0; i < datevalues.length - 1; i++) {
+                  [ka, a] = datevalues[i];
+                  [kb, b] = datevalues[i + 1];
+              
+                  for (let j = 0; j < k; ++j) {
+                    const t = j / k;
+                    keyframes.push([
+                      new Date(ka * (1 - t) + kb * t),
+                      rank(name => (a.get(name) || 0) * (1 - t) + (b.get(name) || 0) * t)
+                    ]);
+                  }
+                }
                 
-            //     if (hoveredDate <= lasthist.date) {
-            //         const filtered = hist.filter(d => {
-            //             return d3.timeFormat("%b %d %Y")(d.date) == d3.timeFormat("%b %d %Y")(hoveredDate)
-            //         })
+                [kb, b] = datevalues[datevalues.length - 1];
+                keyframes.push([new Date(kb), rank(name => b.get(name) || 0)]);
+              
+                return keyframes;
+            }();
 
-            //         console.log("filtered hist", filtered)
+            console.log("keyframes", keyframes)
 
-            //         if (filtered.length > 0) {
-            //             ttdata.push(filtered[0])
-            //         }
-            //     } else {
-            //         const filtered = forecast.filter(d => {
-            //             return d3.timeFormat("%b %d %Y")(d.date) == d3.timeFormat("%b %d %Y")(hoveredDate)
-            //         })
+            // Step 1: Use Array.map and Array.concat.apply to achieve the functionality of flatMap
+            const flattenedData = Array.prototype.concat.apply([], keyframes.map((keyframe) => keyframe[1]));
 
-            //         console.log('filtered forecast', filtered)
+            // Step 2: Use d3.nest to group by name
+            const nameframes = d3.nest()
+                .key(function(d) { return d.name; })
+                .entries(flattenedData);
 
-            //         if (filtered.length > 0) {
-            //             ttdata.push(filtered[0])
-            //         }
-            //     }
+            console.log("nameframes", nameframes)
 
-            //     tooltipCircles.selectAll("circle").remove()
-            //     tooltipCircles.selectAll("circle")
-            //         .data(ttdata)
-            //         .enter()
-            //         .append("circle")
-            //         .attr("r", 4)
-            //         .attr("cx", d => xScale(d.date))
-            //         .attr("cy", d => yScale(d.value))
-            //         .style("fill", d => d.date > lasthist.date ? "#323232" :"#007b82")
+            function flatten(array) {
+                return [].concat.apply([], array);
+            }
+            
+            function pairs(array, callback = (a, b) => [a, b]) {
+                let result = [];
+                for (let i = 0; i < array.length - 1; i++) {
+                    result.push(callback(array[i], array[i + 1]));
+                }
+                return result;
+            }
+            
+            const prev = new Map(flatten(nameframes.map(nameframe => pairs(nameframe.values, (a, b) => [b, a]))));
+            const next = new Map(flatten(nameframes.map(nameframe => pairs(nameframe.values))));      
 
-            //     tooltipCirclesPred.selectAll("circle").remove()
-            //     if (ttdata[0].date <= lasthist.date) {
-            //         tooltipCirclesPred.selectAll("circle")
-            //             .data(ttdata)
-            //             .enter()
-            //             .append("circle")
-            //             .attr("r", 4)
-            //             .attr("cx", d => xScale(d.date))
-            //             .attr("cy", d => yScale(d.histpred))
-            //             .style("fill", "#ffffff")
-            //             .style("stroke", "#007b82")
-            //     }
+            console.log("prev", prev)
+            console.log("next", next)
 
-            //     console.log("ttdata", ttdata)
+            // DEFINE GROUPS
+            const barGroup = group.append('g').attr('class', 'bar-group')
 
-            //     // have title case for the labels in the tooltip text
-            //     function titleCase(str) {
-            //         let sentence = str.toLowerCase().split(" ");
-            //         for (let i = 0; i < sentence.length; i++) {
-            //         sentence[i] = sentence[i][0].toUpperCase() + sentence[i].slice(1)
-            //         }
-            //         return sentence.join(" ")
-            //     }
+            const labelGroup = group.append('g').attr('class', 'label-group').attr("clip-path", "url(#clip)")
 
-            //     tooltip 
-            //         .transition()
-            //         .duration(0)
-            //         .style("opacity", 0.95)
+            const axisGroup = group.append('g').attr('class', 'axis-group')
+            const xAxisLabel = axisGroup.append("text")
+                .attr("class", "axis-label")
+                .attr("x", width / 2)
+                .attr("y", margin.top - 25)
+                .attr("font-size", config.axes_label_size ? `${config.axes_label_size}px` : `12px`)
+                .text(config.x_label ? config.x_label : measures[0].label_short)
+            if (config.show_ylabel == "true") {
+                const yAxisLabel = axisGroup.append("text")
+                    .attr("class", "axis-label")
+                    .attr("x", (-height / 2))
+                    .attr("y", -margin.left + 20)
+                    .style("transform", "rotate(-90deg)")
+                    .attr("text-anchor", "middle")
+                    .attr("font-size", config.axes_label_size ? `${config.axes_label_size}px` : `12px`)
+                    .text(config.y_label ? config.y_label : dimensions[0].label_short)
+            }
 
-            //     tooltipHeader.html(d3.timeFormat("%b %Y")(ttdata[0].date) + "<hr>")
-            //     if (type == 'hist') {
-            //         tooltipBody.html(
-            //             `<span style="float:left;">${titleCase(config.y_label ? config.y_label : dimensions[1].label_short)}:&nbsp&nbsp</span>` + // use label_short
-            //             `<span style="float:right;">${d3.format(config.y_format)(ttdata[0].value)}</span><br>` + 
-            //             `<span style="float:left;">Historical Prediction:&nbsp&nbsp</span>` + 
-            //             `<span style="float:right;">${d3.format(config.y_format)(ttdata[0].histpred)}</span>` 
-            //         )
-            //     } else {
-            //         tooltipBody.html(
-            //             `<span style="float:left;">${titleCase(config.y_label ? config.y_label : dimensions[1].label_short)}:&nbsp&nbsp</span>` + // use label_short
-            //             `<span style="float:right;">${d3.format(config.y_format)(ttdata[0].value)}</span><br>` + 
-            //             `<span style="float:left;">Upper Range:&nbsp&nbsp</span>` + 
-            //             `<span style="float:right;">${d3.format(config.y_format)(ttdata[0].stdup)}</span><br>` + 
-            //             `<span style="float:left;">Lower Range:&nbsp&nbsp</span>` + 
-            //             `<span style="float:right;">${d3.format(config.y_format)(ttdata[0].stddown)}</span>` 
-            //         )
-            //     }                
+            const tickerGroup = group.append('g').attr('class', 'ticker-group')
+            let tick = tickerGroup.append("text")
 
-            //     if (d3.event.pageY < height * 0.7) {
-            //         tooltip.style("top", d3.event.pageY - 30 + 'px')
-            //     } else {
-            //         tooltip.style("top", d3.event.pageY - 150 + 'px')
-            //     }
+            let isAnimationCompleted = false
 
-            //     if (d3.event.pageX < width * 0.7) {
-            //         tooltip.style("left", d3.event.pageX + 10 + 'px')
-            //     } else {
-            //         tooltip.style("left", d3.event.pageX - 250 + 'px')
-            //     }
-            // }
+            svg.append("defs").append("clipPath")
+                .attr("id", "clip")
+                .append("rect")
+                .attr("x", margin.left)
+                .attr("y", 0)
+                .attr("width", width - margin.left)
+                .attr("height", height + margin.top);
+
+                    
+            function bars(group) {
+                let bar = group.selectAll(".bars");
+            
+                return ([date, data], transition) => {
+                    bar = bar.data(data.slice(0, n), d => d.name);
+            
+                    bar.exit().remove();
+            
+                    bar = bar.enter().append("rect")
+                        .attr("class", "bars")
+                        .attr("fill", d => {
+                            return colorScale(d.category)
+                        })
+                        .attr("fill-opacity", .80)
+                        .attr("height", y.bandwidth())
+                        .attr("x", x(0))
+                        .attr("y", d => y((prev.get(d) || d).rank))
+                        .attr("width", d => x((prev.get(d) || d).value) - x(0))
+                        .merge(bar);
+            
+                    bar.transition(transition)
+                        .attr("y", d => y(d.rank))
+                        .attr("width", d => x(d.value) - x(0));
+                }
+            }
+
+            function labels(group) {
+                let labelName = group.selectAll(".labelName")
+                    .style("font-variant-numeric", "tabular-nums")
+                let labelValue = group.selectAll(".labelValue")
+                    .style("font-variant-numeric", "tabular-nums")
+            
+                return ([date, data], transition) => {
+                    labelName = labelName.data(data.slice(0, n), d => d.name);
+                    labelValue = labelValue.data(data.slice(0, n), d => d.name);
+            
+                    labelName.exit().remove();
+                    labelValue.exit().remove();
+            
+                    labelName = labelName.enter().append("text")
+                        .attr("class", "labelName")
+                        .attr("text-anchor", "end")
+                        .attr("transform", d => `translate(${x((prev.get(d) || d).value)},${y((prev.get(d) || d).rank)})`)
+                        .attr("y", y.bandwidth() / 2)
+                        .attr("x", -6)
+                        .attr("dy", "-0.25em")
+                        .attr("font-size", config.label_size ? Number(config.label_size) : 10)
+                        .style("font-weight", "bold")
+                        .style("fill", "black")
+                        .text(d => d.name)
+                        .merge(labelName);
+            
+                    labelValue = labelValue.enter().append("text")
+                        .attr("class", "labelValue")
+                        .attr("text-anchor", "end")
+                        .attr("transform", d => `translate(${x((prev.get(d) || d).value)},${y((prev.get(d) || d).rank)})`)
+                        .attr("y", y.bandwidth() / 2)
+                        .attr("x", -6)
+                        .attr("dy", "1.0em")
+                        .attr("font-size", config.label_size ? Number(config.label_size) : 10)
+                        .style("font-weight", "normal")
+                        .style("fill", "#262626")
+                        .text(d => formatNumber((prev.get(d) || d).value))
+                        .merge(labelValue);
+            
+                    labelName.transition(transition)
+                        .attr("transform", d => `translate(${x(d.value)},${y(d.rank)})`);
+            
+                    labelValue.transition(transition)
+                        .attr("transform", d => `translate(${x(d.value)},${y(d.rank)})`)
+                        .tween("text", function(d) {
+                            const that = d3.select(this)
+                            const i = d3.interpolateNumber((prev.get(d) || d).value, d.value)
+                            return function(t) {
+                                that.text(formatNumber(i(t)))
+                            }
+                        });
+                }
+            }
+
+            const formatNumber = d3.format(config.x_format)
+            const formatDate = d3.utcFormat("%Y")
+
+            function ticker(group) {
+                tick
+                    .attr("class", "tickval")
+                    .style("font-weight", "bold")
+                    .style("font-size", "20px")
+                    .style("font-variant-numeric", "tabular-nums")
+                    .attr("text-anchor", "end")
+                    .attr("x", width - 6)
+                    .attr("y", margin.top + barSize * (n - 0.45))
+                    .attr("dy", "0.32em")
+                    .text(formatDate(keyframes[0][0]))
+
+                return ([date, data], transition) => {
+                    tick.transition(transition)
+                        .text(formatDate(date))
+                }
+            }
+
+            function axis(svg) {
+                let g = svg.selectAll(".axis")
+                    .data([null]);
+            
+                // Enter
+                g = g.enter().append("g").attr("class", "axis")
+                    .merge(g)
+                    .attr("transform", `translate(0,${margin.top})`);
+            
+                const axis = d3.axisTop(x)
+                    .ticks(width / 160)
+                    .tickSizeOuter(0)
+                    .tickSizeInner(-barSize * (n + y.padding()))
+                    .tickFormat(d => d3.format(config.x_format)(d))
+            
+                return (_, transition) => {
+                    g = transition.select(".axis");
+            
+                    // Remove old ticks before new ones are added
+                    if (!isAnimationCompleted) {
+                        g.selectAll("*").remove();
+                    }
+            
+                    g.call(axis)
+                        .selectAll("text")
+                        .style("font-size", config.x_ticklabel_size ? `${config.x_ticklabel_size}px` : '12px');
+            
+                    g.select("path")
+                        .attr("opacity", 0)
+
+                    // g.select(".tick:first-of-type text").remove();
+                    g.selectAll(".tick:not(:first-of-type) line").attr("stroke", "white");
+                    g.select(".domain").remove();
+                };
+            }            
+
+            // INSERT COLOR STUFF HERE
+
+            // AXES
+            const x = d3.scaleLinear([0, 1], [margin.left, width - margin.right])
+
+            const barSize = height/n
+
+            const y = d3.scaleBand()
+                .domain(d3.range(n + 1))
+                .rangeRound([margin.top, margin.top + barSize * (n + 1 + 0.1)])
+                .padding(0.1)
+
+            console.log("original y bandwidth", y.bandwidth())
+
+            const colorScale = d3.scaleOrdinal()
+                .domain(cats)
+                .range(d3.schemeSet3)
+
+            height = margin.top + barSize * n + margin.bottom
+
+            // BUILD CHART
+            var chart = function(i) { 
+                if(i >= keyframes.length) return; // stop recursion when all keyframes have been shown
+              
+                var keyframe = keyframes[i];
+                // console.log("chart keyframe", keyframe)
+              
+                var transition = group.transition()
+                  .duration(duration)
+                  .ease(d3.easeLinear);
+              
+                // Extract the top bar’s value.
+                x.domain([0, keyframe[1][0].value]);
+              
+                var updateBars = bars(barGroup);
+                var updateAxis = axis(axisGroup);
+                var updateLabels = labels(labelGroup);
+                var updateTicker = ticker(tickerGroup);
+              
+                updateBars(keyframe, transition);
+                updateAxis(keyframe, transition);
+                updateLabels(keyframe, transition);
+                updateTicker(keyframe, transition);
+              
+                transition.on('end', function() {
+                  isAnimationCompleted = true
+                  chart(i + 1); // call the next keyframe when the transition ends
+                });
+              }
+              
+              chart(0);  // start the chart with the first keyframe
+              
+        
+            // legend
+            const legend = group.append('g')
+                .attr("transform", `translate(${margin.left}, ${height - margin.top - margin.bottom/2})`)
+                .classed("legendContainer", true)
+
+            let catSort = Array.from(cats)
+            catSort.sort()
+
+            catSort.forEach((d, i) => {
+                console.log("i", i, d)
+                let curr = legend.append('g')
+                    .classed('legend', true)
+                    .attr('transform', `translate(${100 * i}, 0)`)
+
+                curr.append("rect")
+                    .attr("x", 0)
+                    .attr("y", 0)
+                    .attr("width", 20)
+                    .attr("height", 20)
+                    .attr("fill", colorScale(d))
+
+                curr.append("text")
+                    .attr("x", 25)
+                    .attr("y", 12)
+                    .style("text-anchor", "start")
+                    .style("dominant-baseline", "middle")
+                    .style("font-size", 12)
+                    .text(`${d}`)
+                
+            })
         })
         
     } catch(error) {

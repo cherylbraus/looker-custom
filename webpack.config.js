@@ -49,7 +49,8 @@ var webpackConfig = {
     // heatmap: './src/integration/heatmap/heatmap.js',
     // lineForecast: './src/integration/line/lineForecast.js',
     // animatedBubble: './src/integration/animations/animatedBubble.js',
-    template: './src/integration/template/template.js',
+    barRace: './src/integration/animations/barRace.js',
+    // template: './src/integration/template/template.js',
   },
   output: {
     filename: "[name].js",
